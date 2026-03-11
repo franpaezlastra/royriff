@@ -1,0 +1,437 @@
+/*
+   ESTILOS CHECKOUT WOOCOMMERCE - ROY RIFF
+   Pegar TODO en Apariencia > Personalizar > CSS adicional
+   Luego hacer clic en PUBLICAR.
+*/
+
+/* ===== FORZAR HEADER Y FOOTER EN CHECKOUT ===== */
+body.woocommerce-checkout .site-header,
+body.woocommerce-checkout header,
+body.woocommerce-checkout .site-footer,
+body.woocommerce-checkout footer {
+  display: block !important;
+  visibility: visible !important;
+}
+
+body.woocommerce-checkout .site-content {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* ===== PRUEBA: si ves el título naranja, el CSS está cargando ===== */
+.woocommerce-checkout .entry-title,
+body.woocommerce-checkout h1.entry-title,
+.woocommerce-checkout h1 {
+  color: #FF460D !important;
+  font-size: 2rem !important;
+}
+
+/* ===== CONTENEDOR ===== */
+body.woocommerce-checkout,
+.woocommerce form.checkout,
+.woocommerce-checkout form.checkout {
+  font-family: 'PP Neue Montreal', -apple-system, sans-serif !important;
+  color: #151515 !important;
+}
+
+/* ===== TÍTULOS DE SECCIÓN ===== */
+.woocommerce-checkout h3,
+body.woocommerce-checkout h3,
+.woocommerce-checkout #order_review_heading,
+.woocommerce-billing-fields h3,
+.woocommerce-additional-fields h3 {
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+  text-transform: uppercase !important;
+  color: #151515 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* ===== ETIQUETAS ===== */
+.woocommerce-checkout label,
+body.woocommerce-checkout label {
+  font-weight: 600 !important;
+  color: #344648 !important;
+  margin-bottom: 0.4rem !important;
+}
+.woocommerce-checkout label .required {
+  color: #FF460D !important;
+}
+
+/* ===== INPUTS Y SELECT ===== */
+.woocommerce-checkout input[type="text"],
+.woocommerce-checkout input[type="email"],
+.woocommerce-checkout input[type="tel"],
+.woocommerce-checkout input[type="number"],
+.woocommerce-checkout select,
+.woocommerce-checkout textarea,
+body.woocommerce-checkout input,
+body.woocommerce-checkout select,
+body.woocommerce-checkout textarea {
+  padding: 0.75rem 1rem !important;
+  border: 2px solid #C7C9C4 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  font-size: 1rem !important;
+  width: 100% !important;
+}
+.woocommerce-checkout input:focus,
+.woocommerce-checkout select:focus,
+.woocommerce-checkout textarea:focus {
+  border-color: #FF460D !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 70, 13, 0.2) !important;
+}
+
+/* ===== BOTÓN REALIZAR PEDIDO ===== */
+.woocommerce-checkout #place_order,
+body.woocommerce-checkout #place_order,
+.woocommerce-checkout button[type="submit"][name="woocommerce_checkout_place_order"] {
+  background: #FF460D !important;
+  color: #fff !important;
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  text-transform: uppercase !important;
+  padding: 1rem 2rem !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  margin-top: 1rem !important;
+}
+.woocommerce-checkout #place_order:hover,
+body.woocommerce-checkout #place_order:hover {
+  background: #E03D0B !important;
+  box-shadow: 0 4px 12px rgba(255, 70, 13, 0.35) !important;
+}
+
+/* ===== RESUMEN DEL PEDIDO ===== */
+#order_review,
+.woocommerce-checkout #order_review_heading {
+  background: #FCF8F5 !important;
+  border: 1px solid #C7C9C4 !important;
+  border-radius: 8px !important;
+  padding: 1.25rem !important;
+}
+.woocommerce-checkout #order_review .order-total .amount,
+.woocommerce-checkout .order-total .amount {
+  color: #FF460D !important;
+  font-weight: 700 !important;
+}
+
+/* ===== BLOQUES DE FORMULARIO ===== */
+.woocommerce-billing-fields__field-wrapper,
+.woocommerce-additional-fields__field-wrapper {
+  margin-bottom: 1rem !important;
+}
+.woocommerce-checkout .form-row {
+  margin-bottom: 1rem !important;
+}
+
+/* ===== CUPÓN ===== */
+.woocommerce-checkout a.woocommerce-form-coupon-toggle {
+  color: #FF460D !important;
+  text-decoration: underline !important;
+}
+
+/* ===== PÁGINA ORDER-PAY (Pago de pedido existente) ===== */
+body.woocommerce-order-pay,
+body.woocommerce-order-pay .woocommerce,
+.woocommerce-order-pay {
+  font-family: 'PP Neue Montreal', -apple-system, sans-serif !important;
+  background: #FCF8F5 !important;
+  color: #151515 !important;
+  min-height: 100vh !important;
+}
+
+/* Contenedor principal centrado */
+body.woocommerce-order-pay .site-content,
+.woocommerce-order-pay .entry-content,
+body.woocommerce-order-pay .site-main {
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 3rem 1.5rem !important;
+  background: #FCF8F5 !important;
+}
+
+.woocommerce-order-pay h1,
+body.woocommerce-order-pay h1.entry-title,
+.woocommerce-order-pay .entry-title {
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #151515 !important;
+  font-size: 2.5rem !important;
+  margin-bottom: 2.5rem !important;
+  text-align: center !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Información del pedido - Tarjeta mejorada */
+.woocommerce-order-pay .woocommerce-order-overview,
+.woocommerce-order-pay .woocommerce-order-details,
+.woocommerce-order-pay .woocommerce-order,
+.woocommerce-order-pay .order_details {
+  background: #fff !important;
+  border: 2px solid #C7C9C4 !important;
+  border-radius: 16px !important;
+  padding: 2.5rem !important;
+  margin: 2rem auto !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  max-width: 600px !important;
+}
+
+/* Estilos para todos los párrafos de información */
+.woocommerce-order-pay .entry-content p,
+.woocommerce-order-pay .woocommerce p,
+.woocommerce-order-pay p {
+  margin-bottom: 1.5rem !important;
+  padding: 1.5rem !important;
+  background: #FCF8F5 !important;
+  border-radius: 12px !important;
+  border-left: 4px solid #FF460D !important;
+  font-size: 1rem !important;
+  line-height: 1.8 !important;
+  text-align: left !important;
+  font-family: 'PP Neue Montreal', sans-serif !important;
+}
+
+/* Etiquetas (NÚMERO DE PEDIDO, FECHA, etc.) */
+.woocommerce-order-pay p strong {
+  display: block !important;
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #344648 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.15em !important;
+  margin-bottom: 0.75rem !important;
+  opacity: 0.9 !important;
+}
+
+/* Valores */
+.woocommerce-order-pay p:not(:has(strong:only-child)),
+.woocommerce-order-pay p span:not(strong) {
+  font-family: 'PP Neue Montreal', sans-serif !important;
+  color: #151515 !important;
+  font-size: 1.2rem !important;
+  font-weight: 500 !important;
+  display: block !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Estilo especial para TOTAL */
+.woocommerce-order-pay p:contains("TOTAL"),
+.woocommerce-order-pay p:has-text("TOTAL") {
+  background: linear-gradient(135deg, #FF460D 0%, #E03D0B 100%) !important;
+  color: #fff !important;
+  border-left: none !important;
+  padding: 2rem !important;
+}
+
+.woocommerce-order-pay p:contains("TOTAL") strong,
+.woocommerce-order-pay p:has-text("TOTAL") strong {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.woocommerce-order-pay p:contains("TOTAL") span,
+.woocommerce-order-pay p:has-text("TOTAL") span,
+.woocommerce-order-pay p:contains("TOTAL") .amount,
+.woocommerce-order-pay .amount {
+  color: #FF460D !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+}
+
+.woocommerce-order-pay p:contains("TOTAL") .amount,
+.woocommerce-order-pay p:has-text("TOTAL") .amount {
+  color: #fff !important;
+  font-size: 2rem !important;
+}
+
+/* Botones de pago - Estilo mejorado */
+.woocommerce-order-pay button,
+.woocommerce-order-pay .button,
+.woocommerce-order-pay input[type="submit"],
+.woocommerce-order-pay a.button,
+.woocommerce-order-pay .wc-forward,
+.woocommerce-order-pay .checkout-button,
+.woocommerce-order-pay form .button {
+  background: #FF460D !important;
+  color: #fff !important;
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  padding: 1.5rem 3rem !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 0.1em !important;
+  transition: all 0.3s ease !important;
+  display: inline-block !important;
+  text-decoration: none !important;
+  box-shadow: 0 6px 20px rgba(255, 70, 13, 0.3) !important;
+  min-width: 280px !important;
+  text-align: center !important;
+  margin: 0.5rem !important;
+}
+
+.woocommerce-order-pay button:hover,
+.woocommerce-order-pay .button:hover,
+.woocommerce-order-pay input[type="submit"]:hover,
+.woocommerce-order-pay a.button:hover,
+.woocommerce-order-pay .wc-forward:hover {
+  background: #E03D0B !important;
+  box-shadow: 0 8px 24px rgba(255, 70, 13, 0.4) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* Contenedor de botones */
+.woocommerce-order-pay .woocommerce-order-pay .button-container,
+.woocommerce-order-pay .payment-box,
+.woocommerce-order-pay form,
+.woocommerce-order-pay .woocommerce-order-pay-button-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 3rem !important;
+  max-width: 600px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Botón secundario (cancelar) */
+.woocommerce-order-pay .button.alt,
+.woocommerce-order-pay a.button.alt,
+.woocommerce-order-pay .button.cancel {
+  background: #fff !important;
+  color: #FF460D !important;
+  border: 2px solid #FF460D !important;
+  box-shadow: 0 4px 12px rgba(255, 70, 13, 0.15) !important;
+}
+
+.woocommerce-order-pay .button.alt:hover,
+.woocommerce-order-pay a.button.alt:hover,
+.woocommerce-order-pay .button.cancel:hover {
+  background: #FF460D !important;
+  color: #fff !important;
+  border-color: #FF460D !important;
+}
+
+/* Ocultar mensaje de "Próximamente" */
+body.woocommerce-order-pay .coming-soon-message,
+body.woocommerce-order-pay .maintenance-mode-message,
+body.woocommerce-order-pay .woocommerce-info {
+  display: none !important;
+}
+
+/* Mejorar el header */
+body.woocommerce-order-pay .site-header,
+body.woocommerce-order-pay header {
+  background: #fff !important;
+  border-bottom: 2px solid #C7C9C4 !important;
+  padding: 1.5rem 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.woocommerce-order-pay .site-header .site-title,
+body.woocommerce-order-pay header .site-title {
+  font-family: 'Barlow Semi Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #151515 !important;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* Mejorar el footer */
+body.woocommerce-order-pay .site-footer,
+body.woocommerce-order-pay footer {
+  margin-top: 4rem !important;
+  padding: 2rem 0 !important;
+  border-top: 2px solid #C7C9C4 !important;
+  background: #fff !important;
+  text-align: center !important;
+}
+
+/* Ocultar elementos innecesarios */
+body.woocommerce-order-pay .site-header .menu-toggle,
+body.woocommerce-order-pay .widget-area,
+body.woocommerce-order-pay .sidebar,
+.woocommerce-order-pay .widget,
+.woocommerce-order-pay aside {
+  display: none !important;
+}
+
+/* Mejorar el contenido principal */
+body.woocommerce-order-pay .site-main {
+  padding: 2rem 0 !important;
+  background: #FCF8F5 !important;
+}
+
+/* Mejorar el breadcrumb */
+.woocommerce-order-pay .woocommerce-breadcrumb,
+.woocommerce-order-pay .breadcrumb {
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  font-size: 0.9rem !important;
+  color: #344648 !important;
+  font-family: 'PP Neue Montreal', sans-serif !important;
+}
+
+.woocommerce-order-pay .woocommerce-breadcrumb a,
+.woocommerce-order-pay .breadcrumb a {
+  color: #FF460D !important;
+  text-decoration: none !important;
+}
+
+.woocommerce-order-pay .woocommerce-breadcrumb a:hover,
+.woocommerce-order-pay .breadcrumb a:hover {
+  text-decoration: underline !important;
+}
+
+/* Estilos adicionales */
+.woocommerce-order-pay * {
+  box-sizing: border-box !important;
+}
+
+.woocommerce-order-pay .woocommerce {
+  background: transparent !important;
+}
+
+body.woocommerce-order-pay .site-content {
+  background: #FCF8F5 !important;
+  min-height: calc(100vh - 200px) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .woocommerce-checkout h1.entry-title,
+  body.woocommerce-checkout h1,
+  .woocommerce-order-pay h1 {
+    font-size: 1.75rem !important;
+  }
+  .woocommerce-checkout #place_order,
+  .woocommerce-order-pay button,
+  .woocommerce-order-pay .button {
+    font-size: 1rem !important;
+    padding: 1.25rem 2rem !important;
+    min-width: 100% !important;
+  }
+  
+  .woocommerce-order-pay .woocommerce-order-overview,
+  .woocommerce-order-pay .woocommerce-order-details {
+    padding: 1.5rem !important;
+  }
+  
+  body.woocommerce-order-pay .site-content,
+  .woocommerce-order-pay .entry-content {
+    padding: 2rem 1rem !important;
+  }
+}

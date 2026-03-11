@@ -1,0 +1,30 @@
+# =============================================================================
+# INSTRUCCIONES: Copiá ESTE BLOQUE COMPLETO al INICIO del archivo .htaccess
+# que está en la RAÍZ del subdominio (api.royriff.com.ar).
+# Ruta en SiteGround: public_html/.htaccess
+# Debe ir ARRIBA de las reglas de WordPress.
+# =============================================================================
+
+# Roy Riff – React app (dist dentro del plugin)
+RewriteEngine On
+RewriteBase /
+
+# 1) Archivos estáticos del frontend (JS, CSS, fuentes, etc.)
+RewriteRule ^assets/(.*)$ wp-content/plugins/royriff-app/dist/assets/$1 [L]
+RewriteRule ^fonts/(.*)$ wp-content/plugins/royriff-app/dist/fonts/$1 [L]
+RewriteRule ^vite\.svg$ wp-content/plugins/royriff-app/dist/vite.svg [L]
+
+# 2) Raíz del subdominio (/) → mostrar la app React
+# ^/?$ = URL vacía o solo "/" (así entra bien la primera vez)
+RewriteRule ^/?$ wp-content/plugins/royriff-app/dist/index.html [L]
+
+# 3) Rutas de la SPA (/carrito, /checkout, etc.) → index.html (no WordPress)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/wp-
+RewriteRule ^ wp-content/plugins/royriff-app/dist/index.html [L]
+
+# =============================================================================
+# A partir de aquí van las reglas NORMALES de WordPress (RewriteRule .* - [E=...]
+# y la que manda todo a index.php). No las borres.
+# =============================================================================

@@ -1,0 +1,360 @@
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCartItems } from '../../store/slices/cartSlice';
+import { calculateShipping } from '../../services/woocommerceService';
+import { formatPrice } from '../../utils/constants';
+import LoadingSpinner from '../common/LoadingSpinner';
+import { FiTruck, FiMapPin, FiCheck } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+
+/**
+ * Calculador de envío reutilizable
+ * Se puede usar en Carrito, Checkout, ProductDetail, etc.
+ * 
+ * @param {Object} props
+ * @param {Function} [props.onShippingSelected] - Callback cuando se selecciona un método (recibe {id, title, cost, method_id})
+ * @param {Function} [props.onCalculationResult] - Callback cuando se obtiene la respuesta completa ({ postcode, options })
+ * @param {string} [props.className] - Clases CSS adicionales
+ * @param {boolean} [props.showTitle=true] - Mostrar título "Calcular envío"
+ * @param {Array} [props.customItems] - Productos personalizados (si no se usa, toma del carrito)
+ * @param {boolean} [props.compact=false] - Versión compacta (para drawer móvil)
+ */
+const ShippingCalculator = ({ 
+  onShippingSelected, 
+  onCalculationResult,
+  className = '', 
+  showTitle = true,
+  customItems = null,
+  compact = false,
+}) => {
+  const cartItems = useSelector(selectCartItems);
+  const items = customItems || cartItems;
+
+  const [postcode, setPostcode] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState([]);
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const [calculated, setCalculated] = useState(false);
+
+  const handleCalculate = async (e) => {
+    e?.preventDefault();
+
+    if (!postcode.trim()) {
+      toast.error('Ingresá tu código postal');
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error('Agregá productos al carrito primero');
+      return;
+    }
+
+    setLoading(true);
+    setShippingOptions([]);
+    setSelectedShipping(null);
+    setCalculated(false);
+
+    try {
+      const result = await calculateShipping({
+        postcode: postcode.trim(),
+        city: city.trim() || undefined,
+        state: state.trim() || undefined,
+        line_items: items,
+      });
+
+      if (onCalculationResult && result) {
+        onCalculationResult(result);
+      }
+
+      if (result.options && result.options.length > 0) {
+        setShippingOptions(result.options);
+        setCalculated(true);
+        
+        // Si hay un solo método, seleccionarlo automáticamente
+        if (result.options.length === 1) {
+          handleSelectShipping(result.options[0]);
+        }
+      } else {
+        toast('No hay opciones de envío disponibles para este código postal', { duration: 4000 });
+        setCalculated(true);
+      }
+    } catch (error) {
+      console.error('Error calculating shipping:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Error al calcular envío';
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectShipping = (option) => {
+    setSelectedShipping(option);
+    if (onShippingSelected) {
+      onShippingSelected(option);
+    }
+  };
+
+  // Provincias de Argentina
+  const argentinaProvinces = [
+    { value: '', label: 'Seleccionar provincia' },
+    { value: 'CABA', label: 'Ciudad Autónoma de Buenos Aires' },
+    { value: 'BA', label: 'Buenos Aires' },
+    { value: 'CT', label: 'Catamarca' },
+    { value: 'CC', label: 'Chaco' },
+    { value: 'CH', label: 'Chubut' },
+    { value: 'CB', label: 'Córdoba' },
+    { value: 'CR', label: 'Corrientes' },
+    { value: 'ER', label: 'Entre Ríos' },
+    { value: 'FO', label: 'Formosa' },
+    { value: 'JY', label: 'Jujuy' },
+    { value: 'LP', label: 'La Pampa' },
+    { value: 'LR', label: 'La Rioja' },
+    { value: 'MZ', label: 'Mendoza' },
+    { value: 'MN', label: 'Misiones' },
+    { value: 'NQ', label: 'Neuquén' },
+    { value: 'RN', label: 'Río Negro' },
+    { value: 'SA', label: 'Salta' },
+    { value: 'SJ', label: 'San Juan' },
+    { value: 'SL', label: 'San Luis' },
+    { value: 'SC', label: 'Santa Cruz' },
+    { value: 'SF', label: 'Santa Fe' },
+    { value: 'SE', label: 'Santiago del Estero' },
+    { value: 'TF', label: 'Tierra del Fuego' },
+    { value: 'TM', label: 'Tucumán' },
+  ];
+
+  return (
+    <div
+      className={`bg-white rounded-lg shadow-md ${
+        compact ? 'p-3 md:p-4' : 'p-4 md:p-6'
+      } ${className}`}
+    >
+      {showTitle && (
+        <div className="flex items-center gap-2 mb-3">
+          <FiTruck className="w-5 h-5 text-primary-orange" />
+          <h3 className="font-barlow font-bold text-base md:text-lg">
+            Calcular envío
+          </h3>
+        </div>
+      )}
+
+      <form onSubmit={handleCalculate} className={compact ? 'space-y-2' : 'space-y-4'}>
+        {/* Versión compacta: solo código postal y botón */}
+        {compact ? (
+          <>
+            <div>
+              <label
+                htmlFor="shipping-postcode"
+                className="block text-xs font-medium text-neutral-darkGreen mb-1"
+              >
+                Código Postal <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-gray w-4 h-4" />
+                <input
+                  id="shipping-postcode"
+                  type="text"
+                  value={postcode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    setPostcode(value);
+                    setCalculated(false);
+                  }}
+                  placeholder="Ej: 1000"
+                  className="w-full pl-10 pr-3 py-2 border border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue text-sm"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          // Versión completa: CP + ciudad + provincia
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Código Postal */}
+            <div>
+              <label
+                htmlFor="shipping-postcode"
+                className="block text-sm font-medium text-neutral-darkGreen mb-1"
+              >
+                Código Postal <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-gray w-4 h-4" />
+                <input
+                  id="shipping-postcode"
+                  type="text"
+                  value={postcode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    setPostcode(value);
+                    setCalculated(false);
+                  }}
+                  placeholder="Ej: 1000"
+                  className="w-full pl-10 pr-4 py-2 border-2 border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Ciudad */}
+            <div>
+              <label
+                htmlFor="shipping-city"
+                className="block text-sm font-medium text-neutral-darkGreen mb-1"
+              >
+                Ciudad
+              </label>
+              <input
+                id="shipping-city"
+                type="text"
+                value={city}
+                onChange={(e) => {
+                  setCity(e.target.value);
+                  setCalculated(false);
+                }}
+                placeholder="Ej: Buenos Aires"
+                className="w-full px-4 py-2 border-2 border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue"
+              />
+            </div>
+
+            {/* Provincia */}
+            <div>
+              <label
+                htmlFor="shipping-state"
+                className="block text-sm font-medium text-neutral-darkGreen mb-1"
+              >
+                Provincia
+              </label>
+              <select
+                id="shipping-state"
+                value={state}
+                onChange={(e) => {
+                  setState(e.target.value);
+                  setCalculated(false);
+                }}
+                className="w-full px-4 py-2 border-2 border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue"
+              >
+                {argentinaProvinces.map((prov) => (
+                  <option key={prov.value} value={prov.value}>
+                    {prov.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading || !postcode.trim() || items.length === 0}
+          className={`w-full md:w-auto px-6 ${
+            compact ? 'py-2 text-xs md:text-sm' : 'py-2'
+          } bg-primary-orange text-white rounded-lg font-barlow font-bold hover:bg-primary-orange/90 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+        >
+          {loading ? (
+            <>
+              <LoadingSpinner size="sm" />
+              Calculando...
+            </>
+          ) : (
+            <>
+              <FiTruck className="w-4 h-4" />
+              Calcular envío
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Resultados */}
+      {calculated && shippingOptions.length > 0 && (
+        <div className="mt-6 pt-6 border-t border-neutral-gray/20 space-y-4">
+          {/* Separar opciones en envío a domicilio y retiro */}
+          {(() => {
+            const isPickup = (option) => {
+              const title = (option.title || '').toLowerCase();
+              return (
+                title.includes('retiro') ||
+                title.includes('retirar') ||
+                title.includes('sucursal') ||
+                title.includes('punto de retiro') ||
+                title.includes('pickup')
+              );
+            };
+
+            const deliveryOptions = shippingOptions.filter((o) => !isPickup(o));
+            const pickupOptions = shippingOptions.filter(isPickup);
+
+            const renderGroup = (title, options) => {
+              if (!options.length) return null;
+              return (
+                <div className="space-y-2">
+                  <h4 className="font-barlow font-bold text-sm uppercase tracking-wide text-neutral-darkGreen">
+                    {title}
+                  </h4>
+                  {options.map((option) => {
+                    const isSelected = selectedShipping?.id === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSelectShipping(option)}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-smooth ${
+                          isSelected
+                            ? 'border-primary-orange bg-primary-orange/5'
+                            : 'border-neutral-gray/30 hover:border-primary-orange/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {isSelected && <FiCheck className="w-5 h-5 text-primary-orange" />}
+                            <div>
+                              <p className="font-barlow font-bold text-neutral-black">
+                                {option.title || 'Envío'}
+                              </p>
+                              {option.cost > 0 ? (
+                                <p className="text-sm text-neutral-darkGreen font-neue">
+                                  {formatPrice(option.cost)}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-neutral-darkGreen font-neue">
+                                  A calcular según destino
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {option.cost > 0 && (
+                            <span className="font-barlow font-bold text-primary-orange text-lg">
+                              {formatPrice(option.cost)}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            };
+
+            return (
+              <>
+                {renderGroup('Envío a domicilio', deliveryOptions)}
+                {renderGroup('Retirar por', pickupOptions)}
+              </>
+            );
+          })()}
+        </div>
+      )}
+
+      {calculated && shippingOptions.length === 0 && (
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800 font-neue">
+            No hay opciones de envío disponibles para este código postal. Contactanos para coordinar el envío.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ShippingCalculator;
