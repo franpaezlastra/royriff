@@ -10,9 +10,16 @@ import {
   loadCheckoutShipping,
   saveCheckoutBilling,
   clearCheckoutStorage,
+  isStoreLocalPickup,
   isPickupOption,
 } from '../../utils/checkoutStorage';
+import {
+  getFulfillmentKind,
+  isCarrierBranchPickup,
+  isDoorDeliveryOption,
+} from '../../utils/shippingClassify';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import BranchSucursalInfo from '../../components/shipping/BranchSucursalInfo';
 import toast from 'react-hot-toast';
 import { FiCreditCard, FiTruck, FiChevronLeft, FiCheck } from 'react-icons/fi';
 import { CheckoutStepper } from './CheckoutEntrega';
@@ -25,11 +32,18 @@ const PAYMENT_LOGOS = {
     'https://http2.mlstatic.com/storage/cpp/static-files/1b729977-6241-43bf-a84b-e4fa8c00ca85.png',
 };
 
+const isMercadoPagoMethod = (method) => {
+  const t = `${(method.id || '')} ${(method.title || '')}`.toLowerCase();
+  return t.includes('mercado') || t.includes('mercadopago');
+};
+
+const isBacsMethod = (method) => {
+  const t = `${(method.id || '')} ${(method.title || '')}`.toLowerCase();
+  return t.includes('bacs') || t.includes('transfer') || t.includes('bank');
+};
+
 const getMethodLogo = (method) => {
-  const id = (method.id || '').toLowerCase();
-  const title = (method.title || '').toLowerCase();
-  const text = `${id} ${title}`;
-  if (text.includes('mercado') || text.includes('mp')) return PAYMENT_LOGOS.mercadoPago;
+  if (isMercadoPagoMethod(method)) return PAYMENT_LOGOS.mercadoPago;
   return null;
 };
 
@@ -46,10 +60,19 @@ const CheckoutPago = () => {
   // Recuperar datos de pasos anteriores
   const savedBilling = loadCheckoutBilling();
   const shipping = loadCheckoutShipping();
+  const [isRedirectingToPayment, setIsRedirectingToPayment] = useState(false);
 
   useEffect(() => {
-    if (cartItems.length === 0) { navigate('/carrito'); return; }
-  }, []);
+    if (cartItems.length === 0) {
+      if (isRedirectingToPayment) return;
+      navigate('/carrito');
+      return;
+    }
+    const shp = loadCheckoutShipping();
+    if (!shp) {
+      navigate('/checkout', { replace: true });
+    }
+  }, [cartItems.length, isRedirectingToPayment, navigate]);
 
   // Formulario de contacto inline (por si llegaron sin pasar por entrega)
   const [contactForm, setContactForm] = useState({
@@ -62,6 +85,9 @@ const CheckoutPago = () => {
     postcode: savedBilling?.billing_postcode || '',
   });
   const [contactErrors, setContactErrors] = useState({});
+
+  const shippingIsPickup = isStoreLocalPickup(shipping);
+  const shippingIsBranchCarrier = shipping && isCarrierBranchPickup(shipping);
 
   const handleContactChange = (e) => {
     const { name, value } = e.target;
@@ -76,16 +102,13 @@ const CheckoutPago = () => {
     if (!contactForm.email.trim()) e.email = 'Requerido';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactForm.email)) e.email = 'Email inválido';
     if (!contactForm.phone.trim()) e.phone = 'Requerido';
-    // Para envío a domicilio: también se requiere dirección y ciudad
-    if (!shippingIsPickup) {
+    if (!shippingIsPickup && !shippingIsBranchCarrier) {
       if (!contactForm.address_1.trim()) e.address_1 = 'Requerido';
       if (!contactForm.city.trim()) e.city = 'Requerido';
     }
     setContactErrors(e);
     return Object.keys(e).length === 0;
   };
-
-  const shippingIsPickup = isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup');
 
   // Dirección del local (fallback para pedidos de retiro)
   const STORE_ADDRESS = 'Aconquija 1163';
@@ -100,20 +123,30 @@ const CheckoutPago = () => {
       // Si el billing guardado es de retiro, sus campos address/city ya contienen
       // la dirección del local (seteada en CheckoutEntrega). Si no los tiene (vino
       // directo desde el drawer), los completamos aquí.
+      const pcRef = String(savedBilling.billing_postcode || '').replace(/\D/g, '');
       return {
         ...savedBilling,
-        billing_address_1: savedBilling.billing_address_1 || (shippingIsPickup ? STORE_ADDRESS : ''),
+        billing_address_1:
+          savedBilling.billing_address_1 ||
+          (shippingIsPickup ? STORE_ADDRESS : '') ||
+          (shippingIsBranchCarrier && pcRef
+            ? `Retiro sucursal correo — CP ${pcRef}`
+            : ''),
         billing_city: savedBilling.billing_city || (shippingIsPickup ? STORE_CITY : ''),
         billing_postcode: savedBilling.billing_postcode || (shippingIsPickup ? STORE_POSTCODE : ''),
       };
     }
     // Si no, usar el formulario inline
+    const pcInline = String(contactForm.postcode || '').replace(/\D/g, '');
     return {
       billing_first_name: contactForm.first_name,
       billing_last_name: contactForm.last_name,
       billing_email: contactForm.email,
       billing_phone: contactForm.phone,
-      billing_address_1: contactForm.address_1 || (shippingIsPickup ? STORE_ADDRESS : ''),
+      billing_address_1:
+        contactForm.address_1 ||
+        (shippingIsPickup ? STORE_ADDRESS : '') ||
+        (shippingIsBranchCarrier && pcInline ? `Retiro sucursal correo — CP ${pcInline}` : ''),
       billing_address_2: '',
       billing_city: contactForm.city || (shippingIsPickup ? STORE_CITY : ''),
       billing_postcode: contactForm.postcode || (shippingIsPickup ? STORE_POSTCODE : ''),
@@ -147,17 +180,15 @@ const CheckoutPago = () => {
     setPaymentLoading(true);
     try {
       const methods = await getPaymentMethods();
-      const mpKeys = ['mercado', 'mercadopago', 'mp'];
-      const transferKeys = ['bacs', 'transfer', 'bank', 'bancaria', 'offline'];
-      const cardKeys = ['pagegate', 'visa', 'mastercard', 'card', 'acceptance'];
       const enabled = methods.filter((m) => {
         if (!m.enabled) return false;
-        const t = `${(m.id || '').toLowerCase()} ${(m.title || '').toLowerCase()}`;
-        return (
-          mpKeys.some((k) => t.includes(k)) ||
-          transferKeys.some((k) => t.includes(k)) ||
-          cardKeys.some((k) => t.includes(k))
-        );
+        return isMercadoPagoMethod(m) || isBacsMethod(m);
+      });
+      // Mercado Pago primero, BACS después
+      enabled.sort((a, b) => {
+        const aMP = isMercadoPagoMethod(a) ? 0 : 1;
+        const bMP = isMercadoPagoMethod(b) ? 0 : 1;
+        return aMP - bMP;
       });
       setPaymentMethods(enabled);
       if (enabled.length > 0) setSelectedPayment(enabled[0].id);
@@ -181,11 +212,12 @@ const CheckoutPago = () => {
     }
     setErrors({});
     setSubmitting(true);
+    setIsRedirectingToPayment(false);
 
     try {
       const bil = getEffectiveBilling();
       const shp = shipping;
-      const isPickup = isPickupOption(shp) || shp?.id?.toString().startsWith('local_pickup');
+      const isPickup = isStoreLocalPickup(shp);
 
       // Guardar los datos completos para referencia futura
       saveCheckoutBilling(bil);
@@ -203,21 +235,48 @@ const CheckoutPago = () => {
         country: 'AR',
       };
 
-      const shippingData =
-        isPickup || !bil.billing_address_1
-          ? billingData
-          : bil.ship_to_different_address
-          ? {
-              first_name: bil.shipping_first_name || billingData.first_name,
-              last_name: bil.shipping_last_name || billingData.last_name,
-              address_1: bil.shipping_address_1 || '',
-              address_2: bil.shipping_address_2 || '',
-              city: bil.shipping_city || '',
-              state: bil.shipping_state || '',
-              postcode: bil.shipping_postcode || '',
-              country: 'AR',
-            }
-          : billingData;
+      const joinAddr2 = (a2, note) => [a2, note].filter(Boolean).join(' — ') || note;
+
+      // Dirección de envío en WC: misma data operativa que siempre, con notas para el admin
+      // (retiro tienda / sucursal correo ≠ domicilio del cliente aunque calle y CP coincidan).
+      let shippingData;
+      if (isPickup) {
+        shippingData = {
+          ...billingData,
+          address_2: joinAddr2(billingData.address_2, 'Retiro en local (sin envío a domicilio)'),
+        };
+      } else if (!bil.billing_address_1) {
+        shippingData = billingData;
+      } else if (bil.ship_to_different_address) {
+        const a2 = bil.shipping_address_2 || '';
+        const branch = shp && isCarrierBranchPickup(shp);
+        const door = shp && isDoorDeliveryOption(shp);
+        shippingData = {
+          first_name: bil.shipping_first_name || billingData.first_name,
+          last_name: bil.shipping_last_name || billingData.last_name,
+          address_1: bil.shipping_address_1 || '',
+          address_2: branch
+            ? joinAddr2(a2, 'Retiro en sucursal del transporte — no entrega en el domicilio indicado')
+            : door
+              ? joinAddr2(a2, 'Envío a domicilio (dirección de entrega)')
+              : joinAddr2(a2, 'Envío acordado — revisar método de envío en el pedido'),
+          city: bil.shipping_city || '',
+          state: bil.shipping_state || '',
+          postcode: bil.shipping_postcode || '',
+          country: 'AR',
+        };
+      } else {
+        const branch = shp && isCarrierBranchPickup(shp);
+        const door = shp && isDoorDeliveryOption(shp);
+        shippingData = {
+          ...billingData,
+          address_2: branch
+            ? joinAddr2(billingData.address_2, 'Retiro en sucursal del transporte — no entrega en el domicilio indicado')
+            : door
+              ? joinAddr2(billingData.address_2, 'Envío a domicilio')
+              : joinAddr2(billingData.address_2, 'Envío — revisar método en el pedido'),
+        };
+      }
 
       const line_items = cartItems.map((item) => ({
         product_id: parseInt(item.id),
@@ -225,13 +284,16 @@ const CheckoutPago = () => {
         ...(item.variationId ? { variation_id: parseInt(item.variationId) } : {}),
       }));
 
-      const selectedMethod = paymentMethods.find((m) => m.id === selectedPayment);
       const shipping_lines = shp
         ? [
             {
               method_id: shp.method_id || shp.id,
-              method_title: shp.title || 'Envío',
-              total: String(shp.cost || 0),
+              method_title: isPickup
+                ? shp.title || 'Retiro en el local'
+                : isCarrierBranchPickup(shp)
+                  ? shp.title || 'Retiro en sucursal del transporte'
+                  : shp.title || 'Envío a domicilio',
+              total: String(isPickup ? 0 : shp.cost || 0),
             },
           ]
         : [];
@@ -241,8 +303,9 @@ const CheckoutPago = () => {
         shipping: shippingData,
         line_items,
         payment_method: selectedPayment,
-        payment_method_title: selectedMethod?.title || 'Mercado Pago',
+        payment_method_title: paymentMethods.find((m) => m.id === selectedPayment)?.title || 'Mercado Pago',
         shipping_lines,
+        meta_data: [{ key: 'royriff_fulfillment', value: getFulfillmentKind(shp) }],
       };
 
       const order = await createOrder(orderData);
@@ -254,22 +317,14 @@ const CheckoutPago = () => {
       const orderId = order.id || order.number;
       const orderKey = order.order_key || '';
 
-      dispatch(clearCart());
-      clearCheckoutStorage();
-
-      const isMercadoPago =
-        selectedPayment === 'mercadopago' ||
-        selectedPayment.includes('mercadopago') ||
-        selectedPayment.includes('mercado-pago') ||
-        selectedPayment === 'woo-mercado-pago-basic';
-
-      const isTransferencia =
-        selectedPayment.includes('bacs') ||
-        selectedPayment.includes('transfer') ||
-        selectedPayment.includes('bank') ||
-        selectedPayment.includes('offline');
+      const selectedMethodObj = paymentMethods.find((m) => m.id === selectedPayment);
+      const isMercadoPago = selectedMethodObj ? isMercadoPagoMethod(selectedMethodObj) : false;
+      const isTransferencia = selectedMethodObj ? isBacsMethod(selectedMethodObj) : false;
 
       if (isMercadoPago) {
+        setIsRedirectingToPayment(true);
+        dispatch(clearCart());
+        clearCheckoutStorage();
         const baseUrl = import.meta.env.VITE_WOOCOMMERCE_URL || 'https://api.royriff.com.ar';
         const paymentUrl = `${baseUrl}/checkout/order-pay/${orderId}/?key=${orderKey}`;
         paymentUrlRef.current = paymentUrl;
@@ -282,9 +337,13 @@ const CheckoutPago = () => {
         }, 4000);
         return;
       } else if (isTransferencia) {
+        dispatch(clearCart());
+        clearCheckoutStorage();
         toast.success('Orden creada. Revisá tu email para los datos de transferencia.');
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       } else {
+        dispatch(clearCart());
+        clearCheckoutStorage();
         toast.success('Orden creada exitosamente');
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       }
@@ -294,8 +353,12 @@ const CheckoutPago = () => {
       if (err.response?.data?.message) msg = err.response.data.message;
       else if (err.message) msg = err.message;
       toast.error(msg);
+      setIsRedirectingToPayment(false);
     } finally {
-      if (!skipFinallyRef.current) setSubmitting(false);
+      if (!skipFinallyRef.current) {
+        setSubmitting(false);
+        setIsRedirectingToPayment(false);
+      }
       skipFinallyRef.current = false;
     }
   };
@@ -305,7 +368,7 @@ const CheckoutPago = () => {
   const subtotal = cartItems.reduce((t, i) => t + i.price * i.quantity, 0);
   const shippingCost = shipping?.cost || 0;
   const total = subtotal + shippingCost;
-  const isPickup = isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup');
+  const isPickup = isStoreLocalPickup(shipping);
 
   return (
     <div className="py-10 md:py-16 min-h-screen bg-primary-beige">
@@ -341,17 +404,45 @@ const CheckoutPago = () => {
                     Retiro en el local · Aconquija 1163, Yerba Buena
                   </p>
                 )}
+                {shipping && shippingIsBranchCarrier && (
+                  <>
+                    <BranchSucursalInfo title={shipping.title} className="-mt-1" />
+                    <p className="text-[11px] text-neutral-darkGreen/55 font-neue">
+                      No hace falta cargar calle de entrega: solo ciudad y el mismo código postal que usaste para
+                      calcular el envío.
+                    </p>
+                  </>
+                )}
+                {!shippingIsPickup && !shippingIsBranchCarrier && (
+                  <p className="text-[11px] text-neutral-darkGreen/55 font-neue -mt-2">
+                    Envío a domicilio: completá la dirección completa donde recibís el pedido.
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { label: 'Nombre', name: 'first_name', placeholder: 'Francisco', span: '', required: true },
                     { label: 'Apellido', name: 'last_name', placeholder: 'Páez Lastra', span: '', required: true },
                     { label: 'Email', name: 'email', type: 'email', placeholder: 'tu@email.com', span: 'col-span-2', required: true },
                     { label: 'Teléfono', name: 'phone', type: 'tel', placeholder: '+54 381 000-0000', span: 'col-span-2', required: true },
-                    ...(!shippingIsPickup ? [
-                      { label: 'Dirección', name: 'address_1', placeholder: 'Av. Corrientes 1234', span: 'col-span-2', required: true },
-                      { label: 'Ciudad', name: 'city', placeholder: 'Yerba Buena', span: '', required: true },
-                      { label: 'Código Postal', name: 'postcode', placeholder: '4107', span: '', required: false },
-                    ] : []),
+                    ...(shippingIsPickup || shippingIsBranchCarrier
+                      ? []
+                      : [
+                            {
+                              label: 'Dirección (calle y número)',
+                              name: 'address_1',
+                              placeholder: 'Av. Corrientes 1234',
+                              span: 'col-span-2',
+                              required: true,
+                            },
+                            { label: 'Ciudad', name: 'city', placeholder: 'Yerba Buena', span: '', required: true },
+                            {
+                              label: 'Código postal',
+                              name: 'postcode',
+                              placeholder: '4107',
+                              span: '',
+                              required: false,
+                            },
+                          ]),
                   ].map(({ label, name, type = 'text', placeholder, span, required }) => (
                     <div key={name} className={span}>
                       <label className={LABEL}>
@@ -373,14 +464,20 @@ const CheckoutPago = () => {
                   ))}
                 </div>
                 {shipping && (
-                  <div className="flex items-center gap-2 bg-neutral-gray/5 rounded-lg px-3 py-2.5 text-sm font-neue text-neutral-darkGreen">
+                  <div className="flex flex-wrap items-center gap-2 bg-neutral-gray/5 rounded-lg px-3 py-2.5 text-sm font-neue text-neutral-darkGreen">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-barlow font-bold ${
-                      isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup')
+                      isPickupOption(shipping)
                         ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
                     }`}>
-                      {isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup') ? 'Retiro' : 'Envío'}
+                      {shippingIsBranchCarrier
+                        ? 'Retiro sucursal'
+                        : isPickupOption(shipping)
+                          ? 'Retiro'
+                          : 'Envío a domicilio'}
                     </span>
-                    <span className="font-semibold">{shipping.title}</span>
+                    {!shippingIsBranchCarrier && (
+                      <span className="font-semibold">{shipping.title}</span>
+                    )}
                     <span className="text-neutral-darkGreen/60">
                       {shipping.cost > 0 ? `· ${formatPrice(shipping.cost)}` : '· GRATIS'}
                     </span>
@@ -405,27 +502,49 @@ const CheckoutPago = () => {
                     <FiChevronLeft className="w-3 h-3" /> Cambiar
                   </button>
                 </div>
-                <div className="text-sm font-neue text-neutral-darkGreen space-y-1">
+                <div className="text-sm font-neue text-neutral-darkGreen space-y-3">
                   <p>
                     <span className="font-semibold">{billing?.billing_first_name} {billing?.billing_last_name}</span>
                     {billing?.billing_email && <>{' · '}{billing.billing_email}</>}
                   </p>
+                  {shipping && shippingIsBranchCarrier && (
+                    <BranchSucursalInfo title={shipping.title} compact />
+                  )}
                   {shipping && (
-                    <p className="flex items-center gap-2">
+                    <p className="flex flex-wrap items-center gap-2">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-barlow font-bold ${
-                        isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup')
+                        isPickupOption(shipping)
                           ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
                       }`}>
-                        {isPickupOption(shipping) || shipping?.id?.toString().startsWith('local_pickup') ? 'Retiro' : 'Envío'}
+                        {isPickupOption(shipping) ? 'Retiro' : 'Envío a domicilio'}
                       </span>
-                      {shipping.title}
-                      {shipping.cost > 0 ? ` · ${formatPrice(shipping.cost)}` : ' · GRATIS'}
+                      {!shippingIsBranchCarrier && (
+                        <>
+                          <span className="font-semibold">{shipping.title}</span>
+                          <span className="text-neutral-darkGreen/60">
+                            {shipping.cost > 0 ? `· ${formatPrice(shipping.cost)}` : '· GRATIS'}
+                          </span>
+                        </>
+                      )}
+                      {shippingIsBranchCarrier && (
+                        <span className="text-neutral-darkGreen/60">
+                          {shipping.cost > 0 ? formatPrice(shipping.cost) : 'GRATIS'}
+                        </span>
+                      )}
                     </p>
                   )}
-                  {billing?.billing_address_1 && (
+                  {billing?.billing_address_1 && !shippingIsBranchCarrier && (
                     <p className="text-neutral-darkGreen/70 text-xs">
+                      <span className="font-semibold text-neutral-darkGreen/80">Entrega en: </span>
                       {billing.billing_address_1}, {billing.billing_city}
                       {billing.billing_postcode ? ` (${billing.billing_postcode})` : ''}
+                    </p>
+                  )}
+                  {billing?.billing_address_1 && shippingIsBranchCarrier && (
+                    <p className="text-neutral-darkGreen/60 text-xs">
+                      Referencia / facturación: {billing.billing_address_1}
+                      {billing.billing_city ? ` · ${billing.billing_city}` : ''}
+                      {billing.billing_postcode ? ` · CP ${billing.billing_postcode}` : ''}
                     </p>
                   )}
                 </div>
@@ -459,11 +578,8 @@ const CheckoutPago = () => {
                   {paymentMethods.map((method) => {
                     const selected = selectedPayment === method.id;
                     const logo = getMethodLogo(method);
-                    const isTransfer =
-                      (method.id || '').includes('bacs') ||
-                      (method.id || '').includes('transfer') ||
-                      (method.id || '').includes('bank') ||
-                      (method.id || '').includes('offline');
+                    const isMP = isMercadoPagoMethod(method);
+                    const isBacs = isBacsMethod(method);
 
                     return (
                       <label
@@ -493,21 +609,43 @@ const CheckoutPago = () => {
                               <FiCheck className="w-4 h-4 text-primary-orange ml-auto" />
                             )}
                           </div>
-                          {selected && method.description && (
-                            <p
-                              className="text-xs text-neutral-darkGreen/80 font-neue mt-2"
-                              dangerouslySetInnerHTML={{ __html: method.description }}
-                            />
-                          )}
-                          {selected && !isTransfer && !logo && (
-                            <div className="flex gap-2 mt-2">
-                              <img src={PAYMENT_LOGOS.visa} alt="Visa" className="h-5 w-auto" />
-                              <img src={PAYMENT_LOGOS.mastercard} alt="Mastercard" className="h-5 w-auto" />
+
+                          {selected && isMP && (
+                            <div className="mt-3 space-y-2">
+                              <div className="flex flex-wrap gap-2">
+                                <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-neue">
+                                  Visa, Mastercard, Amex y más
+                                </span>
+                                <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-neue">
+                                  Débito y crédito
+                                </span>
+                                <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-neue">
+                                  Cuotas disponibles
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-neutral-darkGreen/60 font-neue leading-relaxed">
+                                Al finalizar, te redirigimos a Mercado Pago donde elegís tarjeta, cuotas y completás el pago de forma segura.
+                              </p>
                             </div>
                           )}
-                          {selected && isTransfer && (
-                            <div className="flex items-center gap-2 mt-2 text-xs text-neutral-darkGreen/70 font-neue">
-                              Usá el número de pedido como referencia de pago.
+
+                          {selected && isBacs && (
+                            <div className="mt-3 space-y-2">
+                              <div className="flex flex-wrap gap-2">
+                                <span className="text-xs bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-neue">
+                                  Transferencia bancaria
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-neutral-darkGreen/60 font-neue leading-relaxed">
+                                Tu pedido queda reservado. Te enviamos los datos bancarios por email para que hagas la transferencia.
+                                Una vez que confirmemos el pago, procesamos el envío.
+                              </p>
+                              {method.description && (
+                                <div
+                                  className="text-xs text-neutral-darkGreen/70 font-neue bg-neutral-gray/5 rounded-lg px-3 py-2"
+                                  dangerouslySetInnerHTML={{ __html: method.description }}
+                                />
+                              )}
                             </div>
                           )}
                         </div>

@@ -1,20 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { selectCartItems, selectCartTotal, removeFromCart, updateQuantity } from '../../store/slices/cartSlice';
 import { formatPrice, getProductMainImage } from '../../utils/constants';
-import { saveCheckoutShipping, isPickupOption } from '../../utils/checkoutStorage';
+import {
+  saveCheckoutShipping,
+  saveDeliveryContext,
+  clearDeliveryContext,
+  isStoreLocalPickup,
+} from '../../utils/checkoutStorage';
+import { LOCAL_PICKUP_OPTION } from '../../utils/localPickupOption';
 import Button from '../../components/common/Button';
 import ShippingCalculator from '../../components/shipping/ShippingCalculator';
-import { FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiTrash2, FiPlus, FiMinus, FiCheck, FiTruck } from 'react-icons/fi';
 
 const Carrito = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector(selectCartItems);
   const cartTotal = useSelector(selectCartTotal);
+  /** null = aún no eligió; 'local' | 'delivery' alineado con el drawer */
+  const [receiveMode, setReceiveMode] = useState(null);
   const [selectedShipping, setSelectedShipping] = useState(null);
   const [shippingContext, setShippingContext] = useState({ postcode: '' });
+
+  const cartSignature = cartItems.map((i) => `${i.lineKey || i.id}:${i.quantity || 1}`).join('|');
+
+  useEffect(() => {
+    if (cartItems.length === 0) return;
+    if (!selectedShipping || isStoreLocalPickup(selectedShipping)) return;
+    setSelectedShipping(null);
+  }, [cartSignature]);
 
   const handleRemove = (lineKey) => {
     dispatch(removeFromCart(lineKey));
@@ -28,6 +44,15 @@ const Carrito = () => {
     if (cartItems.length === 0) return;
     if (selectedShipping) {
       saveCheckoutShipping(selectedShipping);
+      if (isStoreLocalPickup(selectedShipping)) {
+        clearDeliveryContext();
+      } else {
+        const pc = String(shippingContext.postcode || '').replace(/\D/g, '');
+        if (pc.length >= 4) saveDeliveryContext({ postcode: pc });
+      }
+      window.dispatchEvent(new CustomEvent('royriff:checkout-shipping-saved'));
+    }
+    if (selectedShipping && isStoreLocalPickup(selectedShipping)) {
       navigate('/checkout/pago');
     } else {
       navigate('/checkout');
@@ -51,7 +76,7 @@ const Carrito = () => {
       <div className="container-custom">
         <h1 className="font-barlow font-black text-3xl md:text-4xl mb-2 md:mb-4 uppercase">Tu carrito</h1>
         <p className="text-sm md:text-base text-neutral-darkGreen font-neue mb-6 md:mb-8">
-          Revisá tus productos, calculá el envío y elegí cómo recibir tu bici.
+          Revisá tus productos y elegí retiro en Yerba Buena o envío según tu código postal (igual que en el carrito lateral).
         </p>
 
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
@@ -100,7 +125,7 @@ const Carrito = () => {
                     <div className="flex items-center gap-2 border-2 border-neutral-gray rounded">
                       <button
                         onClick={() => handleUpdateQuantity(item.lineKey, item.quantity - 1)}
-                        className="p-2 hover:bg-neutral-gray/20 transition-smooth"
+                        className="p-2 hover:bg-neutral-gray/20 transition-smooth touch-manipulation"
                         aria-label="Reducir cantidad"
                       >
                         <FiMinus className="w-4 h-4" />
@@ -108,7 +133,7 @@ const Carrito = () => {
                       <span className="px-3 md:px-4 font-bold font-barlow min-w-[2rem] text-center">{item.quantity}</span>
                       <button
                         onClick={() => handleUpdateQuantity(item.lineKey, item.quantity + 1)}
-                        className="p-2 hover:bg-neutral-gray/20 transition-smooth"
+                        className="p-2 hover:bg-neutral-gray/20 transition-smooth touch-manipulation"
                         aria-label="Aumentar cantidad"
                       >
                         <FiPlus className="w-4 h-4" />
@@ -118,7 +143,7 @@ const Carrito = () => {
                     {/* Botón eliminar */}
                     <button
                       onClick={() => handleRemove(item.lineKey)}
-                      className="text-red-500 hover:text-red-700 transition-smooth p-2 flex items-center gap-2"
+                      className="text-red-500 hover:text-red-700 transition-smooth p-2 flex items-center gap-2 touch-manipulation"
                       aria-label="Eliminar producto"
                     >
                       <FiTrash2 className="w-4 h-4 md:w-5 md:h-5" />
@@ -141,25 +166,97 @@ const Carrito = () => {
             <div className="bg-white rounded-lg shadow-md p-4 md:p-6 lg:sticky lg:top-24">
               <h3 className="font-barlow font-bold text-xl md:text-2xl mb-1 md:mb-2">Resumen</h3>
               <p className="text-xs md:text-sm text-neutral-darkGreen font-neue mb-4">
-                {shippingContext.postcode
-                  ? <>Entrega estimada para el CP <span className="font-semibold">{shippingContext.postcode}</span>. Podés cambiarlo arriba.</>
-                  : 'Ingresá tu código postal para ver las opciones de envío disponibles.'}
+                {receiveMode === 'local'
+                  ? 'Retiro gratuito en nuestro local de Yerba Buena, Tucumán.'
+                  : shippingContext.postcode
+                    ? <>CP <span className="font-semibold">{shippingContext.postcode}</span> · podés cambiarlo recalculando abajo.</>
+                    : receiveMode === 'delivery'
+                      ? 'Ingresá tu CP y calculá envío a domicilio o retiro en sucursal del correo.'
+                      : 'Elegí cómo querés recibir tu pedido.'}
               </p>
-              
-              {/* Calculador de envío */}
-              <div className="mb-6">
-                <ShippingCalculator
-                  onShippingSelected={(option) => {
-                    setSelectedShipping(option);
-                    setShippingContext((prev) => ({ ...prev }));
+
+              <div className="space-y-2 mb-4">
+                <p className="text-[11px] font-semibold text-neutral-darkGreen font-neue uppercase tracking-wider">
+                  ¿Cómo recibís tu bici?
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReceiveMode('local');
+                    setSelectedShipping(LOCAL_PICKUP_OPTION);
                   }}
-                  onCalculationResult={(data) => {
-                    setShippingContext((prev) => ({ ...prev, postcode: data.postcode || '' }));
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
+                    receiveMode === 'local'
+                      ? 'border-primary-orange bg-primary-orange/5'
+                      : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      receiveMode === 'local' ? 'border-primary-orange bg-primary-orange' : 'border-neutral-gray/40'
+                    }`}
+                  >
+                    {receiveMode === 'local' && <FiCheck className="w-3 h-3 text-white" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-barlow font-bold text-sm">Retiro en el local</p>
+                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue">Yerba Buena, Tucumán</p>
+                  </div>
+                  <span className="text-xs font-barlow font-bold text-green-600 whitespace-nowrap">GRATIS</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReceiveMode('delivery');
+                    if (isStoreLocalPickup(selectedShipping)) setSelectedShipping(null);
                   }}
-                  showTitle={true}
-                  className="mb-0"
-                />
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
+                    receiveMode === 'delivery'
+                      ? 'border-primary-orange bg-primary-orange/5'
+                      : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      receiveMode === 'delivery' ? 'border-primary-orange bg-primary-orange' : 'border-neutral-gray/40'
+                    }`}
+                  >
+                    {receiveMode === 'delivery' && <FiCheck className="w-3 h-3 text-white" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-barlow font-bold text-sm">Envío o sucursal del correo</p>
+                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue">Según tu código postal</p>
+                  </div>
+                  <FiTruck className="w-4 h-4 text-neutral-gray/40 flex-shrink-0" />
+                </button>
               </div>
+
+              {receiveMode === 'delivery' && (
+                <div className="mb-6">
+                  <p className="text-[10px] text-neutral-darkGreen/55 font-neue mb-2 leading-snug">
+                    No incluye el retiro en nuestro local: esa opción es la de arriba.
+                  </p>
+                  <ShippingCalculator
+                    restoreShippingId={
+                      selectedShipping && !isStoreLocalPickup(selectedShipping)
+                        ? selectedShipping.id
+                        : undefined
+                    }
+                    onRestoreFailed={() => setSelectedShipping(null)}
+                    onShippingSelected={(option) => {
+                      setSelectedShipping(option);
+                      setShippingContext((prev) => ({ ...prev }));
+                    }}
+                    onCalculationResult={(data) => {
+                      const pc = String(data?.postcode || '').replace(/\D/g, '');
+                      setShippingContext((prev) => ({ ...prev, postcode: pc }));
+                      if (pc.length >= 4) saveDeliveryContext({ postcode: pc });
+                    }}
+                    showTitle={true}
+                    className="mb-0"
+                  />
+                </div>
+              )}
 
               <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                 <div className="flex justify-between items-center">
@@ -170,10 +267,10 @@ const Carrito = () => {
                   <span className="font-neue">Envío</span>
                   <span className="font-neue">
                     {selectedShipping ? (
-                      selectedShipping.cost > 0 ? (
+                      Number(selectedShipping.cost) > 0 ? (
                         formatPrice(selectedShipping.cost)
                       ) : (
-                        'A calcular'
+                        'GRATIS'
                       )
                     ) : (
                       'A calcular'
@@ -186,10 +283,10 @@ const Carrito = () => {
                 <div className="flex justify-between items-center text-lg md:text-xl font-barlow font-bold">
                   <span>Total</span>
                   <span className="text-primary-orange">
-                    {formatPrice(cartTotal + (selectedShipping?.cost || 0))}
+                    {formatPrice(cartTotal + Number(selectedShipping?.cost || 0))}
                   </span>
                 </div>
-                {selectedShipping && selectedShipping.cost > 0 && (
+                {selectedShipping && Number(selectedShipping.cost) > 0 && (
                   <p className="text-xs text-neutral-darkGreen mt-2 font-neue">
                     Incluye envío: {selectedShipping.title}
                   </p>
@@ -233,8 +330,12 @@ const Carrito = () => {
 
               <p className="text-[11px] text-neutral-darkGreen/60 font-neue text-center mb-4">
                 {selectedShipping
-                  ? `Irás directo al pago · ${selectedShipping.title}`
-                  : 'Completarás los datos de entrega en el siguiente paso'}
+                  ? isStoreLocalPickup(selectedShipping)
+                    ? 'Retiro en Yerba Buena · Irás directo al pago'
+                    : `Irás directo al pago · ${selectedShipping.title}`
+                  : receiveMode === 'delivery'
+                    ? 'Calculá el envío arriba o seguí al checkout para completar datos.'
+                    : 'Elegí retiro o envío, o seguí al checkout para definirlo allí.'}
               </p>
               
               <Link to="/" className="block text-center text-primary-orange hover:underline text-sm md:text-base font-neue">

@@ -14,12 +14,12 @@ const trustCards = [
   // Nivel A - Decisión de compra
   {
     icon: FiCreditCard,
-    badge: 'Mercado Pago + Tarjetas + Transferencia',
+    badge: 'Mercado Pago (tarjetas y cuotas)',
     title: 'Cuotas y medios de pago',
-    description: 'Elegí cómo pagar y mirá las opciones antes de confirmar la compra.',
+    description: 'Pagá con tarjeta u otros medios habilitados por Mercado Pago; las cuotas se eligen al pagar.',
     bullets: [
-      'Hasta 12 cuotas sin interés',
-      'Transferencia: datos claros y confirmación rápida'
+      'Visa, Mastercard y más, procesados por Mercado Pago',
+      'Cuotas según tu tarjeta y las promociones vigentes en el checkout de Mercado Pago',
     ],
     link: '/financiacion',
     cta: 'Ver financiación',

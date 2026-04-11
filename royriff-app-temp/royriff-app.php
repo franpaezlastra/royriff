@@ -83,9 +83,12 @@ function royriff_app_shortcode() {
         $main_handle = $handle;
         $j++;
     }
-    // Base path para React Router: la SPA vivirá en la raíz (/)
+    // Base path para React Router y datos que la SPA necesita al arrancar
     if ($main_handle) {
         wp_localize_script($main_handle, 'ROYRIFF_BASE', '/');
+        // Nonce de seguridad: el frontend lo envía en cada request sensible.
+        // wp_create_nonce genera un token ligado a la sesión del usuario + time window (~24h).
+        wp_localize_script($main_handle, 'ROYRIFF_NONCE', wp_create_nonce('royriff_api'));
     }
 
     return '<div id="root"></div>';
@@ -218,11 +221,19 @@ function royriff_app_serve_static_assets() {
     // Las rutas pueden ser /fonts/... o /images/... directamente
     if (preg_match('#^(fonts|images)/(.+)$#', $path, $matches)) {
         $asset_type = $matches[1]; // 'fonts' o 'images'
-        $asset_file = $matches[2]; // nombre del archivo
-        
-        $file_path = ROYRIFF_APP_PATH . 'dist/' . $asset_type . '/' . $asset_file;
-        
-        if (file_exists($file_path) && is_file($file_path)) {
+        $asset_rel  = str_replace('\\', '/', $matches[2]);
+        if ($asset_rel === '' || strpos($asset_rel, '..') !== false || strpos($asset_rel, "\0") !== false) {
+            return;
+        }
+        $base_dir = realpath(ROYRIFF_APP_PATH . 'dist/' . $asset_type);
+        if ($base_dir === false) {
+            return;
+        }
+        $file_path = realpath($base_dir . DIRECTORY_SEPARATOR . $asset_rel);
+        if ($file_path === false || strpos($file_path, $base_dir) !== 0) {
+            return;
+        }
+        if (is_file($file_path)) {
             // Determinar el tipo MIME según la extensión
             $ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
             $mime_types = array(

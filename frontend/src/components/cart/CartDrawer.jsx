@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiX, FiTrash2, FiPlus, FiMinus, FiMapPin, FiTruck, FiCheck } from 'react-icons/fi';
+import { FiX, FiTrash2, FiPlus, FiMinus, FiTruck, FiCheck } from 'react-icons/fi';
 import {
   selectCartItems,
   selectCartTotal,
@@ -9,18 +9,16 @@ import {
   updateQuantity,
 } from '../../store/slices/cartSlice';
 import { formatPrice, getProductMainImage } from '../../utils/constants';
-import { saveCheckoutShipping, isPickupOption } from '../../utils/checkoutStorage';
+import {
+  saveCheckoutShipping,
+  saveDeliveryContext,
+  clearDeliveryContext,
+  isStoreLocalPickup,
+} from '../../utils/checkoutStorage';
+import { LOCAL_PICKUP_OPTION } from '../../utils/localPickupOption';
+import { isCarrierBranchPickup, isDoorDeliveryOption } from '../../utils/shippingClassify';
 import ShippingCalculator from '../shipping/ShippingCalculator';
 import Button from '../common/Button';
-
-// Opción estática de retiro en el local (siempre disponible, no depende del CP)
-const LOCAL_PICKUP_OPTION = {
-  id: 'local_pickup',
-  method_id: 'local_pickup',
-  title: 'Retiro en el local',
-  cost: 0,
-  _isStatic: true,
-};
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -30,27 +28,88 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const [selectedShipping, setSelectedShipping] = useState(null);
   const [showCalculator, setShowCalculator] = useState(false);
+  // Mapa UX: solo 2 modos arriba (Retiro local o Envío). "Envío" debe mantenerse activo aunque Andreani
+  // devuelva una opción clasificada como retiro (Sucursal) dentro del calculador.
+  const [deliveryMode, setDeliveryMode] = useState(false);
+  const [lastPostcode, setLastPostcode] = useState('');
 
   const handleRemove = (lineKey) => dispatch(removeFromCart(lineKey));
   const handleUpdateQuantity = (lineKey, qty) =>
     dispatch(updateQuantity({ lineKey, quantity: qty }));
 
-  const handleSelectPickup = () => setSelectedShipping(LOCAL_PICKUP_OPTION);
-  const handleSelectCalculated = (opt) => setSelectedShipping(opt);
+  const handleSelectPickup = () => {
+    setSelectedShipping(LOCAL_PICKUP_OPTION);
+    setShowCalculator(false);
+    setDeliveryMode(false);
+  };
+  const handleSelectCalculated = (opt) => {
+    setSelectedShipping(opt);
+    // Si elegimos una opción calculada (Andreani estándar o sucursal), estamos en modo "Envío".
+    setDeliveryMode(true);
+    setShowCalculator(true);
+  };
 
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) return;
     onClose?.();
     if (selectedShipping) {
       saveCheckoutShipping(selectedShipping);
-      navigate('/checkout/pago');
-    } else {
-      navigate('/checkout');
+      if (isStoreLocalPickup(selectedShipping)) {
+        clearDeliveryContext();
+      } else if (lastPostcode.replace(/\D/g, '').length >= 4) {
+        saveDeliveryContext({ postcode: lastPostcode.replace(/\D/g, '') });
+      }
+      window.dispatchEvent(new CustomEvent('royriff:checkout-shipping-saved'));
     }
+    navigate('/checkout');
   };
 
   const hasItems = cartItems.length > 0;
-  const isPickup = isPickupOption(selectedShipping) || selectedShipping?.id?.toString().startsWith('local_pickup');
+  const shippingCost = Number(selectedShipping?.cost || 0);
+  const hasSelectedShipping = !!selectedShipping;
+  const isLocalPickupSelected =
+    hasSelectedShipping && selectedShipping?.id?.toString().startsWith('local_pickup');
+  const isDeliverySelected = deliveryMode;
+
+  const remoteShippingHeadline = () => {
+    if (!selectedShipping || isLocalPickupSelected) return 'Envío o retiro en sucursal';
+    if (isCarrierBranchPickup(selectedShipping)) return 'Retiro en sucursal del transporte';
+    if (isDoorDeliveryOption(selectedShipping)) return 'Envío a domicilio';
+    return 'Envío o retiro en sucursal';
+  };
+  const remoteShippingSubline = () => {
+    if (!selectedShipping || isLocalPickupSelected) {
+      return 'Ingresá tu CP y elegí domicilio o sucursal del correo';
+    }
+    return selectedShipping.title || 'Seleccionado';
+  };
+
+  const cartSignature = cartItems
+    .map((i) => `${i.lineKey || i.id}:${i.quantity || 1}`)
+    .join('|');
+
+  // Cuando cambian los items del carrito (agrega/quita/cantidad), invalidar el envío
+  // calculado para que recalcule con el nuevo peso/precio.
+  // IMPORTANTE: NO incluir selectedShipping en deps — eso causaría un loop que borra
+  // la selección en el mismo tick en que el usuario la elige.
+  const prevCartSig = useRef(cartSignature);
+  useEffect(() => {
+    if (prevCartSig.current === cartSignature) return;
+    prevCartSig.current = cartSignature;
+
+    if (!hasItems || isLocalPickupSelected || !isDeliverySelected) return;
+    setSelectedShipping(null);
+    setShowCalculator(true);
+  }, [cartSignature, hasItems, isLocalPickupSelected, isDeliverySelected]);
+
+  // Cuando el carrito se vacía, limpiar todo el estado de envío del drawer.
+  useEffect(() => {
+    if (hasItems) return;
+    setSelectedShipping(null);
+    setShowCalculator(false);
+    setDeliveryMode(false);
+    setLastPostcode('');
+  }, [hasItems]);
 
   return (
     <div
@@ -92,10 +151,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Content (una sola página con su propio scroll) */}
+        <div className="flex-1 overflow-y-auto rr-scroll">
           {/* Items */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <div className="px-5 py-4 space-y-3">
             {!hasItems && (
               <div className="text-center py-12">
                 <p className="font-barlow font-bold text-base mb-2">Tu carrito está vacío</p>
@@ -115,9 +174,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 return (
                   <div
                     key={item.lineKey || item.id}
-                    className="flex gap-3 border border-neutral-gray/15 rounded-lg p-3"
+                    className="flex gap-3 border border-neutral-gray/15 rounded-lg p-3.5"
                   >
-                    <div className="w-16 h-16 flex-shrink-0 bg-white rounded-md overflow-hidden border border-neutral-gray/15 flex items-center justify-center">
+                    <div className="w-20 h-20 flex-shrink-0 bg-white rounded-md overflow-hidden border border-neutral-gray/15 flex items-center justify-center">
                       {productImage ? (
                         <img
                           src={productImage}
@@ -132,7 +191,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between gap-2 mb-1">
-                        <p className="font-barlow font-bold text-sm leading-snug truncate">
+                        <p className="font-barlow font-bold text-sm leading-snug">
                           {displayName}
                         </p>
                         <span className="font-barlow font-bold text-sm whitespace-nowrap">
@@ -149,7 +208,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                           <button
                             type="button"
                             onClick={() => handleUpdateQuantity(item.lineKey, item.quantity - 1)}
-                            className="p-1.5 hover:bg-neutral-gray/10 transition-smooth"
+                            className="p-1.5 hover:bg-neutral-gray/10 transition-smooth touch-manipulation"
                           >
                             <FiMinus className="w-3.5 h-3.5" />
                           </button>
@@ -159,7 +218,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                           <button
                             type="button"
                             onClick={() => handleUpdateQuantity(item.lineKey, item.quantity + 1)}
-                            className="p-1.5 hover:bg-neutral-gray/10 transition-smooth"
+                            className="p-1.5 hover:bg-neutral-gray/10 transition-smooth touch-manipulation"
                           >
                             <FiPlus className="w-3.5 h-3.5" />
                           </button>
@@ -167,7 +226,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         <button
                           type="button"
                           onClick={() => handleRemove(item.lineKey)}
-                          className="text-red-400 hover:text-red-600 transition-smooth p-1.5"
+                          className="text-red-400 hover:text-red-600 transition-smooth p-1.5 touch-manipulation"
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
@@ -178,7 +237,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               })}
           </div>
 
-          {/* Resumen + Entrega */}
+          {/* Resumen + Entrega (también dentro del mismo scroll) */}
           {hasItems && (
             <div className="border-t border-neutral-gray/20 bg-neutral-gray/5">
               {/* Opciones de entrega */}
@@ -192,19 +251,19 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   type="button"
                   onClick={handleSelectPickup}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
-                    selectedShipping && isPickupOption(selectedShipping)
+                    isLocalPickupSelected
                       ? 'border-primary-orange bg-primary-orange/5'
                       : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                      selectedShipping && isPickupOption(selectedShipping)
+                      isLocalPickupSelected
                         ? 'border-primary-orange bg-primary-orange'
                         : 'border-neutral-gray/40'
                     }`}
                   >
-                    {isPickupOption(selectedShipping) && (
+                    {isLocalPickupSelected && (
                       <FiCheck className="w-3 h-3 text-white" />
                     )}
                   </div>
@@ -224,42 +283,38 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      if (isPickupOption(selectedShipping) || !selectedShipping) {
-                        setSelectedShipping(null);
-                        setShowCalculator(true);
-                      }
-                      setShowCalculator((prev) => !prev || !!selectedShipping);
+                      // Solo se cierra/oculta el envío si vuelven a seleccionar "Retiro en el local".
+                      // Si estábamos en retiro local, limpiar método calculado.
+                      if (isLocalPickupSelected) setSelectedShipping(null);
+                      setDeliveryMode(true);
+                      setShowCalculator(true);
                     }}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
-                      selectedShipping && !isPickupOption(selectedShipping)
+                      isDeliverySelected
                         ? 'border-primary-orange bg-primary-orange/5'
                         : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
                     }`}
                   >
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                        selectedShipping && !isPickupOption(selectedShipping)
+                        isDeliverySelected
                           ? 'border-primary-orange bg-primary-orange'
                           : 'border-neutral-gray/40'
                       }`}
                     >
-                      {selectedShipping && !isPickupOption(selectedShipping) && (
+                      {isDeliverySelected && (
                         <FiCheck className="w-3 h-3 text-white" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-barlow font-bold text-sm">
-                        {selectedShipping && !isPickupOption(selectedShipping)
-                          ? selectedShipping.title
-                          : 'Envío a domicilio'}
+                      <p className="font-barlow font-bold text-sm leading-snug">
+                        {remoteShippingHeadline()}
                       </p>
-                      <p className="text-[11px] text-neutral-darkGreen/60 font-neue">
-                        {selectedShipping && !isPickupOption(selectedShipping)
-                          ? 'Seleccionado'
-                          : 'Ingresá tu CP para ver opciones'}
+                      <p className="text-[11px] text-neutral-darkGreen/60 font-neue line-clamp-2">
+                        {remoteShippingSubline()}
                       </p>
                     </div>
-                    {selectedShipping && !isPickupOption(selectedShipping) && (
+                    {selectedShipping && !isLocalPickupSelected && (
                       <span
                         className={`text-xs font-barlow font-bold whitespace-nowrap ${
                           selectedShipping.cost > 0 ? 'text-primary-orange' : 'text-green-600'
@@ -270,21 +325,36 @@ const CartDrawer = ({ isOpen, onClose }) => {
                           : 'GRATIS'}
                       </span>
                     )}
-                    {(!selectedShipping || isPickupOption(selectedShipping)) && (
+                    {(!selectedShipping || isLocalPickupSelected) && (
                       <FiTruck className="w-4 h-4 text-neutral-gray/40 flex-shrink-0" />
                     )}
                   </button>
 
                   {/* Calculador compacto — se muestra al hacer click en "Envío a domicilio" */}
-                  {showCalculator && !isPickupOption(selectedShipping) && (
+                  {showCalculator && isDeliverySelected && (
                     <div className="rounded-lg border border-neutral-gray/20 bg-white overflow-hidden">
+                      <p className="text-[10px] text-neutral-darkGreen/55 font-neue px-3 pt-3 leading-snug">
+                        Elegí una opción por grupo: <strong>domicilio</strong> o <strong>sucursal del correo</strong>.
+                        El retiro en nuestro local Yerba Buena es la tarjeta de arriba (sin CP).
+                      </p>
                       <ShippingCalculator
                         showTitle={false}
                         compact
                         className="shadow-none border-0 bg-transparent"
+                        initialPostcode={lastPostcode}
+                        autoCalculateOnMount={true}
+                        autoCalculateKey={cartSignature}
+                        restoreShippingId={
+                          selectedShipping && !isLocalPickupSelected ? selectedShipping.id : undefined
+                        }
+                        onRestoreFailed={() => setSelectedShipping(null)}
                         onShippingSelected={(opt) => {
                           handleSelectCalculated(opt);
-                          setShowCalculator(false);
+                        }}
+                        onCalculationResult={(data) => {
+                          const pc = (data?.postcode || '').replace(/\D/g, '');
+                          setLastPostcode(pc);
+                          if (pc.length >= 4) saveDeliveryContext({ postcode: pc });
                         }}
                       />
                     </div>
@@ -301,6 +371,26 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   </span>
                 </div>
 
+                {hasSelectedShipping && (
+                  <div className="flex justify-between text-sm font-neue text-neutral-darkGreen">
+                    <span>Costo de envío</span>
+                    <span className={`font-barlow font-bold whitespace-nowrap ${
+                      shippingCost > 0 ? 'text-primary-orange' : 'text-green-600'
+                    }`}>
+                      {shippingCost > 0 ? formatPrice(shippingCost) : 'GRATIS'}
+                    </span>
+                  </div>
+                )}
+
+                {hasSelectedShipping && (
+                  <div className="flex justify-between items-center text-lg font-barlow font-bold">
+                    <span>Total</span>
+                    <span className="text-primary-orange">
+                      {formatPrice(cartTotal + shippingCost)}
+                    </span>
+                  </div>
+                )}
+
                 <Button
                   variant="primary"
                   className="w-full py-3.5 text-sm font-bold"
@@ -311,9 +401,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
                 <p className="text-[11px] text-neutral-darkGreen/50 font-neue text-center leading-tight">
                   {selectedShipping
-                    ? isPickup
-                      ? 'Irás directo al paso de pago ✓'
-                      : `Envío seleccionado · Irás directo al pago ✓`
+                    ? isStoreLocalPickup(selectedShipping)
+                      ? 'Retiro en Yerba Buena · Completarás los datos de contacto ✓'
+                      : isCarrierBranchPickup(selectedShipping)
+                        ? 'Retiro en sucursal del correo · Completarás datos en entrega ✓'
+                        : 'Envío a domicilio · Completarás la dirección en entrega ✓'
                     : 'Completarás los datos de entrega en el siguiente paso'}
                 </p>
 

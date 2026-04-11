@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCartItems } from '../../store/slices/cartSlice';
 import { calculateShipping } from '../../services/woocommerceService';
 import { formatPrice } from '../../utils/constants';
+import {
+  filterDuplicateStoreRates,
+  isDoorDeliveryOption,
+  isCarrierBranchPickup,
+} from '../../utils/shippingClassify';
 import LoadingSpinner from '../common/LoadingSpinner';
+import BranchSucursalInfo from './BranchSucursalInfo';
 import { FiTruck, FiMapPin, FiCheck } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -18,6 +24,11 @@ import toast from 'react-hot-toast';
  * @param {boolean} [props.showTitle=true] - Mostrar título "Calcular envío"
  * @param {Array} [props.customItems] - Productos personalizados (si no se usa, toma del carrito)
  * @param {boolean} [props.compact=false] - Versión compacta (para drawer móvil)
+ * @param {string} [props.initialPostcode] - Código postal inicial (para autocalcular al cambiar productos)
+ * @param {boolean} [props.autoCalculateOnMount=false] - Si es true, calcula automáticamente cuando hay CP
+ * @param {string|number} [props.autoCalculateKey] - Llave para volver a autocalcular (ej: firma del carrito)
+ * @param {string} [props.restoreShippingId] - Tras calcular, re-seleccionar esta tarifa si sigue existiendo (evita forzar domicilio)
+ * @param {Function} [props.onRestoreFailed] - Si restoreShippingId ya no está en las opciones (cambió el carrito/CP)
  */
 const ShippingCalculator = ({ 
   onShippingSelected, 
@@ -26,11 +37,16 @@ const ShippingCalculator = ({
   showTitle = true,
   customItems = null,
   compact = false,
+  initialPostcode = '',
+  autoCalculateOnMount = false,
+  autoCalculateKey,
+  restoreShippingId,
+  onRestoreFailed,
 }) => {
   const cartItems = useSelector(selectCartItems);
   const items = customItems || cartItems;
 
-  const [postcode, setPostcode] = useState('');
+  const [postcode, setPostcode] = useState(initialPostcode || '');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,9 +54,7 @@ const ShippingCalculator = ({
   const [selectedShipping, setSelectedShipping] = useState(null);
   const [calculated, setCalculated] = useState(false);
 
-  const handleCalculate = async (e) => {
-    e?.preventDefault();
-
+  const doCalculate = async () => {
     if (!postcode.trim()) {
       toast.error('Ingresá tu código postal');
       return;
@@ -68,13 +82,24 @@ const ShippingCalculator = ({
         onCalculationResult(result);
       }
 
-      if (result.options && result.options.length > 0) {
-        setShippingOptions(result.options);
+      const filtered = filterDuplicateStoreRates(result.options || []);
+      if (filtered.length > 0) {
+        setShippingOptions(filtered);
         setCalculated(true);
-        
-        // Si hay un solo método, seleccionarlo automáticamente
-        if (result.options.length === 1) {
-          handleSelectShipping(result.options[0]);
+
+        // Nunca forzar domicilio si hay varias tarifas: el usuario elige (como Tiendanube / Místico).
+        if (filtered.length === 1) {
+          handleSelectShipping(filtered[0]);
+        } else if (restoreShippingId) {
+          const restored = filtered.find((o) => o.id === restoreShippingId);
+          if (restored) {
+            handleSelectShipping(restored);
+          } else {
+            setSelectedShipping(null);
+            onRestoreFailed?.();
+          }
+        } else {
+          setSelectedShipping(null);
         }
       } else {
         toast('No hay opciones de envío disponibles para este código postal', { duration: 4000 });
@@ -88,6 +113,25 @@ const ShippingCalculator = ({
       setLoading(false);
     }
   };
+
+  const handleCalculate = async (e) => {
+    e?.preventDefault();
+    await doCalculate();
+  };
+
+  // Autocalcular (por ejemplo cuando cambian productos en el carrito)
+  useEffect(() => {
+    if (!autoCalculateOnMount) return;
+    if (!autoCalculateKey && autoCalculateKey !== 0) return;
+    if (!postcode.trim()) return;
+    if (items.length === 0) return;
+    // Debounce suave para evitar múltiples llamadas seguidas
+    const t = setTimeout(() => {
+      doCalculate();
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCalculateKey]);
 
   const handleSelectShipping = (option) => {
     setSelectedShipping(option);
@@ -270,34 +314,31 @@ const ShippingCalculator = ({
       {/* Resultados */}
       {calculated && shippingOptions.length > 0 && (
         <div className="mt-6 pt-6 border-t border-neutral-gray/20 space-y-4">
-          {/* Separar opciones en envío a domicilio y retiro */}
           {(() => {
-            const isPickup = (option) => {
-              const title = (option.title || '').toLowerCase();
-              return (
-                title.includes('retiro') ||
-                title.includes('retirar') ||
-                title.includes('sucursal') ||
-                title.includes('punto de retiro') ||
-                title.includes('pickup')
-              );
-            };
+            const deliveryOptions = shippingOptions.filter(isDoorDeliveryOption);
+            const branchOptions = shippingOptions.filter(isCarrierBranchPickup);
 
-            const deliveryOptions = shippingOptions.filter((o) => !isPickup(o));
-            const pickupOptions = shippingOptions.filter(isPickup);
-
-            const renderGroup = (title, options) => {
+            const renderGroup = (title, subtitle, options) => {
               if (!options.length) return null;
               return (
                 <div className="space-y-2">
                   <h4 className="font-barlow font-bold text-sm uppercase tracking-wide text-neutral-darkGreen">
                     {title}
                   </h4>
+                  {subtitle && (
+                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue leading-snug -mt-1 mb-1">
+                      {subtitle}
+                    </p>
+                  )}
                   {options.map((option) => {
                     const isSelected = selectedShipping?.id === option.id;
+                    const optionTitle = option.title || '';
+                    const isAndreani = optionTitle.toLowerCase().includes('andreani');
+                    const costNum = Number(option.cost);
                     return (
                       <button
                         key={option.id}
+                        type="button"
                         onClick={() => handleSelectShipping(option)}
                         className={`w-full text-left p-4 rounded-lg border-2 transition-smooth ${
                           isSelected
@@ -305,26 +346,32 @@ const ShippingCalculator = ({
                             : 'border-neutral-gray/30 hover:border-primary-orange/50'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            {isSelected && <FiCheck className="w-5 h-5 text-primary-orange" />}
-                            <div>
-                              <p className="font-barlow font-bold text-neutral-black">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {isSelected && <FiCheck className="w-5 h-5 text-primary-orange shrink-0" />}
+                            <div className="min-w-0">
+                              <p
+                                className={`font-barlow font-bold text-neutral-black ${
+                                  isAndreani ? 'text-xs' : 'text-sm'
+                                }`}
+                              >
                                 {option.title || 'Envío'}
                               </p>
-                              {option.cost > 0 ? (
-                                <p className="text-sm text-neutral-darkGreen font-neue">
-                                  {formatPrice(option.cost)}
-                                </p>
-                              ) : (
-                                <p className="text-sm text-neutral-darkGreen font-neue">
-                                  A calcular según destino
-                                </p>
-                              )}
+                              <p
+                                className={`text-sm font-neue ${
+                                  costNum > 0 ? 'text-neutral-darkGreen' : 'text-green-600'
+                                } ${isAndreani ? 'text-xs' : ''}`}
+                              >
+                                {costNum > 0 ? formatPrice(option.cost) : 'GRATIS'}
+                              </p>
                             </div>
                           </div>
-                          {option.cost > 0 && (
-                            <span className="font-barlow font-bold text-primary-orange text-lg">
+                          {costNum > 0 && (
+                            <span
+                              className={`font-barlow font-bold text-primary-orange shrink-0 ${
+                                isAndreani ? 'text-base' : 'text-lg'
+                              }`}
+                            >
                               {formatPrice(option.cost)}
                             </span>
                           )}
@@ -338,8 +385,19 @@ const ShippingCalculator = ({
 
             return (
               <>
-                {renderGroup('Envío a domicilio', deliveryOptions)}
-                {renderGroup('Retirar por', pickupOptions)}
+                {renderGroup(
+                  'Envío a domicilio',
+                  'Llevamos el pedido a la dirección que indiques en el checkout.',
+                  deliveryOptions
+                )}
+                {renderGroup(
+                  'Retiro en sucursal del transporte',
+                  'Retirás en una sucursal Andreani (u otro correo), no en el local Roy Riff de Yerba Buena.',
+                  branchOptions
+                )}
+                {selectedShipping && isCarrierBranchPickup(selectedShipping) && (
+                  <BranchSucursalInfo title={selectedShipping.title} compact className="mt-1" />
+                )}
               </>
             );
           })()}

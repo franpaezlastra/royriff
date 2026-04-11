@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { clearCheckoutStorage } from '../../utils/checkoutStorage';
 
-// Cargar carrito desde localStorage
 const loadCartFromStorage = () => {
   try {
     const serializedCart = localStorage.getItem('royriff_cart');
@@ -64,6 +64,7 @@ const cartSlice = createSlice({
       const lineKey = action.payload;
       state.items = state.items.filter(item => item.lineKey !== lineKey);
       saveCartToStorage(state.items);
+      if (state.items.length === 0) clearCheckoutStorage();
     },
     updateQuantity: (state, action) => {
       const { lineKey, quantity } = action.payload;
@@ -77,10 +78,12 @@ const cartSlice = createSlice({
       }
       
       saveCartToStorage(state.items);
+      if (state.items.length === 0) clearCheckoutStorage();
     },
     clearCart: (state) => {
       state.items = [];
       saveCartToStorage(state.items);
+      clearCheckoutStorage();
     },
   },
 });

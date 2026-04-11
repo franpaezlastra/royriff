@@ -13,12 +13,25 @@ import { FiArrowLeft } from 'react-icons/fi';
 const MIN_QTY = 1;
 const MAX_QTY = 10;
 
+const preloadImage = (src) =>
+  new Promise((resolve) => {
+    if (!src) {
+      resolve();
+      return;
+    }
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = resolve;
+    img.src = src;
+  });
+
 const ProductElegir = () => {
   const { product: productSlug } = useParams();
   const dispatch = useDispatch();
   const { selectedProduct, loading, error } = useSelector((state) => state.products);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,6 +42,43 @@ const ProductElegir = () => {
     if (selectedProduct?.colors?.length) setSelectedColor(selectedProduct.colors[0]);
     else setSelectedColor(null);
   }, [selectedProduct?.colors]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const preloadColorImages = async () => {
+      if (!selectedProduct) {
+        setImagesPreloaded(false);
+        return;
+      }
+
+      setImagesPreloaded(false);
+
+      const variationByColor = selectedProduct.variationByColor || {};
+      const colorImageSources = (selectedProduct.colors || [])
+        .map((color) => {
+          const variationImageSrc = variationByColor[color.name]?.image?.src;
+          const colorImages = selectedProduct.imagesByColor?.[color.name];
+          const fallbackColorImageSrc = colorImages && colorImages[0] ? (colorImages[0].src || colorImages[0]) : null;
+          return variationImageSrc || fallbackColorImageSrc || null;
+        })
+        .filter(Boolean);
+
+      if (colorImageSources.length === 0) {
+        if (!isCancelled) setImagesPreloaded(true);
+        return;
+      }
+
+      await Promise.allSettled(colorImageSources.map((src) => preloadImage(src)));
+      if (!isCancelled) setImagesPreloaded(true);
+    };
+
+    preloadColorImages();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedProduct]);
 
   useEffect(() => {
     if (selectedProduct) document.title = `Elegir ${getDisplayName(selectedProduct)} | Roy Riff`;
@@ -62,7 +112,7 @@ const ProductElegir = () => {
     toast.success(quantity > 1 ? `${quantity} × ${displayName} agregadas al carrito` : `${displayName} agregada al carrito`, { duration: 2000 });
   };
 
-  if (loading) {
+  if (loading || (selectedProduct && !imagesPreloaded)) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <LoadingSpinner size="lg" />

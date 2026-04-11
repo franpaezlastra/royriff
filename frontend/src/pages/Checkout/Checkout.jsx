@@ -4,6 +4,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCartItems, selectCartTotal, clearCart } from '../../store/slices/cartSlice';
 import { formatPrice } from '../../utils/constants';
 import { createOrder, getPaymentMethods, getShippingMethods, calculateShipping } from '../../services/woocommerceService';
+import {
+  filterDuplicateStoreRates,
+  isDoorDeliveryOption,
+  isCarrierBranchPickup,
+  isStoreLocalPickup,
+  getFulfillmentKind,
+} from '../../utils/shippingClassify';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import toast from 'react-hot-toast';
@@ -63,18 +70,6 @@ const Checkout = () => {
   const [shippingOptions, setShippingOptions] = useState([]);
   const [selectedShipping, setSelectedShipping] = useState(null);
   const [shippingLoading, setShippingLoading] = useState(false);
-
-  const isPickupOption = (option) => {
-    if (!option) return false;
-    const title = (option.title || '').toLowerCase();
-    return (
-      title.includes('retiro') ||
-      title.includes('retirar') ||
-      title.includes('sucursal') ||
-      title.includes('punto de retiro') ||
-      title.includes('pickup')
-    );
-  };
 
   // Cargar métodos de pago y envío al montar
   useEffect(() => {
@@ -137,12 +132,12 @@ const Checkout = () => {
         line_items: cartItems,
       });
 
-      const options = result.options || [];
+      const options = filterDuplicateStoreRates(result.options || []);
       setShippingOptions(options);
 
       if (options.length > 0) {
-        // Mantener selección previa si sigue siendo válida
-        let nextSelected = options[0];
+        const doorFirst = options.find(isDoorDeliveryOption) || options[0];
+        let nextSelected = doorFirst;
         if (selectedShipping) {
           const match = options.find(
             (opt) => opt.id === selectedShipping.id || opt.method_id === selectedShipping.method_id
@@ -172,40 +167,21 @@ const Checkout = () => {
     try {
       const methods = await getPaymentMethods();
       
-      // Filtrar solo métodos habilitados Y los 3 métodos específicos que el cliente quiere:
-      // 1. Mercado Pago (cualquier variante: mercadopago, woo-mercado-pago-basic, etc.)
-      // 2. Transferencia bancaria (bacs, bank_transfer, etc.)
-      // 3. Pagegate/Visa/Mastercard (pagegate, visa, etc.)
-      
-      // Palabras clave para identificar cada tipo de método
-      const mercadoPagoKeywords = ['mercado', 'mercadopago', 'mp'];
-      const transferKeywords = ['bacs', 'transfer', 'bank', 'bancaria', 'offline'];
-      const cardKeywords = ['pagegate', 'visa', 'mastercard', 'card', 'acceptance'];
+      // Solo Mercado Pago (plugin oficial woo-mercado-pago-*). Sin otros gateways ni Visa Acceptance.
+      const mercadoPagoKeywords = ['mercado', 'mercadopago'];
       
       const enabled = methods.filter(m => {
         if (!m.enabled) return false;
-        
         const methodId = (m.id || '').toLowerCase();
         const methodTitle = (m.title || '').toLowerCase();
         const searchText = `${methodId} ${methodTitle}`;
-        
-        // Verificar si coincide con alguno de los 3 tipos permitidos
-        const isMercadoPago = mercadoPagoKeywords.some(keyword => searchText.includes(keyword));
-        const isTransfer = transferKeywords.some(keyword => searchText.includes(keyword));
-        const isCard = cardKeywords.some(keyword => searchText.includes(keyword));
-        
-        return isMercadoPago || isTransfer || isCard;
+        return mercadoPagoKeywords.some(keyword => searchText.includes(keyword));
       });
       
-      // Si no encontramos métodos permitidos, mostrar un mensaje y log para debug
       if (enabled.length === 0) {
-        console.warn('No se encontraron métodos de pago permitidos.');
+        console.warn('No se encontraron métodos de pago Mercado Pago habilitados.');
         console.log('Métodos disponibles desde la API:', methods);
-        console.log('Buscando métodos con palabras clave:');
-        console.log('   - Mercado Pago:', mercadoPagoKeywords);
-        console.log('   - Transferencia:', transferKeywords);
-        console.log('   - Tarjetas:', cardKeywords);
-        toast.error('No hay métodos de pago disponibles. Contacta con soporte.');
+        toast.error('No hay métodos de pago disponibles. Activá Mercado Pago en WooCommerce o contactá soporte.');
         return;
       }
       
@@ -342,7 +318,8 @@ const Checkout = () => {
       };
 
       // Preparar datos de envío
-      const shipping = formData.ship_to_different_address ? {
+      const joinAddr2 = (a2, note) => [a2, note].filter(Boolean).join(' — ') || note;
+      const shippingBase = formData.ship_to_different_address ? {
         first_name: formData.shipping_first_name,
         last_name: formData.shipping_last_name,
         address_1: formData.shipping_address_1,
@@ -352,6 +329,24 @@ const Checkout = () => {
         postcode: formData.shipping_postcode,
         country: formData.shipping_country,
       } : billing;
+
+      let shipping = shippingBase;
+      if (selectedShipping && !isStoreLocalPickup(selectedShipping)) {
+        if (isCarrierBranchPickup(selectedShipping)) {
+          shipping = {
+            ...shippingBase,
+            address_2: joinAddr2(shippingBase.address_2, 'Retiro en sucursal del transporte — no entrega en el domicilio indicado'),
+          };
+        } else if (isDoorDeliveryOption(selectedShipping)) {
+          shipping = {
+            ...shippingBase,
+            address_2: joinAddr2(
+              shippingBase.address_2,
+              formData.ship_to_different_address ? 'Envío a domicilio (dirección de entrega)' : 'Envío a domicilio'
+            ),
+          };
+        }
+      }
 
       // Preparar items de la orden
       const line_items = cartItems.map(item => ({
@@ -384,6 +379,7 @@ const Checkout = () => {
         payment_method: formData.payment_method || '',
         payment_method_title: payment_method_title || 'Mercado Pago',
         shipping_lines,
+        meta_data: [{ key: 'royriff_fulfillment', value: getFulfillmentKind(selectedShipping) }],
       };
 
       // Log para debug
@@ -481,7 +477,8 @@ const Checkout = () => {
     return null; // El useEffect ya redirige
   }
 
-  const isPickupSelected = isPickupOption(selectedShipping);
+  /** Solo retiro en local tienda — sucursal correo sigue necesitando datos de envío */
+  const isStoreLocalSelected = isStoreLocalPickup(selectedShipping);
 
   return (
     <div className="py-12 md:py-20 min-h-screen bg-primary-beige">
@@ -726,8 +723,8 @@ const Checkout = () => {
               {shippingOptions.length > 0 && (
                 <div className="space-y-4">
                   {(() => {
-                    const deliveryOptions = shippingOptions.filter((opt) => !isPickupOption(opt));
-                    const pickupOptions = shippingOptions.filter(isPickupOption);
+                    const deliveryOptions = shippingOptions.filter(isDoorDeliveryOption);
+                    const pickupOptions = shippingOptions.filter(isCarrierBranchPickup);
 
                     const renderGroup = (title, options) => {
                       if (!options.length) return null;
@@ -787,7 +784,7 @@ const Checkout = () => {
                     return (
                       <>
                         {renderGroup('Envío a domicilio', deliveryOptions)}
-                        {renderGroup('Retirar por', pickupOptions)}
+                        {renderGroup('Retiro en sucursal del transporte', pickupOptions)}
                       </>
                     );
                   })()}
@@ -800,7 +797,7 @@ const Checkout = () => {
             </section>
 
             {/* Envío a otra dirección (solo si se selecciona envío a domicilio) */}
-            {!isPickupSelected && (
+            {!isStoreLocalSelected && (
               <section className="bg-white rounded-lg shadow-md p-6">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -948,11 +945,11 @@ const Checkout = () => {
               ) : (
                 <div className="space-y-4">
                   {paymentMethods.map((method) => {
-                    // Detectar el tipo de método para mostrar iconos y estilos específicos
                     const methodId = (method.id || '').toLowerCase();
-                    const isMercadoPago = methodId.includes('mercado') || methodId.includes('mercadopago');
-                    const isTransfer = methodId.includes('bacs') || methodId.includes('transfer') || methodId.includes('bank');
-                    const isCard = methodId.includes('pagegate') || methodId.includes('visa') || methodId.includes('card');
+                    const isMercadoPago =
+                      methodId.includes('mercado') ||
+                      methodId.includes('mercadopago') ||
+                      (method.title || '').toLowerCase().includes('mercado');
                     
                     return (
                       <label
@@ -987,38 +984,7 @@ const Checkout = () => {
                                 </div>
                               </div>
                             )}
-                            {isTransfer && (
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                                  <FiMapPin className="text-green-600 w-4 h-4" />
-                                </div>
-                                <div className="font-barlow font-bold text-lg text-neutral-black">
-                                  {method.title || 'Transferencia Bancaria'}
-                                </div>
-                              </div>
-                            )}
-                            {isCard && (
-                              <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2">
-                                  <img
-                                    src={PAYMENT_LOGOS.visa}
-                                    alt="Visa"
-                                    className="h-6 w-auto"
-                                    loading="lazy"
-                                  />
-                                  <img
-                                    src={PAYMENT_LOGOS.mastercard}
-                                    alt="Mastercard"
-                                    className="h-6 w-auto"
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <div className="font-barlow font-bold text-lg text-neutral-black">
-                                  {method.title || 'Tarjetas Visa / Mastercard'}
-                                </div>
-                              </div>
-                            )}
-                            {!isMercadoPago && !isTransfer && !isCard && (
+                            {!isMercadoPago && (
                               <div className="font-barlow font-bold text-lg text-neutral-black">
                                 {method.title}
                               </div>
@@ -1035,25 +1001,13 @@ const Checkout = () => {
                           {isMercadoPago && (
                             <div className="mt-3 flex flex-wrap gap-2">
                               <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-neue">
-                                Hasta 12 cuotas sin interés
+                                Tarjetas Visa, Mastercard y otras vía Mercado Pago
+                              </span>
+                              <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-neue">
+                                Cuotas: elegí plazos al pagar (según tu tarjeta y promociones activas)
                               </span>
                               <span className="text-xs bg-gray-50 text-gray-700 px-3 py-1 rounded-full font-neue">
                                 Pago seguro
-                              </span>
-                            </div>
-                          )}
-                          {isTransfer && (
-                            <div className="mt-3 text-xs bg-green-50 text-green-700 px-3 py-2 rounded-lg font-neue flex items-center gap-2">
-                              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-green-600 text-[10px] font-bold">
-                                i
-                              </span>
-                              <span>Usa el número de pedido como referencia de pago</span>
-                            </div>
-                          )}
-                          {isCard && (
-                            <div className="mt-3 flex items-center gap-2">
-                              <span className="text-xs bg-gray-50 text-gray-700 px-3 py-1 rounded-full font-neue">
-                                Pago seguro con tus tarjetas Visa y Mastercard
                               </span>
                             </div>
                           )}

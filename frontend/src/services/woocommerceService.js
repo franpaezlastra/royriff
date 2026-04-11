@@ -1,19 +1,66 @@
 import axios from 'axios';
 
-// Configuración: usar siempre el proxy del plugin (/api/) para seguridad
-// El proxy maneja las credenciales en el servidor, nunca se exponen al navegador
-// En desarrollo (localhost): Vite proxy en vite.config.js reenvía /api a api.royriff.com.ar (TEMPORAL, eliminar proxy al publicar)
 const API_BASE_URL = '/api';
 
-// Crear instancia de axios que usa nuestro proxy seguro
+// ── Nonce de seguridad ──────────────────────────────────────────────────────
+// En producción, WordPress inyecta `ROYRIFF_NONCE` vía wp_localize_script.
+// En desarrollo (localhost), lo obtenemos del endpoint /api/config.
+let _nonce = typeof window !== 'undefined' && window.ROYRIFF_NONCE
+  ? String(window.ROYRIFF_NONCE)
+  : '';
+
+let _nonceFetched = !!_nonce;
+
+async function ensureNonce() {
+  if (_nonce) return _nonce;
+  if (_nonceFetched) return _nonce;
+  _nonceFetched = true;
+  try {
+    const res = await axios.get(`${API_BASE_URL}/config`);
+    if (res.data?.nonce) _nonce = String(res.data.nonce);
+  } catch { /* noop — nonce will be empty, server returns 403 */ }
+  return _nonce;
+}
+
+/** Fuerza la renovación del nonce (útil tras un 403 de sesión expirada). */
+export async function refreshNonce() {
+  _nonceFetched = false;
+  _nonce = '';
+  return ensureNonce();
+}
+
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// NO enviamos credenciales desde el navegador - el proxy las maneja en el servidor
+// Interceptor: adjuntar nonce en cada petición saliente
+api.interceptors.request.use(async (config) => {
+  const nonce = await ensureNonce();
+  if (nonce) {
+    config.headers['X-RoyRiff-Nonce'] = nonce;
+  }
+  return config;
+});
+
+// Interceptor: si el servidor responde 403 con "token inválido", renovar nonce y reintentar 1 vez
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (
+      error.response?.status === 403 &&
+      !original._nonceRetry &&
+      (error.response?.data?.message || '').toLowerCase().includes('token')
+    ) {
+      original._nonceRetry = true;
+      await refreshNonce();
+      original.headers['X-RoyRiff-Nonce'] = _nonce;
+      return api(original);
+    }
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Obtener todos los productos
@@ -193,6 +240,9 @@ export const calculateShipping = async ({ postcode, city, state, line_items }) =
       state: state || '',
       line_items: line_items.map(item => ({
         product_id: parseInt(item.product_id || item.id),
+        // Importante: para productos con variaciones, el plugin/proxy necesita variation_id
+        // para tomar peso/dimensiones correctos y así calcular tarifas para más de un producto.
+        variation_id: item.variationId ? parseInt(item.variationId) : undefined,
         quantity: parseInt(item.quantity || 1),
       })),
     });
@@ -232,24 +282,11 @@ export const createOrder = async (orderData) => {
       console.log('Return URLs:', { returnUrl, cancelUrl, frontendUrl, currentOrigin });
     }
 
-    // Determinar el estado inicial según el método de pago
-    const isTransferencia = orderData.payment_method && (
-      orderData.payment_method.includes('bacs') ||
-      orderData.payment_method.includes('transfer') ||
-      orderData.payment_method.includes('bank') ||
-      orderData.payment_method.includes('offline')
-    );
-    
-    // Para transferencia bancaria, usar "on-hold" para que WooCommerce envíe el email
-    // Para otros métodos, usar "pending" hasta que se procese el pago
-    const initialStatus = isTransferencia ? 'on-hold' : 'pending';
-    
-    // Preparar datos de la orden según formato de WooCommerce API
+    // El servidor SIEMPRE fuerza set_paid=false y status=pending.
+    // El estado final (on-hold, processing…) lo gestiona WooCommerce según el gateway de pago.
     const orderPayload = {
       payment_method: orderData.payment_method || '',
       payment_method_title: orderData.payment_method_title || '',
-      set_paid: false, // No marcar como pagada hasta que se procese el pago
-      status: initialStatus, // "on-hold" para transferencia (envía email), "pending" para otros
       billing: {
         first_name: orderData.billing.first_name || '',
         last_name: orderData.billing.last_name || '',
@@ -290,14 +327,10 @@ export const createOrder = async (orderData) => {
         }
         return base;
       }),
-      // Solo incluir shipping_lines si hay métodos válidos con method_id
-      // Si está vacío o no tiene method_id válido, no lo enviamos
-      // WooCommerce calculará el envío automáticamente
       ...(orderData.shipping_lines && 
           orderData.shipping_lines.length > 0 && 
           orderData.shipping_lines[0].method_id ? 
           { shipping_lines: orderData.shipping_lines } : {}),
-      fee_lines: orderData.fee_lines || [],
       meta_data: [
         ...(orderData.meta_data || []),
         {
@@ -349,11 +382,16 @@ export const updateOrder = async (orderId, orderData) => {
 };
 
 /**
- * Obtener una orden por ID
+ * Obtener datos mínimos de una orden (requiere order_key; validado en el servidor).
  */
-export const getOrder = async (orderId) => {
+export const getOrder = async (orderId, orderKey) => {
+  if (!orderKey) {
+    throw new Error('order_key es requerido para consultar la orden');
+  }
   try {
-    const response = await api.get(`/orders/${orderId}`);
+    const response = await api.get(`/orders/${orderId}`, {
+      params: { order_key: orderKey },
+    });
     return response.data;
   } catch (error) {
     console.error(`Error fetching order ${orderId}:`, error);

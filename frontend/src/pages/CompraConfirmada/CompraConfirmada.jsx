@@ -25,7 +25,7 @@ const CompraConfirmada = () => {
 
   const loadOrder = async () => {
     try {
-      const orderData = await getOrder(orderId);
+      const orderData = await getOrder(orderId, orderKey);
       setOrder(orderData);
     } catch (error) {
       console.error('Error loading order:', error);

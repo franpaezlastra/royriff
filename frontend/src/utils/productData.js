@@ -8,13 +8,47 @@
 const LOLA_SLUGS = ['lola-cruiser', 'lola'];
 const XXXX_SLUGS = ['xxxx-expedition', 'xxxx'];
 
+const WP_UPLOAD_2026_02 = 'http://api.royriff.com.ar/wp-content/uploads/2026/02';
+const WP_UPLOAD_2026_04 = 'http://api.royriff.com.ar/wp-content/uploads/2026/04';
+
+/** Portada (hero derecha); la historia texto|imagen usa `description.storySplit.image`. */
+const PRODUCT_DETAIL_IMAGE_OVERRIDES = {
+  'lola-cruiser': {
+    hero: `${WP_UPLOAD_2026_04}/4.webp`,
+    inPage: [],
+    byColor: {
+      'Champagne Metallic': `${WP_UPLOAD_2026_04}/9.webp`,
+      'Graphite Pearl': `${WP_UPLOAD_2026_04}/4.webp`,
+    },
+  },
+  'xxxx-expedition': {
+    hero: `${WP_UPLOAD_2026_04}/1-7.webp`,
+    inPage: [],
+    byColor: {
+      'Graphite Pearl': `${WP_UPLOAD_2026_04}/1-7.webp`,
+      'Matte Olive Gold': `${WP_UPLOAD_2026_04}/1-2.webp`,
+    },
+  },
+};
+
+/**
+ * @returns {{ hero: string, inPage: string[] } | null}
+ */
+export const getProductDetailImageOverride = (slug) => {
+  if (!slug) return null;
+  const s = String(slug).toLowerCase().trim();
+  if (s.includes('lola')) return PRODUCT_DETAIL_IMAGE_OVERRIDES['lola-cruiser'];
+  if (s.includes('xxxx')) return PRODUCT_DETAIL_IMAGE_OVERRIDES['xxxx-expedition'];
+  return null;
+};
+
 export const PRODUCT_DATA = {
   'lola-cruiser': {
     displayName: 'LOLA',
     seoName: 'LOLA | Bicicleta Eléctrica Urbana Cruiser | 500W - Rodado 26"',
     slug: 'lola-cruiser',
     meta: {
-      title: 'Roy Riff LOLA: E-Bike Urbana con Puerto USB y Frenos Hidráulicos | Hasta 12 Cuotas Fijas',
+      title: 'Roy Riff LOLA: E-Bike Urbana Cruiser 500W | Frenos Hidráulicos y Puerto USB',
       description: 'Descubrí la LOLA. Bicicleta eléctrica urbana estilo Cruiser con autonomía de hasta 65 km, frenos hidráulicos y puerto USB. 100% Legal (Sin patente). Envíos a todo el país.',
     },
     colors: [
@@ -53,24 +87,34 @@ export const PRODUCT_DATA = {
         'Conectividad: Pantalla con Puerto de Carga USB.',
       ],
       productTitle: 'LOLA | Urban Cruiser E-Bike',
-      financing: {
-        cuotas: 'Pagá en hasta 12 cuotas fijas de $275.000',
-        transferencia: 'Consultar promociones vigentes - Hasta 30% OFF',
-      },
-      stockText: 'Stock disponible - Envíos gratis a todo el país.',
     },
     description: {
-      sectionTitle: 'La Ciudad es Tuya. Recórrela a Tu Ritmo.',
-      paragraphs: [
-        'Olvídate del tráfico y llega fresco a tu destino. Imaginate recorriendo las calles de tu ciudad con el viento pegandote en la cara, la sensación de placer bajo el Sol, sin preocupaciones por llegar transpirado, pero moviéndote de una manera sencilla y ecológica. Eso te brinda nuestra bici LOLA.',
-        'Olvídate de tener que buscar estacionamiento, de tener que pagar nafta, seguro y patente cada mes. Olvídate de no tener un medio de transporte que te represente y te brinde independencia.',
-        'LOLA fusiona la estética clásica de una Cruiser con la potencia eléctrica moderna. Diseñada para aquellos que valoran su independencia y la movilidad sustentable, su cuadro de paso bajo (Step-Through) te permite subir y bajar con facilidad, ideal para la ropa de trabajo o paradas frecuentes.',
-      ],
-      beneficiosTitle: '¿Por qué elegir la LOLA?',
-      beneficios: [
-        { titulo: 'Potencia Inteligente y Legal', texto: 'Su motor de 500W te impulsa con un torque de 65 N.m, suficiente para subir pendientes y arrancar rápido en los semáforos, pero limitado a 25 km/h para que circules legalmente por ciclovías sin necesidad de registro, patente ni licencia. En ámbitos privados hasta 34 km/hora, aprovechando todo su poder.' },
-        { titulo: 'Confort Anti-Baches', texto: 'Rodamos sobre neumáticos Chaoyang Semi-Fat de 26" x 3.0". Son más anchos que los de una bici común, lo que sumado a la suspensión delantera con bloqueo, absorbe las imperfecciones de las calles rotas para un andar suave como una nube.' },
-        { titulo: 'Siempre Conectada', texto: '¿Te quedaste sin batería en el celular usando el GPS? No hay problema. El display LCD de la LOLA incluye un puerto USB integrado para que cargues tus dispositivos mientras pedaleas.' },
+      storySplit: {
+        image: `${WP_UPLOAD_2026_02}/DSC01639-scaled.webp`,
+        title: 'La Ciudad es Tuya. Recórrela a Tu Ritmo.',
+        paragraphs: [
+          'Olvídate del tráfico y llega fresco a tu destino. Imaginate recorriendo las calles de tu ciudad con el viento pegandote en la cara, la sensación de placer bajo el Sol, sin preocupaciones por llegar transpirado, pero moviéndote de una manera sencilla y ecológica. Eso te brinda nuestra bici LOLA.',
+          'Olvídate de tener que buscar estacionamiento, de tener que pagar nafta, seguro y patente cada mes. Olvídate de no tener un medio de transporte que te represente y te brinde independencia.',
+          'LOLA fusiona la estética clásica de una Cruiser con la potencia eléctrica moderna. Diseñada para aquellos que valoran su independencia y la movilidad sustentable, su cuadro de paso bajo (Step-Through) te permite subir y bajar con facilidad, ideal para la ropa de trabajo o paradas frecuentes.',
+        ],
+        sectionHeading: '¿Por qué elegir la LOLA?',
+        leadCard: {
+          titulo: 'Potencia Inteligente y Legal',
+          texto:
+            'Su motor de 500W te impulsa con un torque de 65 N.m, suficiente para subir pendientes y arrancar rápido en los semáforos, pero limitado a 25 km/h para que circules legalmente por ciclovías sin necesidad de registro, patente ni licencia. En ámbitos privados hasta 34 km/hora, aprovechando todo su poder.',
+        },
+      },
+      bottomBeneficios: [
+        {
+          titulo: 'Confort Anti-Baches',
+          texto:
+            'Rodamos sobre neumáticos Chaoyang Semi-Fat de 26" x 3.0". Son más anchos que los de una bici común, lo que sumado a la suspensión delantera con bloqueo, absorbe las imperfecciones de las calles rotas para un andar suave como una nube.',
+        },
+        {
+          titulo: 'Siempre Conectada',
+          texto:
+            '¿Te quedaste sin batería en el celular usando el GPS? No hay problema. El display LCD de la LOLA incluye un puerto USB integrado para que cargues tus dispositivos mientras pedaleas.',
+        },
       ],
     },
     specsTable: [
@@ -126,7 +170,7 @@ export const PRODUCT_DATA = {
     seoName: 'Roy Riff XXXX | Bicicleta Eléctrica Todo terreno | 500W - Rodado 20"',
     slug: 'xxxx-expedition',
     meta: {
-      title: 'Roy Riff XXXX: E-Bike Fat Tire 500W con 90km de Autonomía | Hasta 12 Cuotas Fijas',
+      title: 'Roy Riff XXXX: E-Bike Fat Tire 500W | 90km de Autonomía y Doble Suspensión',
       description: 'Conocé la XXXX. Bicicleta eléctrica Fat Tire de expedición para arena, tierra y asfalto. Motor 500W, batería de 20Ah (90km), doble suspensión y frenos hidráulicos. 100% Legal (sin patente). Envíos a todo el país.',
     },
     colors: [
@@ -152,23 +196,37 @@ export const PRODUCT_DATA = {
         'Frenos: Hidráulicos de alto rendimiento.',
       ],
       productTitle: 'XXXX | Tu compañera de aventuras todoterreno',
-      financing: {
-        cuotas: 'Pagá en 12 Cuotas Fijas de $366.667',
-        transferencia: '$2.700.000 por transferencia bancaria - 39% OFF',
-      },
-      stockText: 'Stock disponible - Envíos a todo el país.',
     },
     description: {
-      sectionTitle: 'TU EXPEDICIÓN EMPIEZA DONDE TERMINA EL ASFALTO.',
-      paragraphs: [
-        'La Roy Riff XXXX no es una bici común. Es una declaración de principios. Diseñada para quienes creen que el mundo necesita más locos que se animen a explorar, esta máquina ignora los pozos, conquista la arena y domina la ciudad con una presencia que intimida.',
-      ],
-      beneficiosTitle: '¿Por qué la XXXX juega en otra liga?',
-      beneficios: [
-        { titulo: 'El Fin de la "Ansiedad de Rango"', texto: 'Mientras otras e-bikes te dejan a mitad de camino con baterías de 10Ah, la XXXX monta una celda de 20Ah (960 Wh). Es el doble de energía. Salí a trabajar, repartir o explorar todo el día sin mirar el indicador de batería.' },
-        { titulo: 'Suspensión Grado Moto', texto: 'Olvidate de las vibraciones. Equipada con una horquilla delantera de Doble Corona de Acero (tipo downhill) y un shock trasero HLT-100. Es una alfombra mágica sobre adoquines, tierra o pozos.' },
-        { titulo: 'Estilo Rebelde, Corazón Legal', texto: 'Parece una moto, se siente como una moto, pero es legalmente una bicicleta (EPAC). Gracias a su motor de 500W limitado a 25 km/h, circulás libremente sin patente, sin registro y sin seguro obligatorio.' },
-        { titulo: 'Centro de Comando 4.0"', texto: 'Controlá tu nave desde el display gigante SW-M808X. Pantalla color, resistente al agua (IP65) y preparada para el futuro (NFC/Bluetooth opcional).' },
+      storySplit: {
+        image: `${WP_UPLOAD_2026_02}/DSC01474-scaled.webp`,
+        title: 'TU EXPEDICIÓN EMPIEZA DONDE TERMINA EL ASFALTO.',
+        paragraphs: [
+          'La Roy Riff XXXX no es una bici común. Es una declaración de principios. Diseñada para quienes creen que el mundo necesita más locos que se animen a explorar, esta máquina ignora los pozos, conquista la arena y domina la ciudad con una presencia que intimida.',
+        ],
+        sectionHeading: '¿Por qué la XXXX juega en otra liga?',
+        leadCard: {
+          titulo: 'El Fin de la "Ansiedad de Rango"',
+          texto:
+            'Mientras otras e-bikes te dejan a mitad de camino con baterías de 10Ah, la XXXX monta una celda de 20Ah (960 Wh). Es el doble de energía. Salí a trabajar, repartir o explorar todo el día sin mirar el indicador de batería.',
+        },
+      },
+      bottomBeneficios: [
+        {
+          titulo: 'Suspensión Grado Moto',
+          texto:
+            'Olvídate de las vibraciones. Equipada con una horquilla delantera de Doble Corona de Acero (tipo downhill) y un shock trasero HLT-100. Es una alfombra mágica sobre adoquines, tierra o pozos.',
+        },
+        {
+          titulo: 'Estilo Rebelde, Corazón Legal',
+          texto:
+            'Parece una moto, se siente como una moto, pero es legalmente una bicicleta (EPAC). Gracias a su motor de 500W limitado a 25 km/h, circulás libremente sin patente, sin registro y sin seguro obligatorio.',
+        },
+        {
+          titulo: 'Centro de Comando 4.0"',
+          texto:
+            'Controlá tu nave desde el display gigante SW-M808X. Pantalla color, resistente al agua (IP65) y preparada para el futuro (NFC/Bluetooth opcional).',
+        },
       ],
     },
     specsTable: [

@@ -142,15 +142,15 @@ export const PAYMENT_METHODS = {
   mercadoPago: {
     name: 'Mercado Pago',
     installments: 12,
-    description: 'Hasta 12 cuotas sin interés',
+    description: 'Tarjetas y cuotas al pagar (según promociones activas)',
   },
   cards: {
     name: 'Tarjetas de crédito/débito',
-    description: 'Todas las tarjetas',
+    description: 'Vía Mercado Pago',
   },
   transfer: {
     name: 'Transferencia bancaria',
-    description: 'Descuentos especiales',
+    description: 'Si lo habilitás en WooCommerce aparte de este flujo',
   },
 };
 

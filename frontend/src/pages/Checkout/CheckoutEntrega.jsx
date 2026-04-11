@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCartItems } from '../../store/slices/cartSlice';
 import { formatPrice, getProductMainImage } from '../../utils/constants';
@@ -9,8 +9,17 @@ import {
   saveCheckoutBilling,
   loadCheckoutShipping,
   loadCheckoutBilling,
-  isPickupOption,
+  saveDeliveryContext,
+  loadDeliveryContext,
+  isStoreLocalPickup,
+  filterDuplicateStoreRates,
 } from '../../utils/checkoutStorage';
+import {
+  isDoorDeliveryOption,
+  isCarrierBranchPickup,
+} from '../../utils/shippingClassify';
+import { LOCAL_PICKUP_OPTION } from '../../utils/localPickupOption';
+import BranchSucursalInfo from '../../components/shipping/BranchSucursalInfo';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { FiMapPin, FiCheck, FiRefreshCw, FiShoppingCart } from 'react-icons/fi';
 
@@ -121,91 +130,137 @@ const ShippingRow = ({ opt, selected, onSelect }) => (
     </div>
     <span
       className={`font-barlow font-bold text-sm whitespace-nowrap ml-2 ${
-        opt.cost > 0 ? 'text-neutral-black' : 'text-green-600'
+        Number(opt.cost) > 0 ? 'text-neutral-black' : 'text-green-600'
       }`}
     >
-      {opt.cost > 0 ? formatPrice(opt.cost) : 'Gratis'}
+      {Number(opt.cost) > 0 ? formatPrice(opt.cost) : 'Gratis'}
     </span>
   </label>
 );
 
+/** Lee billing + envío + CP guardados (carrito / drawer / paso anterior). */
+function readEntregaBootstrap() {
+  const prev = loadCheckoutBilling() || {};
+  const prevShipping = loadCheckoutShipping();
+  const deliveryCtx = loadDeliveryContext();
+  const storePickup = isStoreLocalPickup(prevShipping);
+  const initialPc = String(prev.billing_postcode || deliveryCtx.postcode || '').replace(/\D/g, '');
+  const savedCalculatedMethod = prevShipping && !storePickup;
+  const billingHadPc = String(prev.billing_postcode || '').replace(/\D/g, '').length >= 4;
+  const initialPcConfirmed =
+    storePickup ||
+    (savedCalculatedMethod && initialPc.length >= 4) ||
+    (billingHadPc && !storePickup);
+
+  return {
+    prev,
+    prevShipping,
+    initialPc,
+    initialPcConfirmed,
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 const CheckoutEntrega = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const cartItems = useSelector(selectCartItems);
 
   useEffect(() => {
     if (cartItems.length === 0) navigate('/carrito');
   }, []);
 
-  const prev = loadCheckoutBilling() || {};
-  const prevShipping = loadCheckoutShipping();
+  const initRef = useRef(null);
+  if (!initRef.current) initRef.current = readEntregaBootstrap();
+  const i0 = initRef.current;
 
-  // Si ya viene con retiro pre-seleccionado, no necesitamos CP
-  const prevIsPickup = isPickupOption(prevShipping) || prevShipping?.id?.toString().startsWith('local_pickup');
+  const [postcode, setPostcode] = useState(i0.initialPc);
+  const [postcodeInput, setPostcodeInput] = useState(i0.initialPc);
+  const [pcConfirmed, setPcConfirmed] = useState(i0.initialPcConfirmed);
 
-  // CP state — si es retiro pre-seleccionado, no pedimos CP
-  const [postcode, setPostcode] = useState(prev.billing_postcode || '');
-  const [postcodeInput, setPostcodeInput] = useState(prev.billing_postcode || '');
-  const [pcConfirmed, setPcConfirmed] = useState(!!prev.billing_postcode || prevIsPickup);
-
-  // Opción estática de retiro en el local (siempre disponible)
-  const LOCAL_PICKUP = {
-    id: 'local_pickup',
-    method_id: 'local_pickup',
-    title: 'Retiro en el local',
-    cost: 0,
-    _isStatic: true,
-  };
-
-  // Shipping
   const [shippingOptions, setShippingOptions] = useState([]);
-  const [selectedShipping, setSelectedShipping] = useState(prevShipping || null);
+  const [selectedShipping, setSelectedShipping] = useState(i0.prevShipping || null);
   const [shippingLoading, setShippingLoading] = useState(false);
   const [shippingCalcError, setShippingCalcError] = useState('');
-  const [shippingCalculated, setShippingCalculated] = useState(!!prevShipping);
+  const [shippingCalculated, setShippingCalculated] = useState(!!i0.prevShipping);
 
-  // Form
   const [form, setForm] = useState({
-    first_name: prev.billing_first_name || '',
-    last_name: prev.billing_last_name || '',
-    email: prev.billing_email || '',
-    phone: prev.billing_phone || '',
-    dni: prev.billing_dni || '',
-    address_1: prev.billing_address_1?.replace(/\s+\S+$/, '') || '',
-    address_number: prev.billing_address_number || '',
-    address_2: prev.billing_address_2 || '',
-    address_neighborhood: prev.billing_address_neighborhood || '',
-    city: prev.billing_city || '',
+    first_name: i0.prev.billing_first_name || '',
+    last_name: i0.prev.billing_last_name || '',
+    email: i0.prev.billing_email || '',
+    phone: i0.prev.billing_phone || '',
+    dni: i0.prev.billing_dni || '',
+    address_1: i0.prev.billing_address_1?.replace(/\s+\S+$/, '') || '',
+    address_number: i0.prev.billing_address_number || '',
+    address_2: i0.prev.billing_address_2 || '',
+    address_neighborhood: i0.prev.billing_address_neighborhood || '',
+    city: i0.prev.billing_city || '',
   });
   const [errors, setErrors] = useState({});
 
-  const isPickup = isPickupOption(selectedShipping) || selectedShipping?.id === 'local_pickup';
-  const calcRef = useRef(null);
+  /**
+   * Releer envío/CP desde localStorage: mismo paso /checkout sin desmontar (drawer → Iniciar compra)
+   * o navegación con nueva location.key.
+   */
+  useLayoutEffect(() => {
+    const applyFromStorage = () => {
+      const b = readEntregaBootstrap();
+      setPostcode(b.initialPc);
+      setPostcodeInput(b.initialPc);
+      setPcConfirmed(b.initialPcConfirmed);
+      setSelectedShipping(b.prevShipping || null);
+      setShippingOptions([]);
+      setShippingCalcError('');
+      setShippingCalculated(!!b.prevShipping);
+      // El auto-calculo inmediato se encarga de recalcular si pcConfirmed es true
+      if (initialCalcDone) initialCalcDone.current = false;
+    };
+    applyFromStorage();
+    window.addEventListener('royriff:checkout-shipping-saved', applyFromStorage);
+    return () => window.removeEventListener('royriff:checkout-shipping-saved', applyFromStorage);
+  }, [location.key]);
 
-  // Auto-calcular cuando cambia el CP confirmado
+  /** Solo retiro en el local Roy Riff — no sucursal Andreani (ahí hace falta dirección del cliente) */
+  const isPickup = isStoreLocalPickup(selectedShipping);
+  const isLocalPickupSelected = selectedShipping?.id?.toString().startsWith('local_pickup');
+  const isBranchCarrierPickup =
+    selectedShipping && !isPickup && isCarrierBranchPickup(selectedShipping);
+  const calcRef = useRef(null);
+  const initialCalcDone = useRef(false);
+
+  // Firma del carrito para recalcular envío cuando agregan/quitan productos
+  const cartSignature = cartItems
+    .map((i) => `${i.lineKey || i.id}:${i.quantity || 1}`)
+    .join('|');
+
+  // Auto-calcular cuando cambia el CP confirmado.
+  // Primer cálculo (viene del drawer): inmediato (0ms).
+  // Siguientes (usuario cambia CP): debounce 400ms.
   useEffect(() => {
-    if (pcConfirmed && postcode.length >= 4) {
+    if (pcConfirmed && postcode.length >= 4 && !isPickup) {
+      const delay = initialCalcDone.current ? 400 : 0;
       clearTimeout(calcRef.current);
-      calcRef.current = setTimeout(() => doCalcShipping(postcode), 400);
+      calcRef.current = setTimeout(() => {
+        initialCalcDone.current = true;
+        doCalcShipping(postcode);
+      }, delay);
     }
     return () => clearTimeout(calcRef.current);
-  }, [postcode, pcConfirmed]);
+  }, [postcode, pcConfirmed, cartSignature, isPickup]);
 
   const doCalcShipping = async (pc) => {
     setShippingLoading(true);
     setShippingCalcError('');
     try {
       const result = await calculateShipping({ postcode: pc, line_items: cartItems });
-      const opts = result.options || [];
+      const opts = filterDuplicateStoreRates(result.options || []);
       setShippingOptions(opts);
       setShippingCalculated(true);
       if (opts.length > 0) {
-        const keep =
-          selectedShipping && opts.find((o) => o.id === selectedShipping.id)
-            ? selectedShipping
-            : opts[0];
-        setSelectedShipping(keep);
+        setSelectedShipping((prev) => {
+          const match = prev && opts.find((o) => o.id === prev.id);
+          return match || opts[0];
+        });
       } else {
         setSelectedShipping(null);
         setShippingCalcError(
@@ -259,15 +314,17 @@ const CheckoutEntrega = () => {
     if (!form.first_name.trim()) e.first_name = 'Requerido';
     if (!form.last_name.trim()) e.last_name = 'Requerido';
     if (!form.phone.trim()) e.phone = 'Requerido';
-    // Para envío a domicilio, WooCommerce requiere dirección, número y ciudad
-    if (!isPickup) {
+
+    if (isBranchCarrierPickup) {
       if (!postcode || postcode.length < 4) e.postcode = 'Ingresá tu código postal para calcular el envío';
+      if (!form.dni.trim()) e.dni = 'Andreani requiere DNI/CUIT para entregar en sucursal';
+    } else if (!isPickup) {
+      if (!postcode || postcode.length < 4) e.postcode = 'Ingresá tu código postal para calcular el envío';
+      if (!form.city.trim()) e.city = 'Requerido';
       if (!form.address_1.trim()) e.address_1 = 'Requerido';
       if (!form.address_number.trim()) e.address_number = 'Requerido';
-      if (!form.city.trim()) e.city = 'Requerido';
     }
-    // Para retiro: WooCommerce requiere address_1 y city internamente,
-    // pero los completamos con la dirección del local en handleContinue.
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -289,24 +346,33 @@ const CheckoutEntrega = () => {
       billing_dni: form.dni,
       billing_address_1: isPickup
         ? STORE_ADDRESS
-        : `${form.address_1} ${form.address_number}`.trim(),
-      billing_address_number: isPickup ? '' : form.address_number,
-      billing_address_2: form.address_2 || '',
-      billing_address_neighborhood: form.address_neighborhood || '',
-      billing_city: isPickup ? STORE_CITY : form.city,
+        : isBranchCarrierPickup
+          ? `Retiro en sucursal — CP ${postcode}`
+          : `${form.address_1} ${form.address_number}`.trim(),
+      billing_address_number: isPickup || isBranchCarrierPickup ? '' : form.address_number,
+      billing_address_2: isPickup || isBranchCarrierPickup ? '' : form.address_2 || '',
+      billing_address_neighborhood: isPickup || isBranchCarrierPickup ? '' : form.address_neighborhood || '',
+      billing_city: isPickup
+        ? STORE_CITY
+        : isBranchCarrierPickup
+          ? `CP ${postcode}`
+          : form.city,
       billing_postcode: isPickup ? STORE_POSTCODE : postcode,
       billing_state: '',
       billing_country: 'AR',
       billing_is_pickup: isPickup,
     });
     saveCheckoutShipping(selectedShipping);
+    if (!isPickup && postcode.replace(/\D/g, '').length >= 4) {
+      saveDeliveryContext({ postcode: postcode.replace(/\D/g, '') });
+    }
     navigate('/checkout/pago');
   };
 
-  const deliveryOpts = shippingOptions.filter((o) => !isPickupOption(o));
-  const pickupOpts = shippingOptions.filter(isPickupOption);
+  const deliveryOpts = shippingOptions.filter(isDoorDeliveryOption);
+  const pickupOpts = shippingOptions.filter(isCarrierBranchPickup);
   const subtotal = cartItems.reduce((t, i) => t + i.price * i.quantity, 0);
-  const shippingCost = selectedShipping?.cost || 0;
+  const shippingCost = Number(selectedShipping?.cost || 0);
 
   if (cartItems.length === 0) return null;
 
@@ -346,11 +412,11 @@ const CheckoutEntrega = () => {
                   Retirar por
                 </p>
                 <ShippingRow
-                  opt={LOCAL_PICKUP}
-                  selected={isPickupOption(selectedShipping)}
+                  opt={LOCAL_PICKUP_OPTION}
+                  selected={isLocalPickupSelected}
                   onSelect={(opt) => {
                     setSelectedShipping(opt);
-                    // Al elegir retiro, limpiar los campos de dirección en errors
+                    setShippingCalcError('');
                     setErrors((p) => {
                       const n = { ...p };
                       delete n.address_1; delete n.address_number; delete n.city; delete n.postcode;
@@ -369,14 +435,19 @@ const CheckoutEntrega = () => {
                 <div className="flex-1 h-px bg-neutral-gray/15" />
               </div>
 
-              {/* ── Sección de envío a domicilio ─────────────────────── */}
+              {/* ── Envío calculado por CP ── */}
               <div className="space-y-3">
                 <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                  Envío a domicilio
+                  Envío a domicilio o sucursal del correo
                 </p>
 
-                {/* CP Input o confirmado */}
-                {!pcConfirmed || isPickup ? (
+                {isPickup && !shippingOptions.length && !pcConfirmed && (
+                  <p className="text-xs text-neutral-darkGreen/70 font-neue leading-relaxed bg-neutral-gray/5 rounded-lg px-3 py-2.5">
+                    Tenés seleccionado retiro en el local. Si preferís envío, ingresá tu CP acá abajo.
+                  </p>
+                )}
+
+                {!pcConfirmed ? (
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -408,7 +479,6 @@ const CheckoutEntrega = () => {
                     )}
                   </div>
                 ) : (
-                  /* CP confirmado */
                   <div className="flex items-center justify-between bg-neutral-gray/5 rounded-lg px-4 py-2.5">
                     <div className="flex items-center gap-2">
                       <FiMapPin className="w-3.5 h-3.5 text-neutral-gray/50" />
@@ -416,21 +486,23 @@ const CheckoutEntrega = () => {
                         CP <span className="font-barlow font-bold text-neutral-black">{postcode}</span>
                       </span>
                     </div>
-                    <button type="button" onClick={handleChangePostcode} className="text-xs text-primary-orange font-neue hover:underline">
+                    <button
+                      type="button"
+                      onClick={handleChangePostcode}
+                      className="text-xs text-primary-orange font-neue hover:underline"
+                    >
                       Cambiar
                     </button>
                   </div>
                 )}
 
-                {/* Cargando */}
                 {shippingLoading && (
                   <div className="flex items-center gap-2 text-sm text-neutral-darkGreen/60 font-neue py-1">
                     <LoadingSpinner size="sm" /> Calculando…
                   </div>
                 )}
 
-                {/* Error con retry */}
-                {!shippingLoading && shippingCalcError && pcConfirmed && !isPickup && (
+                {!shippingLoading && shippingCalcError && pcConfirmed && (
                   <div className="space-y-1.5">
                     <p className="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2.5 font-neue">
                       {shippingCalcError}
@@ -445,16 +517,18 @@ const CheckoutEntrega = () => {
                   </div>
                 )}
 
-                {/* Opciones calculadas */}
                 {!shippingLoading && shippingOptions.length > 0 && (
                   <div className="space-y-4">
                     {deliveryOpts.length > 0 && (
                       <div className="space-y-2">
+                        <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
+                          Envío a domicilio
+                        </p>
                         {deliveryOpts.map((opt) => (
                           <ShippingRow
                             key={opt.id}
                             opt={opt}
-                            selected={selectedShipping?.id === opt.id}
+                            selected={!isPickup && selectedShipping?.id === opt.id}
                             onSelect={setSelectedShipping}
                           />
                         ))}
@@ -463,13 +537,16 @@ const CheckoutEntrega = () => {
                     {pickupOpts.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                          También podés retirar por
+                          Retiro en sucursal del transporte
+                        </p>
+                        <p className="text-[10px] text-neutral-darkGreen/45 font-neue leading-snug">
+                          No es el local de Yerba Buena: es una sucursal del correo (ej. Andreani).
                         </p>
                         {pickupOpts.map((opt) => (
                           <ShippingRow
                             key={opt.id}
                             opt={opt}
-                            selected={selectedShipping?.id === opt.id}
+                            selected={!isPickup && selectedShipping?.id === opt.id}
                             onSelect={setSelectedShipping}
                           />
                         ))}
@@ -489,7 +566,7 @@ const CheckoutEntrega = () => {
                       Datos de contacto
                     </h2>
                     <p className="text-[11px] text-neutral-darkGreen/50 font-neue -mt-2">
-                      Para avisarte cuando tu pedido esté listo para retirar.
+                      Para avisarte cuando tu pedido esté listo para retirar en Yerba Buena.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <Field
@@ -507,16 +584,6 @@ const CheckoutEntrega = () => {
                         onChange={handleChange}
                         error={errors.last_name}
                         placeholder="Páez Lastra"
-                      />
-                      <Field
-                        label="Email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        error={errors.email}
-                        type="email"
-                        placeholder="tu@email.com"
-                        className="col-span-2"
                       />
                       <Field
                         label="Teléfono"
@@ -539,11 +606,62 @@ const CheckoutEntrega = () => {
                       />
                     </div>
                   </>
+                ) : isBranchCarrierPickup ? (
+                  <>
+                    <BranchSucursalInfo title={selectedShipping?.title} className="mb-1" />
+                    <h2 className="font-barlow font-bold text-sm text-neutral-darkGreen">
+                      Persona que retira en sucursal
+                    </h2>
+                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue -mt-2 leading-relaxed">
+                      El paquete se envía a la sucursal de Andreani más cercana a tu CP.
+                      Solo necesitamos tus datos para que puedas retirarlo con DNI.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field
+                        label="Nombre"
+                        name="first_name"
+                        value={form.first_name}
+                        onChange={handleChange}
+                        error={errors.first_name}
+                        placeholder="Francisco"
+                      />
+                      <Field
+                        label="Apellido"
+                        name="last_name"
+                        value={form.last_name}
+                        onChange={handleChange}
+                        error={errors.last_name}
+                        placeholder="Páez Lastra"
+                      />
+                      <Field
+                        label="Teléfono"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        error={errors.phone}
+                        type="tel"
+                        placeholder="+54 381 000-0000"
+                        className="col-span-2"
+                      />
+                      <Field
+                        label="DNI o CUIT"
+                        name="dni"
+                        value={form.dni}
+                        onChange={handleChange}
+                        error={errors.dni}
+                        placeholder="39477480"
+                        className="col-span-2"
+                      />
+                    </div>
+                  </>
                 ) : (
                   <>
                     <h2 className="font-barlow font-bold text-sm text-neutral-darkGreen">
-                      Datos del destinatario
+                      Datos del destinatario — envío a domicilio
                     </h2>
+                    <p className="text-[11px] text-neutral-darkGreen/55 font-neue -mt-2">
+                      Completá la dirección completa: el pedido se entrega ahí.
+                    </p>
                     <div className="grid grid-cols-2 gap-4">
                       <Field
                         label="Nombre"
@@ -613,13 +731,6 @@ const CheckoutEntrega = () => {
                         placeholder="Yerba Buena"
                         className="col-span-2 md:col-span-1"
                       />
-                    </div>
-
-                    {/* Datos de facturación */}
-                    <div className="border-t border-neutral-gray/15 pt-4 space-y-3">
-                      <h3 className="font-barlow font-bold text-sm text-neutral-darkGreen">
-                        Datos de facturación
-                      </h3>
                       <Field
                         label="DNI o CUIT"
                         name="dni"
@@ -627,7 +738,6 @@ const CheckoutEntrega = () => {
                         onChange={handleChange}
                         optional
                         placeholder="39477480"
-                        className="max-w-xs"
                       />
                     </div>
                   </>
@@ -644,6 +754,31 @@ const CheckoutEntrega = () => {
             )}
 
           </form>
+
+          {/* Resumen en móvil (el aside grande está oculto en pantallas chicas) */}
+          <div className="lg:hidden mt-8 bg-white rounded-xl border border-neutral-gray/15 shadow-sm px-5 py-4 space-y-2">
+            <p className="font-barlow font-bold text-sm text-neutral-darkGreen">Resumen</p>
+            <div className="flex justify-between text-sm">
+              <span className="font-neue text-neutral-darkGreen/70">Subtotal</span>
+              <span className="font-barlow font-bold">{formatPrice(subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="font-neue text-neutral-darkGreen/70">Costo de envío</span>
+              <span
+                className={`font-barlow font-bold ${
+                  selectedShipping ? (shippingCost > 0 ? 'text-neutral-black' : 'text-green-600') : 'text-neutral-gray/40'
+                }`}
+              >
+                {selectedShipping ? (shippingCost > 0 ? formatPrice(shippingCost) : 'Gratis') : '—'}
+              </span>
+            </div>
+            <div className="flex justify-between items-baseline pt-2 border-t border-neutral-gray/15">
+              <span className="font-barlow font-black text-base">Total</span>
+              <span className="font-barlow font-black text-lg text-neutral-black">
+                {formatPrice(subtotal + shippingCost)}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* ── Resumen lateral ──────────────────────────────────────────── */}
