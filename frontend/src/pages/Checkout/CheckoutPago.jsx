@@ -5,6 +5,7 @@ import { selectCartItems } from '../../store/slices/cartSlice';
 import { clearCart } from '../../store/slices/cartSlice';
 import { formatPrice } from '../../utils/constants';
 import { createOrder, getPaymentMethods } from '../../services/woocommerceService';
+import DOMPurify from 'dompurify';
 import {
   loadCheckoutBilling,
   loadCheckoutShipping,
@@ -643,7 +644,7 @@ const CheckoutPago = () => {
                               {method.description && (
                                 <div
                                   className="text-xs text-neutral-darkGreen/70 font-neue bg-neutral-gray/5 rounded-lg px-3 py-2"
-                                  dangerouslySetInnerHTML={{ __html: method.description }}
+                                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(method.description) }}
                                 />
                               )}
                             </div>

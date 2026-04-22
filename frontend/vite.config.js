@@ -12,13 +12,11 @@ export default defineConfig({
     port: 3000,
     open: true,
     proxy: {
-      // ========== TEMPORAL DESARROLLO: consumir API desde localhost ==========
-      // Redirige /api/* a la API en producción para poder probar en local.
-      // ELIMINAR cuando la app esté publicada y ya no se use localhost para desarrollo.
       '/api': {
         target: 'https://api.royriff.com.ar',
         changeOrigin: true,
         secure: true,
+        cookieDomainRewrite: 'localhost',
       },
     },
   },

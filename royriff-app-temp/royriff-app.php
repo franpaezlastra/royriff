@@ -21,6 +21,40 @@ define('ROYRIFF_APP_URL', plugin_dir_url(__FILE__));
 define('ROYRIFF_APP_SLUG', '');
 
 /**
+ * Forzar el título de la pestaña a "Roy Riff" cuando se sirve la SPA.
+ * Evita que WordPress muestre "My WordPress" u otro título del tema.
+ */
+add_filter('pre_get_document_title', function ($title) {
+    if (get_query_var('royriff_spa') || is_front_page()) {
+        return 'Roy Riff | Bicicletas Eléctricas Premium en Argentina';
+    }
+    return $title;
+}, 999);
+
+add_filter('wp_title', function ($title) {
+    if (get_query_var('royriff_spa') || is_front_page()) {
+        return 'Roy Riff | Bicicletas Eléctricas Premium en Argentina';
+    }
+    return $title;
+}, 999);
+
+/**
+ * Headers de seguridad HTTP para proteger contra clickjacking, MIME sniffing, etc.
+ */
+add_action('send_headers', function () {
+    if (headers_sent()) {
+        return;
+    }
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    if (is_ssl()) {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+});
+
+/**
  * Shortcode: [royriff_app]
  * Inserta el div raíz y encola los assets del build de Vite.
  */

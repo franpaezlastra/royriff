@@ -23,10 +23,10 @@ const ContactSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="font-barlow font-black text-4xl md:text-5xl mb-6">
+            <h2 className="font-barlow font-black text-4xl md:text-5xl mb-6 !text-white">
               ¿Tenés dudas? Hablemos.
             </h2>
-            <p className="text-xl text-neutral-gray mb-12">
+            <p className="text-xl text-white/85 mb-12 font-neue max-w-2xl mx-auto">
               Estamos para ayudarte a elegir tu Roy Riff ideal. Sin vueltas, con la posta.
             </p>
 
@@ -40,7 +40,9 @@ const ContactSection = () => {
                 className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-all"
               >
                 <FaWhatsapp className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                <h3 className="font-bold mb-2">WhatsApp</h3>
+                <h3 className="font-barlow font-bold mb-2 uppercase tracking-wide !text-white">
+                  WhatsApp
+                </h3>
                 <a 
                   href={CONTACT_INFO.whatsappLink}
                   target="_blank"
@@ -60,7 +62,9 @@ const ContactSection = () => {
                 className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-all"
               >
                 <FiMail className="w-12 h-12 text-primary-orange mx-auto mb-4" />
-                <h3 className="font-bold mb-2">Email</h3>
+                <h3 className="font-barlow font-bold mb-2 uppercase tracking-wide !text-white">
+                  Email
+                </h3>
                 <a 
                   href={`mailto:${CONTACT_INFO.email}`}
                   className="text-primary-orange hover:text-primary-yellow transition-smooth break-all"
@@ -78,7 +82,9 @@ const ContactSection = () => {
                 className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-all"
               >
                 <FiMapPin className="w-12 h-12 text-primary-orange mx-auto mb-4" />
-                <h3 className="font-bold mb-2">Showroom</h3>
+                <h3 className="font-barlow font-bold mb-2 uppercase tracking-wide !text-white">
+                  Showroom
+                </h3>
                 <a 
                   href={CONTACT_INFO.googleMapsLink}
                   target="_blank"

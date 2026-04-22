@@ -12,6 +12,8 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import BranchSucursalInfo from './BranchSucursalInfo';
 import { FiTruck, FiMapPin, FiCheck } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+const ANDREANI_LOGO_URL =
+  'https://api.royriff.com.ar/wp-content/uploads/2026/04/correo_andreani_-removebg-preview-e1776259635246.webp';
 
 /**
  * Calculador de envío reutilizable
@@ -53,6 +55,15 @@ const ShippingCalculator = ({
   const [shippingOptions, setShippingOptions] = useState([]);
   const [selectedShipping, setSelectedShipping] = useState(null);
   const [calculated, setCalculated] = useState(false);
+
+  const getDisplayShippingTitle = (option, isDeliveryGroup) => {
+    const raw = option?.title || 'Envío';
+    const hasEstandar = /est[aá]ndar/i.test(raw);
+    if (isDeliveryGroup && hasEstandar) {
+      return `${raw} (envío a domicilio)`;
+    }
+    return raw;
+  };
 
   const doCalculate = async () => {
     if (!postcode.trim()) {
@@ -195,11 +206,13 @@ const ShippingCalculator = ({
               >
                 Código Postal <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-gray w-4 h-4" />
+              <div className="rr-postcode-field flex min-h-[44px] items-center gap-2.5 w-full rounded-lg border border-neutral-gray bg-white px-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] focus-within:border-primary-orange focus-within:ring-1 focus-within:ring-primary-orange/25">
+                <FiMapPin className="shrink-0 w-4 h-4 text-neutral-gray pointer-events-none" aria-hidden />
                 <input
                   id="shipping-postcode"
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
                   value={postcode}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, '').slice(0, 8);
@@ -207,7 +220,7 @@ const ShippingCalculator = ({
                     setCalculated(false);
                   }}
                   placeholder="Ej: 1000"
-                  className="w-full pl-10 pr-3 py-2 border border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue text-sm"
+                  className="rr-postcode-input min-h-0 min-w-0 flex-1 border-0 bg-transparent py-2.5 font-neue text-sm leading-normal tracking-normal text-neutral-black placeholder:text-neutral-gray/75 focus:outline-none focus:ring-0"
                   required
                 />
               </div>
@@ -224,11 +237,13 @@ const ShippingCalculator = ({
               >
                 Código Postal <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-gray w-4 h-4" />
+              <div className="rr-postcode-field flex min-h-[48px] items-center gap-2.5 w-full rounded-lg border-2 border-neutral-gray bg-white px-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] focus-within:border-primary-orange focus-within:ring-1 focus-within:ring-primary-orange/25">
+                <FiMapPin className="shrink-0 w-4 h-4 text-neutral-gray pointer-events-none" aria-hidden />
                 <input
                   id="shipping-postcode"
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
                   value={postcode}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, '').slice(0, 8);
@@ -236,7 +251,7 @@ const ShippingCalculator = ({
                     setCalculated(false);
                   }}
                   placeholder="Ej: 1000"
-                  className="w-full pl-10 pr-4 py-2 border-2 border-neutral-gray rounded-lg focus:border-primary-orange focus:outline-none font-neue"
+                  className="rr-postcode-input min-h-0 min-w-0 flex-1 border-0 bg-transparent py-2.5 font-neue text-base leading-normal tracking-normal text-neutral-black placeholder:text-neutral-gray/75 focus:outline-none focus:ring-0"
                   required
                 />
               </div>
@@ -318,7 +333,7 @@ const ShippingCalculator = ({
             const deliveryOptions = shippingOptions.filter(isDoorDeliveryOption);
             const branchOptions = shippingOptions.filter(isCarrierBranchPickup);
 
-            const renderGroup = (title, subtitle, options) => {
+            const renderGroup = (title, subtitle, options, isDeliveryGroup = false) => {
               if (!options.length) return null;
               return (
                 <div className="space-y-2">
@@ -333,6 +348,7 @@ const ShippingCalculator = ({
                   {options.map((option) => {
                     const isSelected = selectedShipping?.id === option.id;
                     const optionTitle = option.title || '';
+                    const displayTitle = getDisplayShippingTitle(option, isDeliveryGroup);
                     const isAndreani = optionTitle.toLowerCase().includes('andreani');
                     const costNum = Number(option.cost);
                     return (
@@ -350,12 +366,20 @@ const ShippingCalculator = ({
                           <div className="flex items-center gap-3 min-w-0">
                             {isSelected && <FiCheck className="w-5 h-5 text-primary-orange shrink-0" />}
                             <div className="min-w-0">
+                              {isAndreani && (
+                                <img
+                                  src={ANDREANI_LOGO_URL}
+                                  alt="Andreani"
+                                  className="h-4 w-auto mb-1 object-contain"
+                                  loading="lazy"
+                                />
+                              )}
                               <p
                                 className={`font-barlow font-bold text-neutral-black ${
                                   isAndreani ? 'text-xs' : 'text-sm'
                                 }`}
                               >
-                                {option.title || 'Envío'}
+                                {displayTitle}
                               </p>
                               <p
                                 className={`text-sm font-neue ${
@@ -388,12 +412,14 @@ const ShippingCalculator = ({
                 {renderGroup(
                   'Envío a domicilio',
                   'Llevamos el pedido a la dirección que indiques en el checkout.',
-                  deliveryOptions
+                  deliveryOptions,
+                  true
                 )}
                 {renderGroup(
                   'Retiro en sucursal del transporte',
                   'Retirás en una sucursal Andreani (u otro correo), no en el local Roy Riff de Yerba Buena.',
-                  branchOptions
+                  branchOptions,
+                  false
                 )}
                 {selectedShipping && isCarrierBranchPickup(selectedShipping) && (
                   <BranchSucursalInfo title={selectedShipping.title} compact className="mt-1" />

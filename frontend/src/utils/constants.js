@@ -4,7 +4,12 @@ export const CONTACT_INFO = {
   whatsappLink: 'https://wa.me/5493812006514',
   email: 'postventa@royriff.com.ar',
   address: 'Avenida Aconquija 1727, Yerba Buena, Tucumán',
-  googleMapsLink: 'https://maps.google.com/?q=Avenida+Aconquija+1727,+Yerba+Buena,+Tucumán',
+  /** Enlace corto oficial al pin en Google Maps */
+  googleMapsLink: 'https://maps.app.goo.gl/2HgLACgZTQbXrW856',
+  /** iframe embed (misma ubicación que la dirección) */
+  googleMapsEmbedSrc: `https://maps.google.com/maps?q=${encodeURIComponent(
+    'Avenida Aconquija 1727, Yerba Buena, Tucumán, Argentina'
+  )}&hl=es&z=16&output=embed`,
 };
 
 // Información de productos

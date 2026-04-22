@@ -48,19 +48,19 @@ const Header = () => {
           <nav className="hidden lg:flex items-center gap-8">
             <Link 
               to={`/bicicletas-electricas/${lolaSlug}`}
-              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-medium"
+              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               Lola Cruiser Urbana
             </Link>
             <Link 
               to={`/bicicletas-electricas/${xxxxSlug}`}
-              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-medium"
+              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               XXXX Todo terreno
             </Link>
             <Link 
               to="/test-ride-tucuman" 
-              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-medium"
+              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               Test drive
             </Link>
@@ -103,21 +103,21 @@ const Header = () => {
           <nav className="container-custom py-4 flex flex-col gap-4">
             <Link 
               to={`/bicicletas-electricas/${lolaSlug}`}
-              className="text-neutral-black hover:text-primary-orange transition-smooth font-medium py-2"
+              className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
               onClick={closeMenu}
             >
               Lola Cruiser Urbana
             </Link>
             <Link 
               to={`/bicicletas-electricas/${xxxxSlug}`}
-              className="text-neutral-black hover:text-primary-orange transition-smooth font-medium py-2"
+              className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
               onClick={closeMenu}
             >
               XXXX Todo terreno
             </Link>
             <Link 
               to="/test-ride-tucuman" 
-              className="text-neutral-black hover:text-primary-orange transition-smooth font-medium py-2"
+              className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
               onClick={closeMenu}
             >
               Test drive

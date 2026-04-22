@@ -369,19 +369,6 @@ export const createOrder = async (orderData) => {
 };
 
 /**
- * Actualizar una orden existente
- */
-export const updateOrder = async (orderId, orderData) => {
-  try {
-    const response = await api.put(`/orders/${orderId}`, orderData);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating order ${orderId}:`, error);
-    throw error;
-  }
-};
-
-/**
  * Obtener datos mínimos de una orden (requiere order_key; validado en el servidor).
  */
 export const getOrder = async (orderId, orderKey) => {
@@ -611,8 +598,6 @@ export default {
   getShippingMethods,
   calculateShipping,
   createOrder,
-  updateOrder,
   getOrder,
-  calculateShipping,
   formatWooCommerceProduct,
 };

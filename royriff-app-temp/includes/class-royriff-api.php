@@ -75,16 +75,11 @@ class RoyRiff_API {
     }
 
     private function get_client_ip() {
-        $headers = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR');
-        foreach ($headers as $h) {
-            if (!empty($_SERVER[$h])) {
-                $ip = strtok($_SERVER[$h], ',');
-                $ip = trim($ip);
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
-                }
-            }
+        // Cloudflare: header confiable que solo CF puede setear.
+        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP']) && filter_var($_SERVER['HTTP_CF_CONNECTING_IP'], FILTER_VALIDATE_IP)) {
+            return $_SERVER['HTTP_CF_CONNECTING_IP'];
         }
+        // Sin proxy o proxy de confianza: usar REMOTE_ADDR (no spoofeable).
         return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
@@ -169,7 +164,10 @@ class RoyRiff_API {
 
         $is_slug_lookup = false;
         if ($path === 'products') {
-            $wc_path = 'products?' . http_build_query($_GET);
+            $allowed_params = array('per_page', 'page', 'slug', 'category', 'search', 'orderby', 'order', 'include');
+            $safe_params = array_intersect_key($_GET, array_flip($allowed_params));
+            $safe_params['status'] = 'publish';
+            $wc_path = 'products?' . http_build_query($safe_params);
         } elseif (preg_match('#^products/slug/(.+)$#', $path, $m)) {
             $is_slug_lookup = true;
             $slug = rawurlencode($m[1]);
@@ -187,7 +185,26 @@ class RoyRiff_API {
                 $this->send_error('Sesión expirada o token inválido.', 403);
                 return;
             }
-            $wc_path = 'payment_gateways';
+            $gw_result = $this->request('GET', 'payment_gateways');
+            if ($gw_result['code'] >= 200 && $gw_result['code'] < 300) {
+                $all_gateways = json_decode($gw_result['body'], true);
+                $safe_gateways = array();
+                if (is_array($all_gateways)) {
+                    foreach ($all_gateways as $gw) {
+                        $safe_gateways[] = array(
+                            'id'          => isset($gw['id']) ? $gw['id'] : '',
+                            'title'       => isset($gw['title']) ? $gw['title'] : '',
+                            'description' => isset($gw['description']) ? wp_kses_post($gw['description']) : '',
+                            'enabled'     => isset($gw['enabled']) ? (bool) $gw['enabled'] : false,
+                            'order'       => isset($gw['order']) ? (int) $gw['order'] : 0,
+                        );
+                    }
+                }
+                $this->send_json($safe_gateways);
+            } else {
+                $this->send_error('No se pudieron obtener los métodos de pago.', $gw_result['code'] ?: 500);
+            }
+            return;
         } elseif ($path === 'shipping_methods') {
             $wc_path = 'shipping_methods';
         } elseif ($path === 'shipping/calculate' && $method === 'POST') {

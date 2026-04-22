@@ -22,6 +22,8 @@ import { LOCAL_PICKUP_OPTION } from '../../utils/localPickupOption';
 import BranchSucursalInfo from '../../components/shipping/BranchSucursalInfo';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { FiMapPin, FiCheck, FiRefreshCw, FiShoppingCart } from 'react-icons/fi';
+const ANDREANI_LOGO_URL =
+  'https://api.royriff.com.ar/wp-content/uploads/2026/04/correo_andreani_-removebg-preview-e1776259635246.webp';
 
 // ── Stepper exportado ─────────────────────────────────────────────────────────
 export const CheckoutStepper = ({ currentStep }) => (
@@ -106,7 +108,14 @@ const Field = ({
 );
 
 // ── Fila opción de envío ──────────────────────────────────────────────────────
-const ShippingRow = ({ opt, selected, onSelect }) => (
+const ShippingRow = ({ opt, selected, onSelect, isDeliveryGroup = false }) => {
+  const rawTitle = opt?.title || 'Envío';
+  const displayTitle =
+    isDeliveryGroup && /est[aá]ndar/i.test(rawTitle)
+      ? `${rawTitle} (envío a domicilio)`
+      : rawTitle;
+  const isAndreani = /andreani/i.test(rawTitle);
+  return (
   <label
     className={`flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
       selected
@@ -123,7 +132,15 @@ const ShippingRow = ({ opt, selected, onSelect }) => (
     </div>
     <input type="radio" className="sr-only" checked={selected} readOnly onClick={() => onSelect(opt)} />
     <div className="flex-1 min-w-0">
-      <p className="font-barlow font-bold text-sm text-neutral-black leading-snug">{opt.title}</p>
+      {isAndreani && (
+        <img
+          src={ANDREANI_LOGO_URL}
+          alt="Andreani"
+          className="h-4 w-auto mb-1 object-contain"
+          loading="lazy"
+        />
+      )}
+      <p className="font-barlow font-bold text-sm text-neutral-black leading-snug">{displayTitle}</p>
       {opt.estimated_delivery && (
         <p className="text-[11px] text-neutral-gray/55 font-neue mt-0.5">{opt.estimated_delivery}</p>
       )}
@@ -136,7 +153,8 @@ const ShippingRow = ({ opt, selected, onSelect }) => (
       {Number(opt.cost) > 0 ? formatPrice(opt.cost) : 'Gratis'}
     </span>
   </label>
-);
+  );
+};
 
 /** Lee billing + envío + CP guardados (carrito / drawer / paso anterior). */
 function readEntregaBootstrap() {
@@ -450,10 +468,18 @@ const CheckoutEntrega = () => {
                 {!pcConfirmed ? (
                   <div className="space-y-2">
                     <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-gray/50 w-4 h-4 pointer-events-none" />
+                      <div
+                        className={`rr-postcode-field flex min-h-[44px] flex-1 items-center gap-2.5 rounded-lg border bg-white px-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] transition-all focus-within:ring-1 focus-within:ring-primary-orange/25 ${
+                          errors.postcode
+                            ? 'border-red-400 bg-red-50/40 focus-within:border-red-400'
+                            : 'border-neutral-gray/35 focus-within:border-primary-orange'
+                        }`}
+                      >
+                        <FiMapPin className="shrink-0 w-4 h-4 text-neutral-gray/50 pointer-events-none" aria-hidden />
                         <input
                           type="text"
+                          inputMode="numeric"
+                          autoComplete="postal-code"
                           value={postcodeInput}
                           onChange={(e) =>
                             setPostcodeInput(e.target.value.replace(/\D/g, '').slice(0, 8))
@@ -461,8 +487,8 @@ const CheckoutEntrega = () => {
                           onKeyDown={(e) =>
                             e.key === 'Enter' && (e.preventDefault(), handleConfirmPostcode())
                           }
-                          placeholder="Código postal  Ej: 4107"
-                          className={`${INPUT} pl-10 ${errors.postcode ? INPUT_ERR : ''}`}
+                          placeholder="Ej: 4107"
+                          className="rr-postcode-input min-h-0 min-w-0 flex-1 border-0 bg-transparent py-2.5 font-neue text-sm leading-normal tracking-normal text-neutral-black placeholder:text-neutral-gray/50 focus:outline-none focus:ring-0"
                         />
                       </div>
                       <button
@@ -528,6 +554,7 @@ const CheckoutEntrega = () => {
                           <ShippingRow
                             key={opt.id}
                             opt={opt}
+                            isDeliveryGroup
                             selected={!isPickup && selectedShipping?.id === opt.id}
                             onSelect={setSelectedShipping}
                           />
@@ -575,7 +602,7 @@ const CheckoutEntrega = () => {
                         value={form.first_name}
                         onChange={handleChange}
                         error={errors.first_name}
-                        placeholder="Francisco"
+                        placeholder="Tu nombre"
                       />
                       <Field
                         label="Apellido"
@@ -583,7 +610,7 @@ const CheckoutEntrega = () => {
                         value={form.last_name}
                         onChange={handleChange}
                         error={errors.last_name}
-                        placeholder="Páez Lastra"
+                        placeholder="Tu apellido"
                       />
                       <Field
                         label="Teléfono"
@@ -601,7 +628,7 @@ const CheckoutEntrega = () => {
                         value={form.dni}
                         onChange={handleChange}
                         optional
-                        placeholder="39477480"
+                        placeholder="Tu DNI o CUIT"
                         className="col-span-2"
                       />
                     </div>
@@ -623,7 +650,7 @@ const CheckoutEntrega = () => {
                         value={form.first_name}
                         onChange={handleChange}
                         error={errors.first_name}
-                        placeholder="Francisco"
+                        placeholder="Tu nombre"
                       />
                       <Field
                         label="Apellido"
@@ -631,7 +658,7 @@ const CheckoutEntrega = () => {
                         value={form.last_name}
                         onChange={handleChange}
                         error={errors.last_name}
-                        placeholder="Páez Lastra"
+                        placeholder="Tu apellido"
                       />
                       <Field
                         label="Teléfono"
@@ -649,7 +676,7 @@ const CheckoutEntrega = () => {
                         value={form.dni}
                         onChange={handleChange}
                         error={errors.dni}
-                        placeholder="39477480"
+                        placeholder="Tu DNI o CUIT"
                         className="col-span-2"
                       />
                     </div>
@@ -669,7 +696,7 @@ const CheckoutEntrega = () => {
                         value={form.first_name}
                         onChange={handleChange}
                         error={errors.first_name}
-                        placeholder="Francisco"
+                        placeholder="Tu nombre"
                       />
                       <Field
                         label="Apellido"
@@ -677,7 +704,7 @@ const CheckoutEntrega = () => {
                         value={form.last_name}
                         onChange={handleChange}
                         error={errors.last_name}
-                        placeholder="Páez Lastra"
+                        placeholder="Tu apellido"
                       />
                       <Field
                         label="Teléfono"
@@ -737,7 +764,7 @@ const CheckoutEntrega = () => {
                         value={form.dni}
                         onChange={handleChange}
                         optional
-                        placeholder="39477480"
+                        placeholder="Tu DNI o CUIT"
                       />
                     </div>
                   </>

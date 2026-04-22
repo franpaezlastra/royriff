@@ -3,6 +3,9 @@ import { FaWhatsapp, FaInstagram, FaSpotify } from 'react-icons/fa';
 import { CONTACT_INFO } from '../../utils/constants';
 
 const IMAGOTIPO_URL = 'http://api.royriff.com.ar/wp-content/uploads/2026/02/IMG_8249-removebg-preview-e1772112881155.png';
+const INSTAGRAM_URL = 'https://www.instagram.com/royriff.arg/';
+const SPOTIFY_PLAYLIST_URL =
+  'https://open.spotify.com/playlist/0AKlsyoyQtdk2X6FSARVb0?si=QRmGgdetSTGFAh_flsd3yA&pi=10F8RErnSRCD0';
 
 const Footer = () => {
   return (
@@ -32,20 +35,20 @@ const Footer = () => {
                 <FaWhatsapp className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/90 hover:text-primary-orange transition-colors"
-                aria-label="Instagram"
+                aria-label="Instagram Roy Riff"
               >
                 <FaInstagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href={SPOTIFY_PLAYLIST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/90 hover:text-primary-orange transition-colors"
-                aria-label="Spotify"
+                aria-label="Roy Riff Playlist en Spotify"
               >
                 <FaSpotify className="w-5 h-5" />
               </a>
@@ -135,6 +138,16 @@ const Footer = () => {
             </nav>
             <p className="md:text-right shrink-0">
               &copy; {new Date().getFullYear()} Roy Riff. Todos los derechos reservados.
+              {' '}Desarrollado por{' '}
+              <a
+                href="https://portfolio.franpl.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-primary-orange transition-colors"
+              >
+                Francisco Páez Lastra
+              </a>
+              .
             </p>
           </div>
         </div>

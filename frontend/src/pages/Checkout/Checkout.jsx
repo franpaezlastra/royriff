@@ -179,13 +179,13 @@ const Checkout = () => {
       });
       
       if (enabled.length === 0) {
-        console.warn('No se encontraron métodos de pago Mercado Pago habilitados.');
-        console.log('Métodos disponibles desde la API:', methods);
+        if (import.meta.env.DEV) {
+          console.warn('No se encontraron métodos de pago Mercado Pago habilitados.');
+          console.log('Métodos disponibles desde la API:', methods);
+        }
         toast.error('No hay métodos de pago disponibles. Activá Mercado Pago en WooCommerce o contactá soporte.');
         return;
       }
-      
-      console.log('Métodos de pago filtrados:', enabled.map(m => ({ id: m.id, title: m.title })));
       
       setPaymentMethods(enabled);
       
@@ -382,10 +382,11 @@ const Checkout = () => {
         meta_data: [{ key: 'royriff_fulfillment', value: getFulfillmentKind(selectedShipping) }],
       };
 
-      // Log para debug
-      console.log('Order data being sent:', orderData);
-      console.log('Payment method:', formData.payment_method);
-      console.log('Payment methods available:', paymentMethods);
+      if (import.meta.env.DEV) {
+        console.log('Order data being sent:', orderData);
+        console.log('Payment method:', formData.payment_method);
+        console.log('Payment methods available:', paymentMethods);
+      }
 
       const order = await createOrder(orderData);
 
@@ -438,15 +439,13 @@ const Checkout = () => {
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      if (import.meta.env.DEV) console.error('Error creating order:', error);
       
-      // Mostrar error más detallado
       let errorMessage = 'Error al procesar la orden. Por favor intenta nuevamente.';
       
       if (error.response) {
-        // Error de la API
         const errorData = error.response.data;
-        console.error('Error response data:', errorData);
+        if (import.meta.env.DEV) console.error('Error response data:', errorData);
         
         if (errorData.message) {
           errorMessage = errorData.message;

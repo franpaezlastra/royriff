@@ -15,17 +15,21 @@ const Comparador = () => {
         {/* Tabla Comparativa */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-neutral-black text-white">
+            <table className="w-full rr-comparador-table">
+              {/*
+                !bg / !text: evita que estilos del host (p. ej. WordPress) dejen el thead
+                con fondo crema y texto invisible (mismo color que el fondo).
+              */}
+              <thead className="!bg-[#151515] !text-white [&_th]:!text-white [&_*]:!text-white">
                 <tr>
-                  <th className="px-6 py-4 text-left">Característica</th>
-                  <th className="px-6 py-4 text-center">
-                    <div className="font-barlow font-black text-2xl">LOLA</div>
-                    <div className="text-sm font-normal">Urban Cruiser</div>
+                  <th className="rr-comparador-headcell px-6 py-4 text-left font-barlow !text-white">Característica</th>
+                  <th className="rr-comparador-headcell px-6 py-4 text-center !text-white">
+                    <div className="font-barlow font-black text-2xl !text-white">LOLA</div>
+                    <div className="text-sm font-normal !text-white/90">Urban Cruiser</div>
                   </th>
-                  <th className="px-6 py-4 text-center">
-                    <div className="font-barlow font-black text-2xl">XXXX</div>
-                    <div className="text-sm font-normal">Expedición</div>
+                  <th className="rr-comparador-headcell px-6 py-4 text-center !text-white">
+                    <div className="font-barlow font-black text-2xl !text-white">XXXX</div>
+                    <div className="text-sm font-normal !text-white/90">Expedición</div>
                   </th>
                 </tr>
               </thead>

@@ -25,16 +25,16 @@ const HeroSection = () => {
           className="max-w-5xl mx-auto"
         >
           {/* Main Title */}
-          <h1 className="font-barlow font-black text-4xl md:text-6xl lg:text-7xl text-white mb-4 leading-tight uppercase">
+          <h1 className="font-barlow font-black text-4xl md:text-6xl lg:text-7xl !text-white mb-4 leading-tight uppercase">
             Bicicletas eléctricas urbanas
           </h1>
           
-          <h2 className="font-barlow font-black text-3xl md:text-5xl lg:text-6xl text-white mb-8 leading-tight uppercase">
+          <h2 className="font-barlow font-black text-3xl md:text-5xl lg:text-6xl !text-white mb-8 leading-tight uppercase">
             Gran autonomía y diseño
           </h2>
 
           {/* Subtitle - PP Neue Montreal para textos largos */}
-          <p className="font-neue text-white text-lg md:text-xl mb-12 font-normal">
+          <p className="font-neue !text-white text-lg md:text-xl mb-12 font-normal">
             Envíos a todo el país. Hasta 12 cuotas sin interés.
           </p>
 

@@ -15,8 +15,13 @@ if (!defined('ABSPATH')) {
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="profile" href="https://gmpg.org/xfn/11">
+    <title>Roy Riff | Bicicletas Eléctricas Premium en Argentina</title>
     <?php wp_head(); ?>
+    <style>
+        /* Aislar la app React de estilos del tema WordPress */
+        body { margin: 0; padding: 0; }
+        #root { isolation: isolate; }
+    </style>
 </head>
 <body <?php body_class(); ?>>
     <?php

@@ -81,7 +81,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
     if (!selectedShipping || isLocalPickupSelected) {
       return 'Ingresá tu CP y elegí domicilio o sucursal del correo';
     }
-    return selectedShipping.title || 'Seleccionado';
+    const rawTitle = selectedShipping.title || 'Seleccionado';
+    if (isDoorDeliveryOption(selectedShipping) && /est[aá]ndar/i.test(rawTitle)) {
+      return `${rawTitle} (envío a domicilio)`;
+    }
+    return rawTitle;
   };
 
   const cartSignature = cartItems

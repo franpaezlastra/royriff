@@ -27,10 +27,20 @@ const TestRide = () => {
         />
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="bg-white p-8 rounded-lg shadow-md flex flex-col">
             <h3 className="font-barlow font-bold text-2xl mb-4">Ubicación</h3>
-            <p className="text-neutral-darkGreen mb-4">{CONTACT_INFO.address}</p>
-            <Button href={CONTACT_INFO.googleMapsLink} variant="secondary" className="w-full">
+            <div className="relative mb-4 w-full overflow-hidden rounded-lg border border-neutral-gray/25 bg-neutral-black/5 aspect-[4/3] min-h-[200px]">
+              <iframe
+                title="Mapa — Roy Riff Test Ride Yerba Buena"
+                src={CONTACT_INFO.googleMapsEmbedSrc}
+                className="absolute inset-0 h-full w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <p className="text-neutral-darkGreen mb-4 font-neue text-sm">{CONTACT_INFO.address}</p>
+            <Button href={CONTACT_INFO.googleMapsLink} variant="secondary" className="w-full mt-auto">
               Ver en Google Maps
             </Button>
           </div>

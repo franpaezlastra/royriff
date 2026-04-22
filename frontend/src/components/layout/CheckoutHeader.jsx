@@ -31,7 +31,7 @@ const CheckoutHeader = () => {
         <Link
           to="/"
           onClick={handleLeaveCheckout}
-          className="text-sm font-neue font-medium text-neutral-darkGreen hover:text-primary-orange transition-smooth"
+          className="text-sm font-neue font-semibold text-neutral-darkGreen hover:text-primary-orange transition-smooth"
         >
           Volver al inicio
         </Link>

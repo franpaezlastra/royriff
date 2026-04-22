@@ -273,3 +273,56 @@ p {
   color: white;
   text-decoration: none;
 }
+
+/* App embebida en WordPress: el tema puede pisar tablas y h3; forzamos contraste */
+.rr-comparador-table thead {
+  background-color: #151515 !important;
+  color: #ffffff !important;
+}
+.rr-comparador-table thead th,
+.rr-comparador-table thead th * {
+  color: #ffffff !important;
+}
+.rr-comparador-table thead th {
+  background-color: #151515 !important;
+  opacity: 1 !important;
+}
+.rr-comparador-table .rr-comparador-headcell,
+.rr-comparador-table .rr-comparador-headcell * {
+  background-color: #151515 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/*
+ * WordPress / tema: el body fuerza color #151515 en h1–h4.
+ * En secciones con fondo oscuro, los títulos quedan casi invisibles.
+ * Se fuerza blanco y se restaura el naranja de marca donde corresponde.
+ */
+section.bg-neutral-black h1,
+section.bg-neutral-black h2,
+section.bg-neutral-black h3,
+section.bg-neutral-black h4,
+footer.bg-neutral-black h1,
+footer.bg-neutral-black h2,
+footer.bg-neutral-black h3,
+footer.bg-neutral-black h4 {
+  color: #ffffff !important;
+}
+
+section.bg-neutral-black .text-primary-orange,
+section.bg-neutral-black h1.text-primary-orange,
+section.bg-neutral-black h2.text-primary-orange,
+section.bg-neutral-black h3.text-primary-orange,
+section.bg-neutral-black h4.text-primary-orange,
+section.bg-neutral-black a.text-primary-orange,
+footer.bg-neutral-black .text-primary-orange {
+  color: #ff460d !important;
+}
+
+/* Código postal: el tema WP suele pisar padding del input → placeholder amontonado con ícono */
+.rr-postcode-field .rr-postcode-input {
+  text-indent: 0 !important;
+  letter-spacing: normal !important;
+  line-height: 1.5 !important;
+}
