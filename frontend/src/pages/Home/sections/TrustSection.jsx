@@ -16,29 +16,25 @@ const trustCards = [
     icon: FiCreditCard,
     badge: 'Transparencia total',
     title: 'Cuotas y medios de pago',
-    description: 'Pagá como te convenga. Sin letra chica.',
+    description: 'Precio claro. Sin "cuotas sin interés" que no son.',
     bullets: [
-      'Efectivo / transferencia: $2.000.000 LOLA · $2.700.000 XXXX',
-      '3 cuotas fijas: +11% sobre precio efectivo',
-      '6 cuotas fijas: +20% sobre precio efectivo',
-      '9 cuotas fijas: +33% sobre precio efectivo',
-      '12 cuotas fijas: +44% sobre precio efectivo',
-      'Todos los medios de pago habilitados por Mercado Pago',
-      'CFT aplicable según medio de pago y entidad emisora',
+      { label: '6 cuotas fijas', text: '$402.000 LOLA · $536.167 XXXX' },
+      { label: 'Efectivo o transferencia', text: '$2.000.000 LOLA · $2.700.000 XXXX (ahorrás 20%)' },
+      { text: '3, 9 o 12 cuotas también disponibles · Todos los medios de pago · CFT aplicable' },
     ],
-    tagline: 'Sin agencia, sin vueltas, sin "cuotas sin interés" que no son.',
     link: '/financiacion',
     cta: 'Ver financiación',
     level: 'A'
   },
   {
     icon: FiTruck,
-    badge: 'Llega 85–90% armada',
-    title: 'Envíos a todo el país',
-    description: 'Calculá costo y entrega por tu CP. Incluye manual + videos de armado.',
+    badge: 'Envío gratis en todo el país',
+    title: 'Envíos y retiro',
+    description: 'Nosotros nos hacemos cargo. Vos la recibís o la retirás.',
     bullets: [
-      'Embalaje seguro + herramientas básicas',
-      'Recomendamos ajuste final por bicicletero calificado'
+      { label: 'Envío gratis', text: 'a cualquier código postal de Argentina' },
+      { label: 'Retiro en Palermo, BsAs', text: 'con turno previo por WhatsApp' },
+      { text: 'Llega 85–90% armada con manual + videos de armado' },
     ],
     link: '/envios',
     cta: 'Ver envíos y armado',
@@ -46,12 +42,13 @@ const trustCards = [
   },
   {
     icon: FiTool,
-    badge: '1 año garantía eléctrica',
-    title: 'Service + garantía Roy Riff',
-    description: 'Soporte eléctrico propio + repuestos. Mecánica: cualquier bicicletería.',
+    badge: 'Hasta 2 años de garantía',
+    title: 'Service y garantía',
+    description: 'Soporte propio, repuestos en stock, sin vueltas.',
     bullets: [
-      'Cubre fallas de fábrica en motor/batería/controller/display',
-      'Exclusiones claras: golpes, agua/mal uso, desgaste'
+      { label: 'Cuadro', text: '2 años por defectos de fábrica' },
+      { label: 'Motor, batería y controller', text: '1 año' },
+      { label: 'Mecánica cubierta', text: 'por cualquier bicicletería' },
     ],
     link: '/servicio-tecnico-y-garantia',
     cta: 'Ver garantía y service',
@@ -62,10 +59,11 @@ const trustCards = [
     icon: FiHelpCircle,
     badge: 'Por modelo + generales',
     title: 'Preguntas frecuentes',
-    description: 'Respuestas rápidas: autonomía, carga, envíos, garantía y mantenimiento.',
+    description: 'Respuestas directas, sin tecnicismos.',
     bullets: [
-      'LOLA vs XXXX: cuál te conviene según uso',
-      'Cuidados y uso real (lluvia, carga, mantenimiento)'
+      { label: 'LOLA vs XXXX', text: 'cuál te conviene según tu uso' },
+      { label: 'Autonomía real', text: 'cuánto andás con una carga' },
+      { label: 'Cuidados y uso real', text: 'lluvia, carga, mantenimiento' },
     ],
     link: '/faq',
     cta: 'Ir a FAQ',
@@ -74,24 +72,26 @@ const trustCards = [
   {
     icon: FiMapPin,
     badge: 'Con turno',
-    title: 'Test ride en Tucumán',
-    description: 'Probala en Yerba Buena, Tucumán. Coordinación previa.',
+    title: 'Test ride y showroom',
+    description: 'Probala antes de decidir. En Tucumán o BsAs.',
     bullets: [
-      'Elegí modelo: LOLA o XXXX',
-      'Te confirmamos horario por WhatsApp o mail'
+      { label: 'Yerba Buena, Tucumán', text: 'test ride oficial con turno' },
+      { label: 'Palermo, Buenos Aires', text: 'visita al depósito con confirmación previa' },
+      { label: 'Coordinamos horario', text: 'por WhatsApp o mail' },
     ],
     link: '/test-ride-tucuman',
-    cta: 'Agendar test ride',
+    cta: 'Agendar visita',
     level: 'B'
   },
   {
     icon: FiMail,
     badge: 'Atención al cliente',
     title: 'Contacto',
-    description: 'Escribinos y te respondemos con la posta (sin vueltas).',
+    description: 'Escribinos. Respondemos con la posta.',
     bullets: [
-      'Soporte por WhatsApp y email',
-      'Dirección del local + horarios de atención'
+      { label: 'WhatsApp', text: '+54 9 381 200 6514' },
+      { label: 'Email', text: 'postventa@royriff.com.ar' },
+      { label: 'Horarios', text: 'L–V 9 a 13 y 17 a 21 · Sábados 9 a 13' },
     ],
     link: '/contacto',
     cta: 'Ver contacto',
@@ -136,21 +136,22 @@ const TrustCard = ({ card, index }) => {
       </p>
 
       {/* Bullets */}
-      <ul className="space-y-2 mb-4 text-sm text-neutral-darkGreen">
-        {card.bullets.map((bullet, idx) => (
-          <li key={idx} className="flex items-start">
-            <span className="text-primary-orange mr-2">•</span>
-            <span>{bullet}</span>
-          </li>
-        ))}
+      <ul className="space-y-2 mb-6 text-sm text-neutral-darkGreen">
+        {card.bullets.map((bullet, idx) => {
+          const isObject = typeof bullet === 'object' && bullet !== null;
+          const label = isObject ? bullet.label : null;
+          const text = isObject ? bullet.text : bullet;
+          return (
+            <li key={idx} className="flex items-start">
+              <span className="text-primary-orange mr-2">•</span>
+              <span>
+                {label && <strong className="font-bold text-neutral-black">{label}: </strong>}
+                {text}
+              </span>
+            </li>
+          );
+        })}
       </ul>
-
-      {/* Tagline (opcional) */}
-      {card.tagline && (
-        <p className="font-neue font-bold italic text-primary-orange text-sm mb-6">
-          {card.tagline}
-        </p>
-      )}
 
       {/* CTA */}
       <Link

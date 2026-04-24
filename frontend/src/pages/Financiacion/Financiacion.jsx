@@ -19,8 +19,8 @@ const Financiacion = () => {
     <div className="py-12 md:py-20 bg-primary-beige">
       <div className="container-custom max-w-5xl">
         <SectionTitle
-          title="Financiación y medios de pago"
-          subtitle="Pagá como te convenga. Sin letra chica."
+          title="Precio claro, sin letra chica"
+          subtitle="Pagá como te convenga. Así es nuestra financiación."
         />
 
         {/* Precio efectivo destacado */}

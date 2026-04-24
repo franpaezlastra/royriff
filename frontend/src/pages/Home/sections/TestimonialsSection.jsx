@@ -13,9 +13,9 @@ const testimonials = [
   {
     name: 'Héctor Gramajo',
     location: 'Tucumán',
-    model: 'LOLA (x2)',
+    model: 'LOLA ×2',
     rating: 5,
-    text: 'Nos llevamos dos LOLAs con mi mujer, una de cada color. Salimos a pasear juntos, disfrutamos cada paseo y encima cero combustible.',
+    text: 'Nos llevamos dos LOLAs con mi mujer, una de cada color. Cada paseo juntos, cero combustible.',
     image: hectorImg,
   },
   {
@@ -23,7 +23,7 @@ const testimonials = [
     location: 'Tucumán',
     model: 'XXXX',
     rating: 5,
-    text: 'Uso la XXXX para trayectos medianos todos los días. Cómoda, potente y la batería responde bien en el uso real.',
+    text: 'Uso la XXXX para trayectos medianos todos los días. Cómoda, potente y la batería cumple.',
     image: agustinImg,
   },
   {
@@ -31,7 +31,7 @@ const testimonials = [
     location: 'Tucumán',
     model: 'LOLA',
     rating: 5,
-    text: 'Compré la LOLA para hacer ejercicio y salir a rodar. Me re enganché, ahora salgo varias veces por semana.',
+    text: 'La compré para hacer ejercicio. Me re enganché, ahora salgo varias veces por semana.',
     image: arielImg,
   },
   {
@@ -39,7 +39,7 @@ const testimonials = [
     location: 'Tucumán',
     model: 'LOLA',
     rating: 5,
-    text: 'Una bici muy bien armada, con buena terminación. Roy Riff me atendió de primera y quedé encantado con el servicio.',
+    text: 'Muy bien armada y con buena terminación. Roy Riff me atendió de primera de punta a punta.',
     image: federicoImg,
   },
   {
@@ -47,7 +47,7 @@ const testimonials = [
     location: 'Tucumán',
     model: 'XXXX',
     rating: 5,
-    text: 'La XXXX me cambió el día a día. Trayectos que antes hacía en auto ahora los hago pedaleando y llego con energía.',
+    text: 'La XXXX me cambió el día a día. Trayectos que hacía en auto ahora los hago pedaleando.',
     image: matiasImg,
   },
   {
@@ -55,45 +55,45 @@ const testimonials = [
     location: 'Tucumán',
     model: 'LOLA',
     rating: 5,
-    text: 'La LOLA es elegante y súper cómoda. Me encanta la sensación de salir a andar sin preocuparme por el tráfico.',
+    text: 'Elegante y súper cómoda. Me encanta la sensación de salir a andar sin preocuparme por el tráfico.',
     image: patriciaImg,
   },
 ];
 
-const AUTO_ROTATE_MS = 6000;
+const AUTO_ROTATE_MS = 7000;
 const PAGE_SIZE = 3;
 
 const TestimonialCard = ({ testimonial }) => (
-  <div className="bg-white rounded-lg shadow-md p-6 border-2 border-neutral-gray/20 hover:border-primary-orange transition-all duration-300 h-full flex flex-col">
-    <div className="flex gap-1 mb-4">
-      {[...Array(testimonial.rating)].map((_, i) => (
-        <FiStar key={i} className="w-5 h-5 fill-primary-yellow text-primary-yellow" />
-      ))}
+  <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full hover:shadow-2xl transition-shadow duration-300">
+    {/* Foto grande dominante con overlay */}
+    <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-black/5">
+      <img
+        src={testimonial.image}
+        alt={`${testimonial.name} con su Roy Riff ${testimonial.model}`}
+        className="w-full h-full object-cover"
+        loading="lazy"
+      />
+      {/* Gradient + nombre + modelo */}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-5 pt-12">
+        <p className="font-barlow font-black text-white text-xl md:text-2xl uppercase tracking-tight leading-tight">
+          {testimonial.name}
+        </p>
+        <p className="font-neue text-white/90 text-sm mt-0.5">
+          {testimonial.location} · <span className="font-bold text-primary-orange">{testimonial.model}</span>
+        </p>
+      </div>
     </div>
 
-    <p className="text-neutral-darkGreen mb-6 italic flex-grow">
-      "{testimonial.text}"
-    </p>
-
-    <div className="flex items-center gap-4">
-      {testimonial.image ? (
-        <img
-          src={testimonial.image}
-          alt={testimonial.name}
-          className="w-12 h-12 rounded-full object-cover"
-          loading="lazy"
-        />
-      ) : (
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-orange to-primary-yellow flex items-center justify-center text-white font-bold text-xl">
-          {testimonial.name.charAt(0)}
-        </div>
-      )}
-      <div>
-        <div className="font-bold text-neutral-black">{testimonial.name}</div>
-        <div className="text-sm text-neutral-darkGreen">
-          {testimonial.location} • {testimonial.model}
-        </div>
+    {/* Bloque de texto */}
+    <div className="p-5 flex flex-col flex-grow">
+      <div className="flex gap-0.5 mb-3">
+        {[...Array(testimonial.rating)].map((_, i) => (
+          <FiStar key={i} className="w-4 h-4 fill-primary-yellow text-primary-yellow" />
+        ))}
       </div>
+      <p className="text-neutral-darkGreen text-sm md:text-base italic leading-relaxed">
+        "{testimonial.text}"
+      </p>
     </div>
   </div>
 );
@@ -122,10 +122,10 @@ const TestimonialsSection = () => {
       <div className="container-custom">
         <SectionTitle
           title="Lo que dicen los RoyRiffers"
-          subtitle="Historias reales de quienes ya disfrutan su libertad sobre dos ruedas."
+          subtitle="Clientes reales con sus bicis. Gente que ya eligió moverse distinto."
         />
 
-        <div className="relative">
+        <div className="relative mt-4">
           {/* Botones prev/next (solo desktop) */}
           {pageCount > 1 && (
             <>
@@ -133,7 +133,7 @@ const TestimonialsSection = () => {
                 type="button"
                 aria-label="Testimonios anteriores"
                 onClick={() => goTo(page - 1)}
-                className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md items-center justify-center hover:bg-primary-orange hover:text-white text-neutral-black transition-colors"
+                className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white shadow-lg items-center justify-center hover:bg-primary-orange hover:text-white text-neutral-black transition-colors"
               >
                 <FiChevronLeft className="w-5 h-5" />
               </button>
@@ -141,7 +141,7 @@ const TestimonialsSection = () => {
                 type="button"
                 aria-label="Testimonios siguientes"
                 onClick={() => goTo(page + 1)}
-                className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md items-center justify-center hover:bg-primary-orange hover:text-white text-neutral-black transition-colors"
+                className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white shadow-lg items-center justify-center hover:bg-primary-orange hover:text-white text-neutral-black transition-colors"
               >
                 <FiChevronRight className="w-5 h-5" />
               </button>
@@ -156,7 +156,7 @@ const TestimonialsSection = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.4 }}
-              className="grid md:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {currentGroup.map((t) => (
                 <TestimonialCard key={t.name} testimonial={t} />

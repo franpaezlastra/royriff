@@ -6,8 +6,8 @@ const ServicioGarantia = () => {
     <div className="py-12 md:py-20">
       <div className="container-custom max-w-4xl">
         <SectionTitle
-          title="Servicio técnico y garantía"
-          subtitle="Soporte eléctrico propio. Repuestos en stock. Garantía real."
+          title="2 años de cuadro. 1 año de electrónica. Soporte propio."
+          subtitle="Garantía real, repuestos en stock, sin vueltas."
         />
 
         <div className="space-y-8">

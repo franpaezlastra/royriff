@@ -47,8 +47,8 @@ const FAQ = () => {
     <div className="py-12 md:py-20">
       <div className="container-custom max-w-4xl">
         <SectionTitle
-          title="Preguntas frecuentes"
-          subtitle="Respuestas rápidas sobre autonomía, garantía, envíos y más."
+          title="Lo que preguntan. Sin rodeos."
+          subtitle="Autonomía, garantía, envíos y mantenimiento — en criollo."
         />
 
         <div>

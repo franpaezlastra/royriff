@@ -8,8 +8,8 @@ const Contacto = () => {
     <div className="py-12 md:py-20">
       <div className="container-custom max-w-4xl">
         <SectionTitle
-          title="Contacto"
-          subtitle="Escribinos. Te respondemos con la posta."
+          title="Hablemos. Sin formularios eternos."
+          subtitle="Elegí el canal, escribinos y respondemos con la posta."
         />
 
         <div className="grid md:grid-cols-3 gap-6">
