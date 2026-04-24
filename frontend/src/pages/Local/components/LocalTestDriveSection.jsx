@@ -1,0 +1,179 @@
+import { motion } from 'framer-motion';
+import { FaWhatsapp } from 'react-icons/fa';
+import { FiCheck, FiHelpCircle } from 'react-icons/fi';
+import { CONTACT_INFO } from '../../../utils/constants';
+
+const STEPS = [
+  {
+    num: '01',
+    title: 'Agendás',
+    desc: 'Nos escribís por WhatsApp y elegimos día y hora juntos.',
+  },
+  {
+    num: '02',
+    title: 'Venís',
+    desc: 'Llegás al local en Yerba Buena. Te esperamos con tu modelo listo.',
+  },
+  {
+    num: '03',
+    title: 'Probás',
+    desc: 'Subís a la LOLA o la XXXX y salimos a andar por la zona.',
+  },
+  {
+    num: '04',
+    title: 'Decidís',
+    desc: 'Sin apuro, sin presión. Te contestamos todo antes de comprar.',
+  },
+];
+
+const BENEFITS = [
+  'Gratis y sin compromiso',
+  '15 minutos por modelo',
+  'Asesoría real sobre autonomía',
+  'Parking propio en el local',
+];
+
+const LocalTestDriveSection = () => {
+  const whatsappTestDrive = `${CONTACT_INFO.whatsappLink}?text=${encodeURIComponent(
+    'Hola! Quiero agendar un test drive en el local de Yerba Buena. ¿Qué día y hora tienen disponible?'
+  )}`;
+
+  return (
+    <section
+      id="test-drive"
+      aria-labelledby="test-drive-heading"
+      className="rr-grain relative bg-neutral-black text-white py-20 md:py-28 overflow-hidden scroll-mt-20"
+    >
+      {/* Glow orange sutil en esquina */}
+      <div
+        aria-hidden="true"
+        className="absolute -top-32 -right-32 w-[420px] h-[420px] rounded-full pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(255,70,13,0.28) 0%, transparent 70%)',
+        }}
+      />
+
+      <div className="relative container-custom">
+        {/* Heading block */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 md:mb-16 max-w-3xl"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <span className="h-px w-10 bg-primary-orange" />
+            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
+              Test drive
+            </span>
+          </div>
+          <h2
+            id="test-drive-heading"
+            className="font-barlow font-black text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter mb-4"
+          >
+            Cómo{' '}
+            <span className="italic text-primary-orange">funciona.</span>
+          </h2>
+          <p className="font-neue text-white/75 text-base md:text-lg max-w-xl leading-relaxed">
+            Sin compromiso, con turno, en 4 pasos simples.
+          </p>
+        </motion.div>
+
+        {/* Stepper grid — 4 cards con números gigantes desbordados */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-14 md:mb-16">
+          {STEPS.map((step, idx) => (
+            <motion.article
+              key={step.num}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              className="relative bg-white/[0.04] border border-white/10 rounded-lg p-6 md:p-7 pt-14 md:pt-16 overflow-hidden hover:border-primary-orange/50 hover:bg-white/[0.06] transition-colors"
+            >
+              {/* Número gigante ghost */}
+              <span
+                aria-hidden="true"
+                className="absolute -top-3 -right-2 font-barlow font-black text-white/[0.07] leading-none select-none pointer-events-none"
+                style={{ fontSize: 'clamp(7rem, 14vw, 10rem)' }}
+              >
+                {step.num}
+              </span>
+              {/* Número chico con bar naranja */}
+              <div className="relative flex items-center gap-2 mb-4">
+                <span className="h-px w-6 bg-primary-orange" />
+                <span className="font-barlow font-black text-primary-orange text-sm tracking-[0.3em]">
+                  {step.num}
+                </span>
+              </div>
+              <h3 className="relative font-barlow font-black text-white text-2xl md:text-3xl uppercase mb-2 tracking-tight">
+                {step.title}
+              </h3>
+              <p className="relative font-neue text-white/70 text-sm leading-relaxed">
+                {step.desc}
+              </p>
+            </motion.article>
+          ))}
+        </div>
+
+        {/* Benefits block — beige sobre oscuro para contraste */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+          className="bg-primary-beige text-neutral-black rounded-lg p-6 md:p-8 mb-10 md:mb-12"
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <span className="h-px w-8 bg-primary-orange" />
+            <span className="font-barlow font-black text-[10px] md:text-xs text-primary-orange uppercase tracking-[0.35em]">
+              Qué incluye
+            </span>
+          </div>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5">
+            {BENEFITS.map((b) => (
+              <li
+                key={b}
+                className="flex items-start gap-3 font-neue text-neutral-black text-base md:text-lg"
+              >
+                <span className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-primary-orange flex items-center justify-center">
+                  <FiCheck className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                </span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3"
+        >
+          <a
+            href={whatsappTestDrive}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 bg-primary-orange hover:bg-[#E03D0B] text-white font-barlow font-black uppercase tracking-wide text-base py-4 px-8 rounded-full transition-colors shadow-[0_8px_32px_rgba(255,70,13,0.35)]"
+          >
+            <FaWhatsapp className="w-5 h-5" />
+            Agendar turno
+          </a>
+          <a
+            href="/faq"
+            className="inline-flex items-center gap-2 border-2 border-white/25 hover:border-white text-white font-barlow font-black uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors"
+          >
+            <FiHelpCircle className="w-4 h-4" />
+            Preguntas frecuentes
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default LocalTestDriveSection;

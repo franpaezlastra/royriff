@@ -12,6 +12,14 @@ export const CONTACT_INFO = {
   )}&hl=es&z=16&output=embed`,
 };
 
+// Manifiesto del equipo — usado en la página /local
+export const TEAM_MANIFESTO = {
+  quote: 'Atendemos como quisiéramos que nos atiendan a nosotros.',
+  author: 'Nacho',
+  role: 'Fundador',
+  photoCaption: 'Equipo Roy Riff · Tucumán',
+};
+
 // Información legal de la empresa (para páginas legales y documentos)
 export const COMPANY_INFO = {
   razonSocial: 'Zohan Venture SAS',
