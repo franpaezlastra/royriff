@@ -1,32 +1,35 @@
 import { motion } from 'framer-motion';
 import { FiStar } from 'react-icons/fi';
 import SectionTitle from '../../../components/common/SectionTitle';
+import hectorImg from '../../../assets/testimonios/hector-gramajo.webp';
+import agustinImg from '../../../assets/testimonios/agustin-fernandez.webp';
+import arielImg from '../../../assets/testimonios/ariel-martinez.webp';
 
 const testimonials = [
   {
-    name: 'Martín García',
-    location: 'Buenos Aires',
-    model: 'LOLA',
+    name: 'Héctor Gramajo',
+    location: 'Tucumán',
+    model: 'LOLA (x2)',
     rating: 5,
-    text: 'La LOLA es perfecta para la ciudad. Me ahorro 2 horas de tráfico por día y llego fresco al trabajo. La autonomía es real, no chamuyo.',
-    image: null // TODO: Agregar imagen real
+    text: 'Nos llevamos dos LOLAs con mi mujer, una de cada color. Salimos a pasear juntos, disfrutamos cada paseo y encima cero combustible.',
+    image: hectorImg,
   },
   {
-    name: 'Luciana Fernández',
-    location: 'Córdoba',
+    name: 'Agustín Fernández',
+    location: 'Tucumán',
     model: 'XXXX',
     rating: 5,
-    text: 'Compré la XXXX para hacer rutas largas los fines de semana. La batería de 20Ah es un game changer. Y el soporte de Roy Riff es de primera.',
-    image: null
+    text: 'Uso la XXXX para trayectos medianos todos los días. Cómoda, potente y la batería responde bien en el uso real.',
+    image: agustinImg,
   },
   {
-    name: 'Diego Romero',
-    location: 'Rosario',
+    name: 'Ariel Martínez',
+    location: 'Tucumán',
     model: 'LOLA',
     rating: 5,
-    text: 'Excelente inversión. El cuadro paso bajo hace que sea súper cómoda para subir y bajar. Y los frenos hidráulicos son una tranquilidad.',
-    image: null
-  }
+    text: 'Compré la LOLA para hacer ejercicio y salir a rodar. Me re enganché, ahora salgo varias veces por semana.',
+    image: arielImg,
+  },
 ];
 
 const TestimonialCard = ({ testimonial, index }) => {
@@ -52,9 +55,18 @@ const TestimonialCard = ({ testimonial, index }) => {
 
       {/* Author */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-orange to-primary-yellow flex items-center justify-center text-white font-bold text-xl">
-          {testimonial.name.charAt(0)}
-        </div>
+        {testimonial.image ? (
+          <img
+            src={testimonial.image}
+            alt={testimonial.name}
+            className="w-12 h-12 rounded-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-orange to-primary-yellow flex items-center justify-center text-white font-bold text-xl">
+            {testimonial.name.charAt(0)}
+          </div>
+        )}
         <div>
           <div className="font-bold text-neutral-black">{testimonial.name}</div>
           <div className="text-sm text-neutral-darkGreen">

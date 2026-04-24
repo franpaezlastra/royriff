@@ -12,6 +12,15 @@ export const CONTACT_INFO = {
   )}&hl=es&z=16&output=embed`,
 };
 
+// Información legal de la empresa (para páginas legales y documentos)
+export const COMPANY_INFO = {
+  razonSocial: 'Zohan Venture SAS',
+  cuit: '33-71884288-9',
+  domicilioLegal: 'Autopista Ruta Nacional N° 38 - Km 797, San Miguel de Tucumán, Tucumán',
+  brandName: 'Roy Riff',
+  jurisdiccion: 'Tribunales Ordinarios de la Provincia de Tucumán',
+};
+
 // Información de productos
 export const PRODUCTS = {
   LOLA: {
