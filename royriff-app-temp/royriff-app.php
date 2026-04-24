@@ -526,7 +526,7 @@ function royriff_app_redirect_after_payment($order_id) {
             exit;
         } else {
             // Si no hay URL de retorno configurada, usar la URL por defecto de React
-            $frontend_url = get_option('royriff_frontend_url', 'https://api.royriff.com.ar');
+            $frontend_url = get_option('royriff_frontend_url', home_url());
             $redirect_url = $frontend_url . '/compra-confirmada?order_id=' . $order_id . '&order_key=' . $order->get_order_key();
             
             wp_safe_redirect($redirect_url);

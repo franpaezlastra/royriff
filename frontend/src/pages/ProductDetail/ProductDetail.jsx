@@ -6,6 +6,7 @@ import { getDisplayName, getProductDetailImageOverride } from '../../utils/produ
 import { fetchProductBySlug } from '../../store/slices/productsSlice';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ProductPriceBlock from '../../components/product/ProductPriceBlock';
 import {
   FiChevronDown,
   FiChevronUp,
@@ -151,7 +152,7 @@ const ProductDetail = () => {
             )}
 
             {hero.highlights && hero.highlights.length > 0 && (
-              <ul className="space-y-2 mb-8 max-w-lg">
+              <ul className="space-y-2 mb-6 max-w-lg">
                 {hero.highlights.map((item, i) => (
                   <li key={i} className="flex items-start gap-2.5">
                     <FiCheck className="w-4 h-4 mt-0.5 text-primary-orange shrink-0" />
@@ -160,6 +161,8 @@ const ProductDetail = () => {
                 ))}
               </ul>
             )}
+
+            <ProductPriceBlock product={product} />
 
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
               <Button

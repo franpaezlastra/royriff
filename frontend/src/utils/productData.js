@@ -8,8 +8,8 @@
 const LOLA_SLUGS = ['lola-cruiser', 'lola'];
 const XXXX_SLUGS = ['xxxx-expedition', 'xxxx'];
 
-const WP_UPLOAD_2026_02 = 'http://api.royriff.com.ar/wp-content/uploads/2026/02';
-const WP_UPLOAD_2026_04 = 'http://api.royriff.com.ar/wp-content/uploads/2026/04';
+const WP_UPLOAD_2026_02 = 'https://api.royriff.com.ar/wp-content/uploads/2026/02';
+const WP_UPLOAD_2026_04 = 'https://api.royriff.com.ar/wp-content/uploads/2026/04';
 
 /** Portada (hero derecha); la historia texto|imagen usa `description.storySplit.image`. */
 const PRODUCT_DETAIL_IMAGE_OVERRIDES = {
@@ -50,6 +50,17 @@ export const PRODUCT_DATA = {
     meta: {
       title: 'Roy Riff LOLA: E-Bike Urbana Cruiser 500W | Frenos Hidráulicos y Puerto USB',
       description: 'Descubrí la LOLA. Bicicleta eléctrica urbana estilo Cruiser con autonomía de hasta 65 km, frenos hidráulicos y puerto USB. 100% Legal (Sin patente). Envíos a todo el país.',
+    },
+    pricing: {
+      efectivo: 2000000,
+      cuota6: 402000,
+      ahorro: 412000,
+      cuotas: {
+        3: 740000,
+        6: 402000,
+        9: 295556,
+        12: 240000,
+      },
     },
     colors: [
       { name: 'Champagne Metallic', value: '#C9B896' },
@@ -172,6 +183,17 @@ export const PRODUCT_DATA = {
     meta: {
       title: 'Roy Riff XXXX: E-Bike Fat Tire 500W | 90km de Autonomía y Doble Suspensión',
       description: 'Conocé la XXXX. Bicicleta eléctrica Fat Tire de expedición para arena, tierra y asfalto. Motor 500W, batería de 20Ah (90km), doble suspensión y frenos hidráulicos. 100% Legal (sin patente). Envíos a todo el país.',
+    },
+    pricing: {
+      efectivo: 2700000,
+      cuota6: 536167,
+      ahorro: 517000,
+      cuotas: {
+        3: 999000,
+        6: 536167,
+        9: 399000,
+        12: 324000,
+      },
     },
     colors: [
       // IMPORTANTE: estos nombres deben coincidir EXACTO con las opciones del atributo "Color"
@@ -326,6 +348,7 @@ export const enrichProductData = (wcProduct) => {
     trustBlock: hardcoded.trustBlock,
     faq: hardcoded.faq,
     links: hardcoded.links,
+    pricing: hardcoded.pricing,
     tagline: hardcoded.hero?.productTitle || hardcoded.hero?.h2,
   };
 };

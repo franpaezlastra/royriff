@@ -14,13 +14,19 @@ const trustCards = [
   // Nivel A - Decisión de compra
   {
     icon: FiCreditCard,
-    badge: 'Mercado Pago (tarjetas y cuotas)',
+    badge: 'Transparencia total',
     title: 'Cuotas y medios de pago',
-    description: 'Pagá con tarjeta u otros medios habilitados por Mercado Pago; las cuotas se eligen al pagar.',
+    description: 'Pagá como te convenga. Sin letra chica.',
     bullets: [
-      'Visa, Mastercard y más, procesados por Mercado Pago',
-      'Cuotas según tu tarjeta y las promociones vigentes en el checkout de Mercado Pago',
+      'Efectivo / transferencia: $2.000.000 LOLA · $2.700.000 XXXX',
+      '3 cuotas fijas: +11% sobre precio efectivo',
+      '6 cuotas fijas: +20% sobre precio efectivo',
+      '9 cuotas fijas: +33% sobre precio efectivo',
+      '12 cuotas fijas: +44% sobre precio efectivo',
+      'Todos los medios de pago habilitados por Mercado Pago',
+      'CFT aplicable según medio de pago y entidad emisora',
     ],
+    tagline: 'Sin agencia, sin vueltas, sin "cuotas sin interés" que no son.',
     link: '/financiacion',
     cta: 'Ver financiación',
     level: 'A'
@@ -130,7 +136,7 @@ const TrustCard = ({ card, index }) => {
       </p>
 
       {/* Bullets */}
-      <ul className="space-y-2 mb-6 text-sm text-neutral-darkGreen">
+      <ul className="space-y-2 mb-4 text-sm text-neutral-darkGreen">
         {card.bullets.map((bullet, idx) => (
           <li key={idx} className="flex items-start">
             <span className="text-primary-orange mr-2">•</span>
@@ -138,6 +144,13 @@ const TrustCard = ({ card, index }) => {
           </li>
         ))}
       </ul>
+
+      {/* Tagline (opcional) */}
+      {card.tagline && (
+        <p className="font-neue font-bold italic text-primary-orange text-sm mb-6">
+          {card.tagline}
+        </p>
+      )}
 
       {/* CTA */}
       <Link
@@ -162,7 +175,7 @@ const TrustSection = () => {
     <section className="py-16 md:py-24 bg-gradient-to-b from-white to-primary-beige">
       <div className="container-custom">
         <SectionTitle
-          title="Financiación en hasta 12 cuotas, envíos a todo el país, y soporte post venta garantizado"
+          title="Financiación, envíos a todo el país y soporte post venta garantizado"
           subtitle="Explorá toda nuestra información comercial y de asistencia técnica."
         />
 

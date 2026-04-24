@@ -35,7 +35,7 @@ const HeroSection = () => {
 
           {/* Subtitle - PP Neue Montreal para textos largos */}
           <p className="font-neue !text-white text-lg md:text-xl mb-12 font-normal">
-            Envíos a todo el país. Hasta 12 cuotas sin interés.
+            Tu camino, tus reglas. Envíos y financiación a todo el país.
           </p>
 
           {/* CTA Button */}

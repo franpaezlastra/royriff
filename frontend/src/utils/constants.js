@@ -147,7 +147,7 @@ export const PAYMENT_METHODS = {
   mercadoPago: {
     name: 'Mercado Pago',
     installments: 12,
-    description: 'Tarjetas y cuotas al pagar (según promociones activas)',
+    description: 'Todos los medios habilitados. CFT aplicable según medio de pago y entidad emisora.',
   },
   cards: {
     name: 'Tarjetas de crédito/débito',

@@ -3,8 +3,11 @@
  * para que WordPress sirva la SPA con la estructura correcta (index.html + assets/*.js, assets/*.css).
  * Ejecutar después de "npm run build" o usar "npm run build:plugin".
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const frontendDir = path.join(__dirname, '..');
 const srcDir = path.join(frontendDir, 'dist');
