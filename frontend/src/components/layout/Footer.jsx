@@ -119,6 +119,11 @@ const Footer = () => {
                   Test ride (Tucumán)
                 </Link>
               </li>
+              <li>
+                <Link to="/local" className="text-neutral-gray hover:text-white transition-colors">
+                  Visitá el showroom
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
