@@ -177,6 +177,15 @@ p {
   background-color: rgba(21, 21, 21, 0.35);
 }
 
+/* Scrollbar oculto (para filter rows horizontales en mobile) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ============================================
    COMBINACIONES TIPOGRÁFICAS - MANUAL DE MARCA
    Para títulos que destaquen: combinar ambas fuentes

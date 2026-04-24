@@ -45,24 +45,36 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <Link 
+          <nav className="hidden lg:flex items-center gap-6">
+            <Link
               to={`/bicicletas-electricas/${lolaSlug}`}
               className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               Lola Cruiser Urbana
             </Link>
-            <Link 
+            <Link
               to={`/bicicletas-electricas/${xxxxSlug}`}
               className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               XXXX Todo terreno
             </Link>
-            <Link 
-              to="/test-ride-tucuman" 
+            <Link
+              to="/test-ride-tucuman"
               className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
               Test drive
+            </Link>
+            <Link
+              to="/local"
+              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
+            >
+              Local
+            </Link>
+            <Link
+              to="/galeria"
+              className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
+            >
+              Galería
             </Link>
           </nav>
 
@@ -115,12 +127,26 @@ const Header = () => {
             >
               XXXX Todo terreno
             </Link>
-            <Link 
-              to="/test-ride-tucuman" 
+            <Link
+              to="/test-ride-tucuman"
               className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
               onClick={closeMenu}
             >
               Test drive
+            </Link>
+            <Link
+              to="/local"
+              className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
+              onClick={closeMenu}
+            >
+              Local
+            </Link>
+            <Link
+              to="/galeria"
+              className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
+              onClick={closeMenu}
+            >
+              Galería
             </Link>
           </nav>
         </div>

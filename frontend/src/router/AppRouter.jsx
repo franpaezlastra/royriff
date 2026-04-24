@@ -14,6 +14,7 @@ import TestRide from '../pages/TestRide/TestRide';
 import Contacto from '../pages/Contacto/Contacto';
 import Tutoriales from '../pages/Tutoriales/Tutoriales';
 import Local from '../pages/Local/Local';
+import Galeria from '../pages/Galeria/Galeria';
 import TutorialArmado from '../pages/Tutoriales/TutorialArmado';
 import TutorialBateria from '../pages/Tutoriales/TutorialBateria';
 import TutorialMantenimiento from '../pages/Tutoriales/TutorialMantenimiento';
@@ -51,6 +52,7 @@ const AppRouter = () => {
         <Route path="faq" element={<FAQ />} />
         <Route path="test-ride-tucuman" element={<TestRide />} />
         <Route path="local" element={<Local />} />
+        <Route path="galeria" element={<Galeria />} />
         <Route path="contacto" element={<Contacto />} />
 
         {/* Tutoriales */}
