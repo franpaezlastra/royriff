@@ -25,6 +25,7 @@ import local17 from '../../assets/local/local-17.webp';
 import local18 from '../../assets/local/local-18.webp';
 import local19 from '../../assets/local/local-19.webp';
 import local20 from '../../assets/local/local-20.webp';
+import teamGroupImg from '../../assets/local/team.webp';
 
 const makeItem = (id, src) => ({
   id,
@@ -60,12 +61,15 @@ export const LOCAL_PHOTOS = [
   makeItem('local-20', local20),
 ];
 
-// Foto que se usará como featured/team group shot — el dueño puede
-// editar este índice cuando elija cuál de las 20 sirve como foto grupal.
-// Mientras tanto, si es null, la sección Equipo muestra placeholder.
-export const TEAM_GROUP_PHOTO_ID = null;
+// Foto del equipo — RoyRiff-140 de la sesión de Noviembre 2026 (Verde Yerba Buena).
+// Vive separada de LOCAL_PHOTOS porque es de otra producción y no debe aparecer en
+// el masonry del local (que muestra solo Contenido-local-royriff).
+export const TEAM_GROUP_PHOTO = {
+  id: 'team-group-nov2026',
+  type: 'image',
+  src: teamGroupImg,
+  title: '',
+  caption: '',
+};
 
-export const getTeamGroupPhoto = () =>
-  TEAM_GROUP_PHOTO_ID
-    ? LOCAL_PHOTOS.find((p) => p.id === TEAM_GROUP_PHOTO_ID) || null
-    : null;
+export const getTeamGroupPhoto = () => TEAM_GROUP_PHOTO;

@@ -1,20 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import GalleryTile from '../../Galeria/components/GalleryTile';
 import GalleryLightbox from '../../Galeria/components/GalleryLightbox';
-import { LOCAL_PHOTOS, TEAM_GROUP_PHOTO_ID } from '../localData';
+import { LOCAL_PHOTOS } from '../localData';
 
 const LocalGalleryMasonry = () => {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  // Si hay una foto reservada para el equipo, la excluimos del masonry
-  const items = useMemo(
-    () =>
-      TEAM_GROUP_PHOTO_ID
-        ? LOCAL_PHOTOS.filter((p) => p.id !== TEAM_GROUP_PHOTO_ID)
-        : LOCAL_PHOTOS,
-    []
-  );
+  // La foto del equipo vive en otra fuente (TEAM_GROUP_PHOTO de la sesión
+  // de Noviembre 2026), por lo que no es necesario excluirla del masonry.
+  const items = LOCAL_PHOTOS;
 
   const openLightbox = (item) => {
     const idx = items.findIndex((i) => i.id === item.id);

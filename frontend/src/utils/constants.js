@@ -5,7 +5,7 @@ export const CONTACT_INFO = {
   email: 'postventa@royriff.com.ar',
   address: 'Avenida Aconquija 1727, Yerba Buena, Tucumán',
   /** Enlace corto oficial al pin en Google Maps */
-  googleMapsLink: 'https://maps.app.goo.gl/2HgLACgZTQbXrW856',
+  googleMapsLink: 'https://maps.app.goo.gl/Fjnaz3qtX1UTmifW9',
   /** iframe embed (misma ubicación que la dirección) */
   googleMapsEmbedSrc: `https://maps.google.com/maps?q=${encodeURIComponent(
     'Avenida Aconquija 1727, Yerba Buena, Tucumán, Argentina'

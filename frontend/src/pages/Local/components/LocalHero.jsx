@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { CONTACT_INFO } from '../../../utils/constants';
 
-// Fondo del hero: usamos la primera foto del local procesada
-import heroBg from '../../../assets/local/local-01.webp';
+// Fondo del hero: foto producción Noviembre 2026 — RoyRiff-114
+import heroBg from '../../../assets/local/hero.webp';
 
 const scrollToTestDrive = (e) => {
   e.preventDefault();
