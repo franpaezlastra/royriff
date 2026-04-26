@@ -138,7 +138,7 @@ const Galeria = () => {
       <section className="bg-neutral-black py-14 md:py-20">
         <div className="container-custom text-center max-w-2xl">
           <h2 className="font-barlow font-black text-white text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-4">
-            Seguí la Roy Riff
+            Seguinos
           </h2>
           <p className="font-neue text-neutral-gray text-base md:text-lg mb-8">
             Contenido nuevo cada semana. La comunidad Roy Riff también vive en redes.

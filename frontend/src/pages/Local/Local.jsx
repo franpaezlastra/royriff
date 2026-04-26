@@ -54,7 +54,7 @@ const Local = () => {
             <div className="inline-flex items-center gap-3 mb-5">
               <span className="h-px w-10 bg-primary-orange" />
               <span className="font-barlow font-black text-[11px] text-primary-orange uppercase tracking-[0.4em]">
-                Te esperamos
+                Yerba Buena · Tucumán
               </span>
               <span className="h-px w-10 bg-primary-orange" />
             </div>
@@ -62,8 +62,7 @@ const Local = () => {
               id="local-closing-heading"
               className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.88] tracking-tighter mb-6"
             >
-              Yerba Buena,{' '}
-              <span className="italic text-primary-orange">te espera.</span>
+              <span className="italic text-primary-orange">Te esperamos.</span>
             </h2>
             <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
               Pasá, probalas, conocenos. Sin vueltas, sin presión, con toda la
