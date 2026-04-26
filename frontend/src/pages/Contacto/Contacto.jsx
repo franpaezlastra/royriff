@@ -9,7 +9,7 @@ const Contacto = () => {
       <div className="container-custom max-w-4xl">
         <SectionTitle
           title="Hablemos. Sin formularios eternos."
-          subtitle="Elegí el canal, escribinos y respondemos con la posta."
+          subtitle="Elegí el canal, escribinos y te respondemos lo más rápido posible."
         />
 
         <div className="grid md:grid-cols-3 gap-6">

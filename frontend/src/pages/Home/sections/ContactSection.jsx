@@ -27,7 +27,7 @@ const ContactSection = () => {
               ¿Tenés dudas? Hablemos.
             </h2>
             <p className="text-xl text-white/85 mb-12 font-neue max-w-2xl mx-auto">
-              Estamos para ayudarte a elegir tu Roy Riff ideal. Sin vueltas, con la posta.
+              Estamos para ayudarte a elegir tu Roy Riff ideal. Te respondemos lo más rápido posible.
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">

@@ -87,7 +87,7 @@ const trustCards = [
     icon: FiMail,
     badge: 'Atención al cliente',
     title: 'Contacto',
-    description: 'Escribinos. Respondemos con la posta.',
+    description: 'Escribinos. Responderemos lo más rápido posible.',
     bullets: [
       { label: 'WhatsApp', text: '+54 9 381 200 6514' },
       { label: 'Email', text: 'postventa@royriff.com.ar' },

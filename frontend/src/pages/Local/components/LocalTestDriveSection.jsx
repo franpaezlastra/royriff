@@ -42,18 +42,8 @@ const LocalTestDriveSection = () => {
     <section
       id="test-drive"
       aria-labelledby="test-drive-heading"
-      className="rr-grain relative bg-neutral-black text-white py-20 md:py-28 overflow-hidden scroll-mt-20"
+      className="relative bg-primary-beige text-neutral-black py-20 md:py-28 overflow-hidden scroll-mt-20"
     >
-      {/* Glow orange sutil en esquina */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-32 -right-32 w-[420px] h-[420px] rounded-full pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(255,70,13,0.28) 0%, transparent 70%)',
-        }}
-      />
-
       <div className="relative container-custom">
         {/* Heading block */}
         <motion.div
@@ -71,17 +61,17 @@ const LocalTestDriveSection = () => {
           </div>
           <h2
             id="test-drive-heading"
-            className="font-barlow font-black text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter mb-4"
+            className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter mb-4"
           >
             Cómo{' '}
             <span className="italic text-primary-orange">funciona.</span>
           </h2>
-          <p className="font-neue text-white/75 text-base md:text-lg max-w-xl leading-relaxed">
+          <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-xl leading-relaxed">
             Sin compromiso, con turno, en 4 pasos simples.
           </p>
         </motion.div>
 
-        {/* Stepper grid — 4 cards con números gigantes desbordados */}
+        {/* Stepper grid — cards blancas con número outline naranja gigante */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-14 md:mb-16">
           {STEPS.map((step, idx) => (
             <motion.article
@@ -90,13 +80,17 @@ const LocalTestDriveSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5, delay: idx * 0.08 }}
-              className="relative bg-white/[0.04] border border-white/10 rounded-lg p-6 md:p-7 pt-14 md:pt-16 overflow-hidden hover:border-primary-orange/50 hover:bg-white/[0.06] transition-colors"
+              className="relative bg-white border border-neutral-gray/20 rounded-lg p-6 md:p-7 pt-14 md:pt-16 overflow-hidden hover:border-primary-orange/50 hover:shadow-md transition-all"
             >
-              {/* Número gigante ghost */}
+              {/* Número outline naranja gigante en esquina */}
               <span
                 aria-hidden="true"
-                className="absolute -top-3 -right-2 font-barlow font-black text-white/[0.07] leading-none select-none pointer-events-none"
-                style={{ fontSize: 'clamp(7rem, 14vw, 10rem)' }}
+                className="absolute -top-3 -right-2 font-barlow font-black leading-none select-none pointer-events-none"
+                style={{
+                  fontSize: 'clamp(7rem, 14vw, 10rem)',
+                  WebkitTextStroke: '2px rgba(255, 70, 13, 0.18)',
+                  color: 'transparent',
+                }}
               >
                 {step.num}
               </span>
@@ -107,23 +101,23 @@ const LocalTestDriveSection = () => {
                   {step.num}
                 </span>
               </div>
-              <h3 className="relative font-barlow font-black text-white text-2xl md:text-3xl uppercase mb-2 tracking-tight">
+              <h3 className="relative font-barlow font-black text-neutral-black text-2xl md:text-3xl uppercase mb-2 tracking-tight">
                 {step.title}
               </h3>
-              <p className="relative font-neue text-white/70 text-sm leading-relaxed">
+              <p className="relative font-neue text-neutral-darkGreen text-sm leading-relaxed">
                 {step.desc}
               </p>
             </motion.article>
           ))}
         </div>
 
-        {/* Benefits block — beige sobre oscuro para contraste */}
+        {/* Benefits block — card blanca con sombra suave */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.6 }}
-          className="bg-primary-beige text-neutral-black rounded-lg p-6 md:p-8 mb-10 md:mb-12"
+          className="bg-white border border-neutral-gray/20 shadow-sm rounded-lg p-6 md:p-8 mb-10 md:mb-12"
         >
           <div className="flex items-center gap-3 mb-5">
             <span className="h-px w-8 bg-primary-orange" />
@@ -165,7 +159,7 @@ const LocalTestDriveSection = () => {
           </a>
           <a
             href="/faq"
-            className="inline-flex items-center gap-2 border-2 border-white/25 hover:border-white text-white font-barlow font-black uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors"
+            className="inline-flex items-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-barlow font-black uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors"
           >
             <FiHelpCircle className="w-4 h-4" />
             Preguntas frecuentes

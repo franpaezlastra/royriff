@@ -5,7 +5,7 @@ export const CONTACT_INFO = {
   email: 'postventa@royriff.com.ar',
   address: 'Avenida Aconquija 1727, Yerba Buena, Tucumán',
   /** Enlace corto oficial al pin en Google Maps */
-  googleMapsLink: 'https://maps.app.goo.gl/Fjnaz3qtX1UTmifW9',
+  googleMapsLink: 'https://maps.app.goo.gl/1q2wnfTUhPMEUvzPA',
   /** iframe embed (misma ubicación que la dirección) */
   googleMapsEmbedSrc: `https://maps.google.com/maps?q=${encodeURIComponent(
     'Avenida Aconquija 1727, Yerba Buena, Tucumán, Argentina'
@@ -14,8 +14,12 @@ export const CONTACT_INFO = {
 
 // Manifiesto del equipo — usado en la página /local
 export const TEAM_MANIFESTO = {
-  quote: 'Atendemos como quisiéramos que nos atiendan a nosotros.',
-  author: 'Nacho',
+  paragraphs: [
+    'Roy Riff arrancó en Yerba Buena, después de un viaje a China con mis hermanos. Visitamos fábricas, aprendimos, y volvimos con una idea fija: largarnos a crear una marca juntos que nos representara y que resolviera algo del día a día. Después de muchas idas y vueltas, decidimos que se iba a llamar Roy Riff.',
+    'Creemos que hace falta más gente que se anime a perseguir sus ideas locas. Que confíe en su intuición, que sea fiel a lo que tiene en la cabeza, y que banque hasta que eso se haga real. Queremos acercarnos a los que se sientan identificados con esto.',
+    'Cada producto que sacamos lleva esa filosofía detrás.',
+  ],
+  author: 'Marcos',
   role: 'Fundador',
   photoCaption: 'Equipo Roy Riff · Tucumán',
 };

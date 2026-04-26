@@ -42,18 +42,9 @@ const Local = () => {
       {/* CTA final — closing statement */}
       <section
         aria-labelledby="local-closing-heading"
-        className="rr-grain relative bg-neutral-black text-white py-20 md:py-28 overflow-hidden"
+        className="bg-primary-beige text-neutral-black py-20 md:py-28"
       >
-        {/* Glow orange diagonal */}
-        <div
-          aria-hidden="true"
-          className="absolute -bottom-32 -left-32 w-[460px] h-[460px] rounded-full pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(255,70,13,0.25) 0%, transparent 70%)',
-          }}
-        />
-        <div className="relative container-custom text-center max-w-3xl">
+        <div className="container-custom text-center max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -69,12 +60,12 @@ const Local = () => {
             </div>
             <h2
               id="local-closing-heading"
-              className="font-barlow font-black text-white text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.88] tracking-tighter mb-6"
+              className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.88] tracking-tighter mb-6"
             >
               Yerba Buena,{' '}
               <span className="italic text-primary-orange">te espera.</span>
             </h2>
-            <p className="font-neue text-white/75 text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+            <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
               Pasá, probalas, conocenos. Sin vueltas, sin presión, con toda la
               info que necesitás para decidir tranquilo.
             </p>
@@ -90,7 +81,7 @@ const Local = () => {
                 href={whatsappFinal}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white/25 hover:border-white text-white font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
+                className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
               >
                 <FaWhatsapp className="w-4 h-4" />
                 WhatsApp
@@ -99,7 +90,7 @@ const Local = () => {
                 href={CONTACT_INFO.googleMapsLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white/25 hover:border-white text-white font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
+                className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
               >
                 <FiExternalLink className="w-4 h-4" />
                 Google Maps

@@ -176,16 +176,6 @@ const ProductDetail = () => {
                 Agendar test ride
               </Button>
             </div>
-
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-neue text-sm font-semibold text-green-600 hover:text-green-500 transition-colors mt-4 self-start"
-            >
-              <FaWhatsapp className="w-4 h-4" />
-              Consultar por WhatsApp
-            </a>
           </div>
 
           {heroCatalogStyle ? (

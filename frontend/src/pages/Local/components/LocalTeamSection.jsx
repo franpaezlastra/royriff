@@ -86,7 +86,7 @@ const LocalTeamSection = () => {
             </div>
           </motion.div>
 
-          {/* Quote + attribution — 42% desktop */}
+          {/* Manifiesto + atribución — 42% desktop */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -94,19 +94,24 @@ const LocalTeamSection = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="relative flex flex-col justify-center order-1 md:order-2"
           >
-            {/* Giant orange " — desborda sobre el borde de la foto en desktop */}
-            <span
-              aria-hidden="true"
-              className="absolute -top-6 -left-2 md:-left-14 md:-top-8 font-barlow font-black italic text-primary-orange leading-none select-none"
-              style={{ fontSize: 'clamp(7rem, 14vw, 13rem)' }}
-            >
-              &ldquo;
-            </span>
-
-            <blockquote className="relative pt-6 md:pt-8">
-              <p className="font-barlow italic text-neutral-black text-3xl sm:text-4xl md:text-4xl lg:text-5xl leading-[1.05] tracking-tight font-black">
-                {TEAM_MANIFESTO.quote}
-              </p>
+            <blockquote className="relative">
+              <div className="space-y-5 font-neue text-neutral-darkGreen text-base md:text-lg leading-relaxed">
+                {TEAM_MANIFESTO.paragraphs.map((p, idx) => {
+                  const isLast = idx === TEAM_MANIFESTO.paragraphs.length - 1;
+                  return (
+                    <p
+                      key={idx}
+                      className={
+                        isLast
+                          ? 'font-barlow font-black italic text-primary-orange text-xl md:text-2xl leading-snug pt-2'
+                          : ''
+                      }
+                    >
+                      {p}
+                    </p>
+                  );
+                })}
+              </div>
               <footer className="mt-8 flex items-center gap-3">
                 <span className="h-px w-8 bg-primary-orange" />
                 <div className="font-barlow font-black text-sm uppercase tracking-[0.25em]">
