@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FiExternalLink } from 'react-icons/fi';
 import { CONTACT_INFO } from '../../utils/constants';
+import SectionTitle from '../../components/common/SectionTitle';
 
 import LocalHero from './components/LocalHero';
 import LocalGalleryMasonry from './components/LocalGalleryMasonry';
@@ -40,62 +40,38 @@ const Local = () => {
       <LocalFAQ />
 
       {/* CTA final — closing statement */}
-      <section
-        aria-labelledby="local-closing-heading"
-        className="bg-primary-beige text-neutral-black py-20 md:py-28"
-      >
+      <section className="bg-primary-beige py-16 md:py-20">
         <div className="container-custom text-center max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center gap-3 mb-5">
-              <span className="h-px w-10 bg-primary-orange" />
-              <span className="font-barlow font-black text-[11px] text-primary-orange uppercase tracking-[0.4em]">
-                Yerba Buena · Tucumán
-              </span>
-              <span className="h-px w-10 bg-primary-orange" />
-            </div>
-            <h2
-              id="local-closing-heading"
-              className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.88] tracking-tighter mb-6"
+          <SectionTitle
+            title="Te esperamos"
+            subtitle="Pasá, probalas, conocenos. Sin vueltas, sin presión, con toda la info que necesitás para decidir tranquilo."
+          />
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/test-ride-tucuman"
+              className="inline-flex items-center justify-center gap-2 bg-primary-orange hover:bg-[#E03D0B] text-white font-bold uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors"
             >
-              <span className="italic text-primary-orange">Te esperamos.</span>
-            </h2>
-            <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-              Pasá, probalas, conocenos. Sin vueltas, sin presión, con toda la
-              info que necesitás para decidir tranquilo.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                to="/test-ride-tucuman"
-                className="inline-flex items-center justify-center gap-2 bg-primary-orange hover:bg-[#E03D0B] text-white font-barlow font-black uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors shadow-[0_8px_28px_rgba(255,70,13,0.35)]"
-              >
-                Agendar test drive
-              </Link>
-              <a
-                href={whatsappFinal}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
-              >
-                <FaWhatsapp className="w-4 h-4" />
-                WhatsApp
-              </a>
-              <a
-                href={CONTACT_INFO.googleMapsLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-barlow font-black uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
-              >
-                <FiExternalLink className="w-4 h-4" />
-                Google Maps
-              </a>
-            </div>
-          </motion.div>
+              Agendar test drive
+            </Link>
+            <a
+              href={whatsappFinal}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-bold uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
+            >
+              <FaWhatsapp className="w-4 h-4" />
+              WhatsApp
+            </a>
+            <a
+              href={CONTACT_INFO.googleMapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 border-2 border-neutral-black/25 hover:border-neutral-black text-neutral-black font-bold uppercase tracking-wide text-sm py-3 px-7 rounded-full transition-colors"
+            >
+              <FiExternalLink className="w-4 h-4" />
+              Google Maps
+            </a>
+          </div>
         </div>
       </section>
     </div>

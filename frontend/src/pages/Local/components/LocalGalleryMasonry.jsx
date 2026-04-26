@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import SectionTitle from '../../../components/common/SectionTitle';
 import GalleryTile from '../../Galeria/components/GalleryTile';
 import GalleryLightbox from '../../Galeria/components/GalleryLightbox';
 import { LOCAL_PHOTOS } from '../localData';
@@ -31,32 +32,10 @@ const LocalGalleryMasonry = () => {
       className="bg-primary-beige py-16 md:py-24"
     >
       <div className="container-custom">
-        {/* Heading block — eyebrow + H2 + line + subtitle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 md:mb-14 max-w-3xl"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-10 bg-primary-orange" />
-            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
-              Nuestro local
-            </span>
-          </div>
-          <h2
-            id="local-gallery-heading"
-            className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter mb-4"
-          >
-            Así es{' '}
-            <span className="italic text-primary-orange">por&nbsp;dentro</span>
-          </h2>
-          <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-2xl leading-relaxed">
-            Recorré el local antes de venir. Espacios amplios, bicis expuestas,
-            y el equipo siempre presente.
-          </p>
-        </motion.div>
+        <SectionTitle
+          title="Nuestro local"
+          subtitle="Recorré el local antes de venir. Espacios amplios, bicis expuestas, y el equipo siempre presente."
+        />
 
         {/* Masonry grid */}
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">

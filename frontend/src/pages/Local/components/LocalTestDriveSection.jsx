@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FiCheck, FiHelpCircle } from 'react-icons/fi';
+import SectionTitle from '../../../components/common/SectionTitle';
 import { CONTACT_INFO } from '../../../utils/constants';
 
 const STEPS = [
@@ -45,31 +46,10 @@ const LocalTestDriveSection = () => {
       className="relative bg-primary-beige text-neutral-black py-20 md:py-28 overflow-hidden scroll-mt-20"
     >
       <div className="relative container-custom">
-        {/* Heading block */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 md:mb-16 max-w-3xl"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-10 bg-primary-orange" />
-            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
-              Test drive
-            </span>
-          </div>
-          <h2
-            id="test-drive-heading"
-            className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter mb-4"
-          >
-            Cómo{' '}
-            <span className="italic text-primary-orange">funciona.</span>
-          </h2>
-          <p className="font-neue text-neutral-darkGreen text-base md:text-lg max-w-xl leading-relaxed">
-            Sin compromiso, con turno, en 4 pasos simples.
-          </p>
-        </motion.div>
+        <SectionTitle
+          title="Cómo funciona el test drive"
+          subtitle="Sin compromiso, con turno, en 4 pasos simples."
+        />
 
         {/* Stepper grid — cards blancas con número outline naranja gigante */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-14 md:mb-16">

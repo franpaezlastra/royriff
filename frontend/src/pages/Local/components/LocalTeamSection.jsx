@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FiUsers } from 'react-icons/fi';
+import SectionTitle from '../../../components/common/SectionTitle';
 import { TEAM_MANIFESTO } from '../../../utils/constants';
 import { getTeamGroupPhoto } from '../localData';
 
@@ -12,28 +13,10 @@ const LocalTeamSection = () => {
       className="bg-white py-16 md:py-24"
     >
       <div className="container-custom">
-        {/* Eyebrow + heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 md:mb-14 max-w-3xl"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-10 bg-primary-orange" />
-            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
-              El equipo
-            </span>
-          </div>
-          <h2
-            id="local-team-heading"
-            className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter"
-          >
-            Personas,{' '}
-            <span className="italic text-primary-orange">no&nbsp;catálogos.</span>
-          </h2>
-        </motion.div>
+        <SectionTitle
+          title="El equipo"
+          subtitle="Las personas detrás de Roy Riff."
+        />
 
         {/* Asymmetric 58/42 layout */}
         <div className="grid grid-cols-1 md:grid-cols-[58fr_42fr] gap-8 md:gap-12 items-stretch">

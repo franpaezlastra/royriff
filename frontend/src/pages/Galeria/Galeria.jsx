@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FaInstagram, FaSpotify, FaWhatsapp } from 'react-icons/fa';
 import { FiImage } from 'react-icons/fi';
 import { CONTACT_INFO } from '../../utils/constants';
+import SectionTitle from '../../components/common/SectionTitle';
 import { GALLERY_ITEMS, getFeaturedItem } from './galleryData';
 import GalleryFilters from './components/GalleryFilters';
 import GalleryTile from './components/GalleryTile';
@@ -51,52 +52,35 @@ const Galeria = () => {
 
   return (
     <div className="bg-primary-beige">
-      {/* HERO FEATURED */}
-      <section className="relative w-full h-[70vh] min-h-[460px] max-h-[720px] overflow-hidden bg-neutral-black">
-        {featured && featured.type === 'image' && (
-          <img
-            src={featured.src}
-            alt="Galería Roy Riff"
-            className="absolute inset-0 w-full h-full object-cover opacity-80"
-          />
-        )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/30 to-black/70" />
-
-        <div className="relative container-custom h-full flex flex-col justify-end pb-12 md:pb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="font-barlow font-bold text-primary-orange text-xs md:text-sm uppercase tracking-[0.25em] mb-3"
-          >
-            Roy Riff
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-barlow font-black text-white text-6xl md:text-8xl lg:text-9xl uppercase leading-[0.9] tracking-tighter mb-4"
-          >
-            Galería
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-neue text-white/80 text-base md:text-lg max-w-xl leading-relaxed"
-          >
-            La marca en movimiento. Fotos y videos de productos, clientes y la vida Roy Riff.
-          </motion.p>
+      {/* HERO — mismo patrón que HeroSection home */}
+      <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: featured && featured.type === 'image' ? `url(${featured.src})` : undefined,
+            backgroundColor: '#151515',
+          }}
+        >
+          <div className="absolute inset-0 bg-black/60" />
         </div>
-      </section>
 
-      {/* BANNER BREAKAWAY NARANJA */}
-      <section className="bg-primary-orange py-7 md:py-9">
-        <div className="container-custom text-center">
-          <p className="font-barlow font-black text-white text-lg md:text-2xl lg:text-3xl uppercase tracking-tight leading-tight">
-            Explorá la marca. Todo lo que hacemos, en imágenes.
-          </p>
+        <div className="container-custom relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-5xl mx-auto"
+          >
+            <h1 className="font-barlow font-black text-4xl md:text-6xl lg:text-7xl !text-white mb-4 leading-tight uppercase">
+              Galería Roy Riff
+            </h1>
+            <h2 className="font-barlow font-black text-3xl md:text-5xl lg:text-6xl !text-white mb-8 leading-tight uppercase">
+              La marca en movimiento
+            </h2>
+            <p className="font-neue !text-white text-lg md:text-xl mb-2 font-normal">
+              Fotos y videos de productos, clientes y la vida Roy Riff.
+            </p>
+          </motion.div>
         </div>
       </section>
 
@@ -137,12 +121,11 @@ const Galeria = () => {
       {/* CTA FINAL — Seguinos */}
       <section className="bg-neutral-black py-14 md:py-20">
         <div className="container-custom text-center max-w-2xl">
-          <h2 className="font-barlow font-black text-white text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-4">
-            Seguinos
-          </h2>
-          <p className="font-neue text-neutral-gray text-base md:text-lg mb-8">
-            Contenido nuevo cada semana. La comunidad Roy Riff también vive en redes.
-          </p>
+          <SectionTitle
+            title="Seguinos"
+            subtitle="Contenido nuevo cada semana. La comunidad Roy Riff también vive en redes."
+            variant="dark"
+          />
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href={INSTAGRAM_URL}

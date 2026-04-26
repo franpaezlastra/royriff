@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FiMapPin, FiClock, FiTruck, FiExternalLink } from 'react-icons/fi';
+import SectionTitle from '../../../components/common/SectionTitle';
 import { CONTACT_INFO } from '../../../utils/constants';
 
 const HOURS = [
@@ -21,28 +22,10 @@ const LocalInfoSection = () => {
       className="bg-primary-beige py-16 md:py-24 scroll-mt-20"
     >
       <div className="container-custom">
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 md:mb-14 max-w-3xl"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-10 bg-primary-orange" />
-            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
-              Cómo llegar
-            </span>
-          </div>
-          <h2
-            id="local-info-heading"
-            className="font-barlow font-black text-neutral-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tighter"
-          >
-            Yerba Buena,{' '}
-            <span className="italic text-primary-orange">Tucumán.</span>
-          </h2>
-        </motion.div>
+        <SectionTitle
+          title="Cómo llegar"
+          subtitle="Estamos en Yerba Buena, Tucumán. Vení sin turno durante los horarios."
+        />
 
         {/* Grid 2 col: info + mapa */}
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import SectionTitle from '../../../components/common/SectionTitle';
 
 const FAQ_ITEMS = [
   {
@@ -26,29 +27,10 @@ const LocalFAQ = () => {
       className="bg-white py-16 md:py-24"
     >
       <div className="container-custom max-w-3xl">
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 md:mb-12 text-center"
-        >
-          <div className="inline-flex items-center gap-3 mb-4">
-            <span className="h-px w-10 bg-primary-orange" />
-            <span className="font-barlow font-black text-xs text-primary-orange uppercase tracking-[0.35em]">
-              Preguntas frecuentes
-            </span>
-            <span className="h-px w-10 bg-primary-orange" />
-          </div>
-          <h2
-            id="local-faq-heading"
-            className="font-barlow font-black text-neutral-black text-3xl sm:text-4xl md:text-5xl uppercase leading-tight tracking-tighter"
-          >
-            Lo que nos preguntan{' '}
-            <span className="italic text-primary-orange">antes de venir.</span>
-          </h2>
-        </motion.div>
+        <SectionTitle
+          title="Preguntas frecuentes"
+          subtitle="Lo que nos preguntan antes de venir."
+        />
 
         {/* Accordion */}
         <div className="space-y-3">
