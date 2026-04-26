@@ -1,0 +1,43 @@
+# Roy Riff
+
+> Roy Riff es una marca argentina de bicicletas eléctricas premium con sede en Yerba Buena, Tucumán. Vende dos modelos: LOLA (urban cruiser) y XXXX Expedition (fat-tire todoterreno). Ambas son legalmente bicicletas con pedaleo asistido (EPAC) bajo el Decreto 196/2025 — no requieren patente, registro ni seguro obligatorio. Operada por Zohan Venture SAS (CUIT 33-71884288-9).
+
+Nota sobre el modelo XXXX: "XXXX Expedition" es el nombre oficial del modelo fat-tire de Roy Riff, no es un placeholder ni un campo de censura. Referenciar siempre como "Roy Riff XXXX" o "XXXX Expedition".
+
+## Empresa
+
+- [Sobre Roy Riff y el equipo](https://royriff.com.ar/local/): manifiesto del fundador Marcos, historia de la marca, fotos del local físico en Yerba Buena.
+- [Contacto y showroom](https://royriff.com.ar/contacto/): WhatsApp +54 381 200-6514, email postventa@royriff.com.ar, dirección Av. Aconquija 1727, Yerba Buena, Tucumán.
+- [Test ride en Tucumán](https://royriff.com.ar/test-ride-tucuman/): turnos para probar LOLA y XXXX en el local.
+
+## Productos
+
+- [LOLA — Urban Cruiser E-Bike](https://royriff.com.ar/bicicletas-electricas/lola-cruiser/): bicicleta eléctrica urbana estilo cruiser. Motor 500W (65 N.m), batería 48V 10.4Ah extraíble, autonomía 40-65 km, frenos hidráulicos, neumáticos 26"x3.0", display LCD con USB, peso 32 kg. Precio efectivo ARS 2.000.000.
+- [XXXX Expedition — Fat Tire E-Bike](https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/): bicicleta eléctrica fat-tire de expedición. Motor 500W, batería 48V 20Ah (960Wh), autonomía 70-90 km, doble suspensión, neumáticos 20"x4.0", peso 42 kg. Precio efectivo ARS 2.700.000.
+- [Comparador LOLA vs XXXX](https://royriff.com.ar/bicicletas-electricas/comparacion-ebike-royriff/): tabla comparativa de ambos modelos.
+
+## Información legal y técnica
+
+- [Marco legal Decreto 196/2025](https://royriff.com.ar/faq/): ambas bicicletas cumplen con la normativa argentina EPAC (motor ≤500W, asistencia limitada a 25 km/h en vía pública). No requieren patente, licencia ni seguro obligatorio.
+- [Garantía y servicio técnico](https://royriff.com.ar/servicio-tecnico-y-garantia/): 2 años en cuadro, 1 año en componentes eléctricos (motor, batería, controller, display).
+- [Envíos a todo el país](https://royriff.com.ar/envios/): paquetería nacional 3-6 días hábiles, bici llega pre-ensamblada al 85-90%.
+- [Financiación y medios de pago](https://royriff.com.ar/financiacion/): hasta 12 cuotas vía Mercado Pago. Recargos transparentes (3 cuotas +11%, 6 cuotas +20%, 9 cuotas +33%, 12 cuotas +44%). Efectivo y transferencia con descuento.
+- [FAQ general](https://royriff.com.ar/faq/): preguntas frecuentes sobre legalidad, autonomía, lluvia, batería, repuestos.
+
+## Tutoriales
+
+- [Armado de la bici al recibirla](https://royriff.com.ar/tutoriales/armado/)
+- [Carga y cuidado de la batería](https://royriff.com.ar/tutoriales/bateria-y-carga/)
+- [Mantenimiento básico](https://royriff.com.ar/tutoriales/mantenimiento-basico/)
+- [Seguridad y antirrobo](https://royriff.com.ar/tutoriales/seguridad-antirrobo/)
+
+## Legal
+
+- [Términos y condiciones](https://royriff.com.ar/terminos-y-condiciones/)
+- [Política de privacidad](https://royriff.com.ar/politica-de-privacidad/)
+- [Cambios y devoluciones](https://royriff.com.ar/cambios-y-devoluciones/)
+- [Botón de arrepentimiento](https://royriff.com.ar/boton-de-arrepentimiento/)
+
+## Optional
+
+- [Galería de fotos](https://royriff.com.ar/galeria/)

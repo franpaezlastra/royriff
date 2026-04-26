@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.sitemaps.org/schemas/sitemap-image/0.9">
+
+  <!-- Home -->
+  <url>
+    <loc>https://royriff.com.ar/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://royriff.com.ar/og-image.webp</image:loc>
+      <image:title>Roy Riff - Bicicletas Eléctricas Premium</image:title>
+    </image:image>
+  </url>
+
+  <!-- Productos -->
+  <url><loc>https://royriff.com.ar/bicicletas-electricas/lola-cruiser/</loc><lastmod>2026-04-26</lastmod><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/</loc><lastmod>2026-04-26</lastmod><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://royriff.com.ar/bicicletas-electricas/comparacion-ebike-royriff/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+
+  <!-- Conversión / showroom -->
+  <url><loc>https://royriff.com.ar/test-ride-tucuman/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://royriff.com.ar/local/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://royriff.com.ar/contacto/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://royriff.com.ar/financiacion/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+
+  <!-- Confianza / información -->
+  <url><loc>https://royriff.com.ar/envios/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://royriff.com.ar/servicio-tecnico-y-garantia/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://royriff.com.ar/faq/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+
+  <!-- Galería -->
+  <url><loc>https://royriff.com.ar/galeria/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+
+  <!-- Tutoriales -->
+  <url><loc>https://royriff.com.ar/tutoriales/</loc><lastmod>2026-04-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://royriff.com.ar/tutoriales/armado/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://royriff.com.ar/tutoriales/bateria-y-carga/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://royriff.com.ar/tutoriales/mantenimiento-basico/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://royriff.com.ar/tutoriales/seguridad-antirrobo/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.70</priority></url>
+
+  <!-- Legales -->
+  <url><loc>https://royriff.com.ar/terminos-y-condiciones/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.30</priority></url>
+  <url><loc>https://royriff.com.ar/politica-de-privacidad/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.30</priority></url>
+  <url><loc>https://royriff.com.ar/cambios-y-devoluciones/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.40</priority></url>
+  <url><loc>https://royriff.com.ar/boton-de-arrepentimiento/</loc><lastmod>2026-04-26</lastmod><changefreq>yearly</changefreq><priority>0.30</priority></url>
+
+</urlset>

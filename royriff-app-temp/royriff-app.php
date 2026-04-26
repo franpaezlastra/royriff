@@ -21,22 +21,235 @@ define('ROYRIFF_APP_URL', plugin_dir_url(__FILE__));
 define('ROYRIFF_APP_SLUG', '');
 
 /**
- * Forzar el título de la pestaña a "Roy Riff" cuando se sirve la SPA.
- * Evita que WordPress muestre "My WordPress" u otro título del tema.
+ * Mapa de metadata SEO por ruta SPA.
+ * Cada entrada: title (sub-60 chars idealmente) + description (sub-160) + og_image opcional.
+ * Si la ruta no está mapeada, fallback al home.
+ */
+function royriff_app_get_route_metadata() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $path = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
+    $path = trim($path, '/');
+
+    $home_og_image = 'https://royriff.com.ar/og-image.webp';
+
+    $routes = array(
+        '' => array(
+            'title' => 'Roy Riff | Bicicletas Eléctricas Premium en Argentina',
+            'description' => 'Bicicletas eléctricas LOLA y XXXX en Argentina. Envío gratis a todo el país, financiación en cuotas y test ride en nuestro local de Yerba Buena, Tucumán.',
+            'og_image' => $home_og_image,
+        ),
+        'local' => array(
+            'title' => 'Local Roy Riff en Yerba Buena, Tucumán | Test Ride',
+            'description' => 'Visitá nuestro local en Av. Aconquija 1727, Yerba Buena, Tucumán. Probá la LOLA y la XXXX antes de decidir, con turno previo. Equipo propio, parking.',
+        ),
+        'galeria' => array(
+            'title' => 'Galería Roy Riff | Fotos LOLA, XXXX y nuestro local',
+            'description' => 'Galería de fotos de Roy Riff: clientes con sus bicis eléctricas, productos LOLA y XXXX, vida de marca y eventos en Tucumán.',
+        ),
+        'bicicletas-electricas/lola-cruiser' => array(
+            'title' => 'Roy Riff LOLA | E-Bike Urbana 500W con frenos hidráulicos',
+            'description' => 'LOLA, bicicleta eléctrica urbana de Roy Riff. Motor 500W, batería 48V 10.4Ah extraíble, autonomía 40-65km, frenos hidráulicos. 100% legal sin patente.',
+        ),
+        'bicicletas-electricas/xxxx-expedition' => array(
+            'title' => 'Roy Riff XXXX Expedition | Fat Tire 500W con 90km autonomía',
+            'description' => 'XXXX Expedition, bici eléctrica fat tire de Roy Riff. 90km autonomía, batería 48V 20Ah, doble suspensión. 100% legal sin patente. Para quien va más lejos.',
+        ),
+        'bicicletas-electricas/comparacion-ebike-royriff' => array(
+            'title' => 'LOLA vs XXXX | Compará las e-bikes de Roy Riff',
+            'description' => 'Tabla comparativa entre LOLA Urban Cruiser y XXXX Expedition: autonomía, batería, suspensión, peso, precio y financiación. Elegí la que va con vos.',
+        ),
+        'test-ride-tucuman' => array(
+            'title' => 'Test Ride Roy Riff | Probá LOLA y XXXX en Tucumán',
+            'description' => 'Reservá un test ride gratis en Yerba Buena, Tucumán. Probá la LOLA o la XXXX en la calle, sin compromiso. Coordinamos por WhatsApp en 1 minuto.',
+        ),
+        'financiacion' => array(
+            'title' => 'Financiación Roy Riff | Cuotas Bicicletas Eléctricas',
+            'description' => 'Hasta 12 cuotas con Mercado Pago. Recargo transparente: 3 cuotas +11%, 6 cuotas +20%, 9 cuotas +33%, 12 cuotas +44%. Efectivo y transferencia con descuento.',
+        ),
+        'envios' => array(
+            'title' => 'Envíos Roy Riff | Gratis a todo Argentina o retiro Palermo',
+            'description' => 'Envío gratis a todo el país, 3-6 días hábiles. Llega 85-90% armada con manual y videos. Retiro en Palermo BsAs con turno previo.',
+        ),
+        'servicio-tecnico-y-garantia' => array(
+            'title' => 'Garantía y Servicio Técnico Roy Riff | Hasta 2 años',
+            'description' => '2 años de garantía en cuadro, 1 año en componentes eléctricos (motor, batería, controller, display). Repuestos en stock y servicio técnico propio.',
+        ),
+        'faq' => array(
+            'title' => 'Preguntas Frecuentes Roy Riff | Bicicletas Eléctricas',
+            'description' => 'Respuestas sobre legalidad (Decreto 196/2025), autonomía real, mantenimiento, batería, lluvia, repuestos y todo lo que necesitás saber antes de comprar.',
+        ),
+        'contacto' => array(
+            'title' => 'Contacto Roy Riff | WhatsApp, email y showroom Tucumán',
+            'description' => 'Escribinos por WhatsApp +54 381 200-6514, email postventa@royriff.com.ar o visitá el local en Yerba Buena, Tucumán. Te respondemos lo más rápido posible.',
+        ),
+        'tutoriales' => array(
+            'title' => 'Tutoriales Roy Riff | Armado, batería, mantenimiento',
+            'description' => 'Aprendé a armar tu bici eléctrica al recibirla, cuidar la batería, hacer mantenimiento básico y proteger tu Roy Riff de robos.',
+        ),
+        'tutoriales/armado' => array(
+            'title' => 'Tutorial: Armado de tu Roy Riff al recibirla',
+            'description' => 'Cómo armar tu bicicleta eléctrica Roy Riff cuando llega 85-90% pre-ensamblada. Manubrio, asiento, frenos, primer encendido y checklist final.',
+        ),
+        'tutoriales/bateria-y-carga' => array(
+            'title' => 'Tutorial: Batería y carga de tu e-bike Roy Riff',
+            'description' => 'Cómo cargar correctamente la batería de tu Roy Riff, errores frecuentes, almacenamiento, temperatura ideal y señales de batería fallando.',
+        ),
+        'tutoriales/mantenimiento-basico' => array(
+            'title' => 'Tutorial: Mantenimiento básico Roy Riff',
+            'description' => 'Inflado de ruedas, limpieza segura del cuadro, lubricación de cadena, ajuste de luces y revisiones antes de cada salida.',
+        ),
+        'tutoriales/seguridad-antirrobo' => array(
+            'title' => 'Tutorial: Seguridad antirrobo Roy Riff',
+            'description' => 'Cómo proteger tu bici eléctrica del robo. Tipos de candado, parking seguro, GPS tracker, registro de número de serie y qué hacer si te la roban.',
+        ),
+        'terminos-y-condiciones' => array(
+            'title' => 'Términos y Condiciones | Roy Riff',
+            'description' => 'Términos y condiciones de uso del sitio, compra y servicios de Roy Riff (Zohan Venture SAS).',
+        ),
+        'politica-de-privacidad' => array(
+            'title' => 'Política de Privacidad | Roy Riff',
+            'description' => 'Política de privacidad y protección de datos personales de Roy Riff (Zohan Venture SAS), conforme a la Ley 25.326.',
+        ),
+        'cambios-y-devoluciones' => array(
+            'title' => 'Cambios y Devoluciones | Roy Riff',
+            'description' => 'Política de cambios y devoluciones de Roy Riff. Derecho de arrepentimiento de 10 días según Ley 24.240 y Resolución 424/2020.',
+        ),
+        'boton-de-arrepentimiento' => array(
+            'title' => 'Botón de Arrepentimiento | Roy Riff',
+            'description' => 'Ejercé tu derecho de arrepentimiento en 10 días corridos según Art. 34 de la Ley 24.240 y Resolución 424/2020.',
+        ),
+    );
+
+    // Match exacto primero
+    if (isset($routes[$path])) {
+        $cached = $routes[$path];
+    } else {
+        // Match por prefijo (ej: para rutas con slug dinámico)
+        $cached = $routes[''];
+        foreach ($routes as $key => $meta) {
+            if ($key !== '' && strpos($path, $key) === 0) {
+                $cached = $meta;
+                break;
+            }
+        }
+    }
+
+    // Asegurar fallbacks
+    if (!isset($cached['og_image'])) {
+        $cached['og_image'] = $home_og_image;
+    }
+
+    return $cached;
+}
+
+/**
+ * Detecta si la request actual es una ruta SPA.
+ * Centraliza la lógica para evitar duplicación entre filtros y hooks.
+ */
+function royriff_app_is_spa_route() {
+    static $is_spa = null;
+    if ($is_spa !== null) {
+        return $is_spa;
+    }
+
+    $path = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
+    $path = trim($path, '/');
+
+    // Excluir rutas administrativas y de API
+    if ($path === '' || strpos($path, 'wp-') === 0 || strpos($path, 'api/') === 0) {
+        $is_spa = ($path === '');
+        return $is_spa;
+    }
+
+    $spa_prefixes = array('carrito', 'checkout', 'cart', 'bicicletas-electricas', 'financiacion',
+                          'envios', 'servicio-tecnico-y-garantia', 'faq', 'test-ride-tucuman',
+                          'contacto', 'tutoriales', 'compra-confirmada', 'pedido-cancelado',
+                          'seguimiento', 'redireccion-pago', 'boton-de-arrepentimiento',
+                          'cambios-y-devoluciones', 'terminos-y-condiciones', 'politica-de-privacidad',
+                          'local', 'galeria');
+
+    foreach ($spa_prefixes as $prefix) {
+        if ($path === $prefix || strpos($path, $prefix . '/') === 0) {
+            $is_spa = true;
+            return $is_spa;
+        }
+    }
+
+    $is_spa = false;
+    return $is_spa;
+}
+
+/**
+ * Title dinámico por ruta SPA (corrige el bug de duplicación 100%).
  */
 add_filter('pre_get_document_title', function ($title) {
-    if (get_query_var('royriff_spa') || is_front_page()) {
-        return 'Roy Riff | Bicicletas Eléctricas Premium en Argentina';
+    if (royriff_app_is_spa_route() || get_query_var('royriff_spa') || is_front_page()) {
+        $meta = royriff_app_get_route_metadata();
+        return $meta['title'];
     }
     return $title;
 }, 999);
 
 add_filter('wp_title', function ($title) {
-    if (get_query_var('royriff_spa') || is_front_page()) {
-        return 'Roy Riff | Bicicletas Eléctricas Premium en Argentina';
+    if (royriff_app_is_spa_route() || get_query_var('royriff_spa') || is_front_page()) {
+        $meta = royriff_app_get_route_metadata();
+        return $meta['title'];
     }
     return $title;
 }, 999);
+
+/**
+ * Inyectar meta description, Open Graph, Twitter Card y canonical
+ * dinámicos según ruta. Resuelve el bug de que el shortcode descartaba
+ * todos los meta tags del dist/index.html.
+ */
+add_action('wp_head', function () {
+    if (!royriff_app_is_spa_route() && !is_front_page()) {
+        return;
+    }
+
+    $meta = royriff_app_get_route_metadata();
+    $path = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
+    $canonical = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'royriff.com.ar') . $path;
+
+    $title = esc_attr($meta['title']);
+    $description = esc_attr($meta['description']);
+    $og_image = esc_url($meta['og_image']);
+    $canonical_url = esc_url($canonical);
+
+    echo "\n<!-- Roy Riff SEO meta tags -->\n";
+    echo '<meta name="description" content="' . $description . '" />' . "\n";
+    echo '<link rel="canonical" href="' . $canonical_url . '" />' . "\n";
+
+    // Open Graph
+    echo '<meta property="og:type" content="website" />' . "\n";
+    echo '<meta property="og:site_name" content="Roy Riff" />' . "\n";
+    echo '<meta property="og:title" content="' . $title . '" />' . "\n";
+    echo '<meta property="og:description" content="' . $description . '" />' . "\n";
+    echo '<meta property="og:image" content="' . $og_image . '" />' . "\n";
+    echo '<meta property="og:image:width" content="1200" />' . "\n";
+    echo '<meta property="og:image:height" content="630" />' . "\n";
+    echo '<meta property="og:image:alt" content="Roy Riff — Bicicletas Eléctricas Premium" />' . "\n";
+    echo '<meta property="og:url" content="' . $canonical_url . '" />' . "\n";
+    echo '<meta property="og:locale" content="es_AR" />' . "\n";
+
+    // Twitter / X
+    echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
+    echo '<meta name="twitter:title" content="' . $title . '" />' . "\n";
+    echo '<meta name="twitter:description" content="' . $description . '" />' . "\n";
+    echo '<meta name="twitter:image" content="' . $og_image . '" />' . "\n";
+
+    echo "<!-- /Roy Riff SEO meta tags -->\n\n";
+}, 1);
+
+/**
+ * Remover el canonical default de WordPress en rutas SPA — emitimos el nuestro.
+ */
+remove_action('wp_head', 'rel_canonical');
 
 /**
  * Headers de seguridad HTTP para proteger contra clickjacking, MIME sniffing, etc.
@@ -178,11 +391,12 @@ function royriff_app_intercept_spa_routes() {
     }
     
     // Lista de rutas que deben ser manejadas por la SPA
-    $spa_routes = array('carrito', 'checkout', 'cart', 'bicicletas-electricas', 'financiacion', 
-                        'envios', 'servicio-tecnico-y-garantia', 'faq', 'test-ride-tucuman', 
-                        'contacto', 'tutoriales', 'compra-confirmada', 'pedido-cancelado', 
-                        'seguimiento', 'redireccion-pago', 'boton-de-arrepentimiento', 
-                        'cambios-y-devoluciones', 'terminos-y-condiciones', 'politica-de-privacidad');
+    $spa_routes = array('carrito', 'checkout', 'cart', 'bicicletas-electricas', 'financiacion',
+                        'envios', 'servicio-tecnico-y-garantia', 'faq', 'test-ride-tucuman',
+                        'contacto', 'tutoriales', 'compra-confirmada', 'pedido-cancelado',
+                        'seguimiento', 'redireccion-pago', 'boton-de-arrepentimiento',
+                        'cambios-y-devoluciones', 'terminos-y-condiciones', 'politica-de-privacidad',
+                        'local', 'galeria');
     
     // Verificar si la ruta actual es una ruta SPA
     $is_spa_route = false;
