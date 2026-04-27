@@ -311,6 +311,9 @@ function royriff_app_shortcode() {
         // Solo respetar URLs absolutas externas (http/https).
         if (strpos($href, 'http') === 0) {
             $url = $href;
+        } elseif (substr($href, 0, 1) === '/') {
+            // Vite con base='/wp-content/plugins/royriff-app/dist/' ya emite path absoluto
+            $url = home_url($href);
         } else {
             $url = $dist_url . '/' . ltrim($href, './');
         }
@@ -322,6 +325,8 @@ function royriff_app_shortcode() {
     foreach ($scripts as $src) {
         if (strpos($src, 'http') === 0) {
             $url = $src;
+        } elseif (substr($src, 0, 1) === '/') {
+            $url = home_url($src);
         } else {
             $url = $dist_url . '/' . ltrim($src, './');
         }
