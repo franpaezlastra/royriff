@@ -15,7 +15,6 @@ if (!defined('ABSPATH')) {
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Roy Riff | Bicicletas Eléctricas Premium en Argentina</title>
     <?php wp_head(); ?>
     <style>
         /* Aislar la app React de estilos del tema WordPress */

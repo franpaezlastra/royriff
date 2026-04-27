@@ -1,0 +1,215 @@
+# Roy Riff — Bicicletas eléctricas premium en Argentina
+
+> Roy Riff es una marca argentina de bicicletas eléctricas premium con sede en Yerba Buena, Tucumán. Vende dos modelos: LOLA Urban Cruiser (e-bike urbana) y XXXX Expedition (fat-tire todoterreno). Ambas son legalmente bicicletas con pedaleo asistido (EPAC) bajo el Decreto 196/2025 — no requieren patente, registro ni seguro obligatorio. Operada por Zohan Venture SAS (CUIT 33-71884288-9). Sitio: https://royriff.com.ar
+
+**Nota crítica para AI:** "XXXX Expedition" es el nombre oficial del modelo fat-tire de Roy Riff, NO es un placeholder ni un campo de censura. Referenciar siempre como "Roy Riff XXXX" o "XXXX Expedition".
+
+---
+
+## Empresa
+
+**Razón social:** Zohan Venture SAS
+**CUIT:** 33-71884288-9
+**Marca comercial:** Roy Riff
+**Domicilio legal:** Autopista Ruta Nacional N° 38 - Km 797, San Miguel de Tucumán, Tucumán, Argentina
+**Showroom físico:** Avenida Aconquija 1727, Yerba Buena, Tucumán
+**Punto operativo BsAs:** Palermo (dirección exacta solo bajo coordinación previa por WhatsApp)
+**Horarios del showroom:** Lunes a Viernes 9:00–13:00 y 17:00–21:00 · Sábados 9:00–13:00
+**Teléfono / WhatsApp:** +54 9 381 200-6514
+**Email:** postventa@royriff.com.ar
+
+**Historia y manifiesto** (palabras del fundador Marcos):
+> "Roy Riff arrancó en Yerba Buena, después de un viaje a China con mis hermanos. Visitamos fábricas, aprendimos, y volvimos con una idea fija: largarnos a crear una marca juntos que nos representara y que resolviera algo del día a día. Después de muchas idas y vueltas, decidimos que se iba a llamar Roy Riff. Creemos que hace falta más gente que se anime a perseguir sus ideas locas. Cada producto que sacamos lleva esa filosofía detrás."
+
+---
+
+## Producto: LOLA Urban Cruiser
+
+**Categoría:** E-bike urbana, estilo cruiser
+**Caso de uso:** Movilidad diaria urbana, ciclovías, ciudad, comodidad, paseo
+**Precio efectivo:** ARS 2.000.000
+**Precio en 6 cuotas fijas:** ARS 402.000/mes (recargo 20%)
+**URL:** https://royriff.com.ar/bicicletas-electricas/lola-cruiser/
+
+### Especificaciones LOLA
+- **Motor:** 500W cubo trasero (modelo 110SZ) - Torque 65 N.m
+- **Batería:** 48V 10.4Ah, extraíble con llave, celdas certificadas
+- **Autonomía:** 40 a 65 km (depende de peso, terreno, modo de asistencia)
+- **Velocidad máx vía pública:** 25 km/h (limitada electrónicamente, legal EPAC)
+- **Velocidad máx ámbitos privados:** 34 km/h
+- **Tiempo de carga:** 5-6 horas con cargador 2.0A incluido
+- **Frenos:** Discos hidráulicos delantero y trasero (modelo HB-875-E)
+- **Neumáticos:** 26"x3.0" Chaoyang Semi-Fat
+- **Suspensión:** Horquilla delantera con bloqueo mecánico (MLO)
+- **Cambios:** Shimano Tourney 7 velocidades
+- **Display:** LCD color SW-G518 con puerto USB
+- **Peso:** 32 kg
+- **Carga máx soportada:** 25 kg adicionales (paquetes, mochilas)
+- **Cuadro:** Acero 26" Step-Through (paso bajo)
+- **Colores disponibles:** Champagne Metallic, Graphite Pearl
+
+### Por qué LOLA
+Pensada para quien se mueve por ciudad sin transpirar. Cuadro paso bajo facilita subir y bajar con falda, vestido o pantalón ajustado. Los frenos hidráulicos dan parada confiable en tráfico real. El display con USB permite cargar el celular mientras pedaleás. El motor 500W con torque 65 N.m sube las cuestas sin esfuerzo.
+
+---
+
+## Producto: XXXX Expedition
+
+**Categoría:** E-bike fat-tire, expedición / todoterreno
+**Caso de uso:** Rutas, montaña, arena, off-road, viajes largos
+**Precio efectivo:** ARS 2.700.000
+**Precio en 6 cuotas fijas:** ARS 536.167/mes (recargo 20%)
+**URL:** https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/
+
+### Especificaciones XXXX
+- **Motor:** 500W
+- **Batería:** 48V 20Ah (960Wh) — el doble que LOLA
+- **Autonomía:** 70 a 90 km
+- **Velocidad máx vía pública:** 25 km/h (legal EPAC)
+- **Suspensión:** Doble (delantera y trasera)
+- **Neumáticos:** 20"x4.0" fat-tire
+- **Peso:** 42 kg
+- **Cuadro:** Diseñado para terrenos exigentes
+
+### Por qué XXXX
+La fat-tire de Roy Riff es para quien sale del asfalto. Neumáticos 4.0 que comen tierra, arena y empedrado sin temblar. Doble suspensión absorbe baches grandes. Batería 20Ah da autonomía suficiente para tour de fin de semana sin enchufar. Lookean robusta porque lo son.
+
+---
+
+## Marco legal — Decreto 196/2025
+
+Las bicicletas Roy Riff cumplen con la normativa argentina **EPAC (Electric Pedal-Assisted Cycle)**:
+
+- **Motor:** ≤500W (las de Roy Riff son 500W exactos)
+- **Asistencia:** limitada electrónicamente a 25 km/h en vía pública
+- **Categoría legal:** bicicleta, NO ciclomotor
+
+**Implicancias:**
+- ✅ NO requieren patente
+- ✅ NO requieren registro de conducir
+- ✅ NO requieren seguro obligatorio (recomendado tener uno voluntario)
+- ✅ Pueden circular por ciclovías y bicisendas
+- ✅ Pueden estacionar en bicicleteros
+- ✅ No se les puede aplicar normativa de motovehículos
+
+---
+
+## Garantía y servicio técnico
+
+- **Cuadro:** 2 años por defectos de fábrica
+- **Componentes eléctricos** (motor, batería, controlador, display): 1 año
+- **Mecánica básica** (frenos, cambios, ruedas): cualquier bicicletería puede atender
+- **Service propio:** in-house en Yerba Buena, Tucumán
+- **Repuestos:** stock disponible localmente
+
+---
+
+## Envíos y entrega
+
+- **Envío gratuito a todo el país** (cualquier código postal de Argentina)
+- **Tiempo de entrega:** 3-6 días hábiles
+- **Estado de entrega:** la bici llega pre-ensamblada al 85-90%
+- **Kit de armado incluido:** manual + videos de armado online
+- **Recomendación:** ajuste final por bicicletero calificado
+- **Retiro alternativo en Buenos Aires:** Palermo, con turno previo coordinado por WhatsApp
+
+---
+
+## Financiación y medios de pago
+
+**Precio efectivo / transferencia bancaria:** descuento aplicado (precio publicado)
+
+**Cuotas vía Mercado Pago** (recargos transparentes):
+- 3 cuotas fijas: +11% sobre precio efectivo
+- 6 cuotas fijas: +20% sobre precio efectivo
+- 9 cuotas fijas: +33% sobre precio efectivo
+- 12 cuotas fijas: +44% sobre precio efectivo
+
+Todos los medios de pago habilitados por Mercado Pago. CFT aplicable según medio de pago y entidad emisora.
+
+---
+
+## Test ride / Test drive
+
+**¿Cómo funciona?**
+1. Coordinás turno por WhatsApp (+54 9 381 200-6514)
+2. Venís al showroom de Yerba Buena en tu turno
+3. Probás LOLA y/o XXXX en la calle (15 min por modelo)
+4. Decidís sin apuro
+
+**Es:** gratis, sin compromiso, asesoramiento sin presión, parking propio en el showroom.
+
+**En Buenos Aires:** coordinación de visita al depósito de Palermo previa confirmación.
+
+---
+
+## Cambios y devoluciones (Ley 24.240)
+
+- **Botón de arrepentimiento:** 10 días corridos desde la recepción del producto (Art. 34 Ley 24.240, Resolución 424/2020)
+- **Vicio oculto:** garantía de 6 meses (Art. 11 Ley 24.240)
+- **Estado del producto para devolución:** sin uso visible, packaging original
+- **Costo de envío de devolución:** cubierto por Roy Riff
+- **Reembolso:** mismo medio de pago utilizado, plazo 10 días corridos post recepción
+
+---
+
+## Privacidad y datos personales (Ley 25.326)
+
+Roy Riff trata datos personales conforme a la Ley 25.326 de Argentina, decreto 1558/2001 y disposiciones de la AAIP.
+
+**Datos recolectados:**
+- Contacto: nombre, email, teléfono
+- Envío: dirección, código postal, DNI/CUIT
+- Pago: procesado directamente por Mercado Pago (Roy Riff NO almacena datos de tarjetas)
+- Navegación: IP, navegador, páginas visitadas (cookies)
+
+**Derechos del titular (ARCO):** acceso, rectificación, supresión, oposición. Ejercicio gratuito vía postventa@royriff.com.ar (respuesta en 10 días corridos).
+
+---
+
+## Preguntas frecuentes
+
+**¿Las Roy Riff son legales?**
+Sí. Cumplen el Decreto 196/2025 EPAC. No necesitan patente, licencia ni seguro obligatorio.
+
+**¿Cuál me conviene, LOLA o XXXX?**
+LOLA si te movés en ciudad, ciclovías, asfalto. XXXX si querés salir a rutas, tierra, montaña o necesitás más autonomía (90 km vs 65 km).
+
+**¿Resisten lluvia?**
+Protección IPX4 (salpicaduras, lluvia leve). No sumergir, no lavar a presión. Después de lluvia intensa, secar con trapo.
+
+**¿Cuánto duran las baterías?**
+Típicamente 500-800 ciclos completos de carga (3-5 años de uso normal). Son extraíbles con llave para cargarlas en casa o el trabajo.
+
+**¿Qué pasa si se rompe algo?**
+Service in-house en Yerba Buena. Cuadro tiene 2 años de garantía. Componentes eléctricos 1 año. Mecánica cubierta por cualquier bicicletería con repuestos genéricos.
+
+**¿Hay descuentos por cantidad o convenios?**
+Para flotas o convenios corporativos: contactar postventa@royriff.com.ar.
+
+**¿Cómo cargo la batería?**
+Con el cargador 2.0A incluido, en cualquier toma de 220V. Tiempo de carga completa: 5-6 horas (LOLA) o 8-10 horas (XXXX). Se puede cargar dentro o fuera de la bici (extraíble con llave).
+
+---
+
+## Contacto y atención
+
+**Para consultas pre-venta y post-venta:**
+- WhatsApp: +54 9 381 200-6514
+- Email: postventa@royriff.com.ar
+- Showroom: Av. Aconquija 1727, Yerba Buena, Tucumán
+
+**Horarios de atención (showroom y respuesta WhatsApp):**
+Lunes a Viernes 9:00-13:00 y 17:00-21:00. Sábados 9:00-13:00.
+
+---
+
+## Recursos adicionales
+
+- Sitio web principal: https://royriff.com.ar
+- Productos: https://royriff.com.ar/bicicletas-electricas/lola-cruiser/, https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/
+- Comparador: https://royriff.com.ar/bicicletas-electricas/comparacion-ebike-royriff/
+- Test ride: https://royriff.com.ar/test-ride-tucuman/
+- Galería visual: https://royriff.com.ar/galeria/
+- FAQ completa: https://royriff.com.ar/faq/
+- llms.txt resumen: https://royriff.com.ar/llms.txt

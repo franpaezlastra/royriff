@@ -20,6 +20,9 @@ define('ROYRIFF_APP_URL', plugin_dir_url(__FILE__));
 // Cambiado a '' para que la SPA viva en la raíz (/)
 define('ROYRIFF_APP_SLUG', '');
 
+// Schema.org JSON-LD generators (Organization, LocalBusiness, Product, Breadcrumb, FAQ, WebSite)
+require_once ROYRIFF_APP_PATH . 'includes/schema.php';
+
 /**
  * Mapa de metadata SEO por ruta SPA.
  * Cada entrada: title (sub-60 chars idealmente) + description (sub-160) + og_image opcional.
@@ -186,6 +189,14 @@ function royriff_app_is_spa_route() {
 /**
  * Title dinámico por ruta SPA (corrige el bug de duplicación 100%).
  */
+/**
+ * Garantizar que WordPress emita <title> en wp_head() vía title-tag support.
+ * El template page-solo-app.php confía en wp_head() para emitir el título dinámico.
+ */
+add_action('after_setup_theme', function () {
+    add_theme_support('title-tag');
+}, 100);
+
 add_filter('pre_get_document_title', function ($title) {
     if (royriff_app_is_spa_route() || get_query_var('royriff_spa') || is_front_page()) {
         $meta = royriff_app_get_route_metadata();
@@ -244,6 +255,45 @@ add_action('wp_head', function () {
     echo '<meta name="twitter:image" content="' . $og_image . '" />' . "\n";
 
     echo "<!-- /Roy Riff SEO meta tags -->\n\n";
+
+    // ─────────────────────────────────────────────────────────────────────
+    // JSON-LD schemas dinámicos por ruta
+    // ─────────────────────────────────────────────────────────────────────
+    $path_clean = trim($path, '/');
+    $schemas = array();
+
+    // Organization siempre
+    $schemas[] = royriff_app_get_org_schema();
+
+    // Home: WebSite
+    if ($path_clean === '') {
+        $schemas[] = royriff_app_get_website_schema();
+    }
+
+    // Breadcrumb en todas las rutas excepto home
+    $breadcrumb = royriff_app_get_breadcrumb_schema($path_clean);
+    if ($breadcrumb !== null) {
+        $schemas[] = $breadcrumb;
+    }
+
+    // Schemas específicos por ruta
+    if ($path_clean === 'local') {
+        $schemas[] = royriff_app_get_localbusiness_schema();
+    } elseif (strpos($path_clean, 'bicicletas-electricas/lola-cruiser') === 0) {
+        $product = royriff_app_get_product_schema('lola');
+        if ($product) $schemas[] = $product;
+    } elseif (strpos($path_clean, 'bicicletas-electricas/xxxx-expedition') === 0) {
+        $product = royriff_app_get_product_schema('xxxx');
+        if ($product) $schemas[] = $product;
+    } elseif ($path_clean === 'faq') {
+        $schemas[] = royriff_app_get_faq_schema();
+    }
+
+    echo "<!-- Roy Riff JSON-LD -->\n";
+    foreach ($schemas as $s) {
+        echo '<script type="application/ld+json">' . wp_json_encode($s, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+    }
+    echo "<!-- /Roy Riff JSON-LD -->\n\n";
 }, 1);
 
 /**
@@ -370,7 +420,7 @@ function royriff_app_rewrite_rules() {
             
             // Cualquier ruta "limpia" la maneja la SPA, EXCEPTO endpoints de pago de WooCommerce
             // /checkout/order-pay/123 y /checkout/order-received/123 deben ser manejados por WooCommerce
-            add_rewrite_rule('^(?!wp-admin|wp-content|wp-includes|wp-json|api|xmlrpc\.php|feed|sitemap|robots\.txt)(?!.*/order-pay/)(?!.*/order-received/)(.+)?$', 'index.php?page_id=' . $front_page_id . '&royriff_spa=1', 'top');
+            add_rewrite_rule('^(?!wp-admin|wp-content|wp-includes|wp-json|api|xmlrpc\.php|feed|sitemap|robots\.txt|llms\.txt|llms-full\.txt|og-image\.webp)(?!.*/order-pay/)(?!.*/order-received/)(.+)?$', 'index.php?page_id=' . $front_page_id . '&royriff_spa=1', 'top');
         }
     }
 }
