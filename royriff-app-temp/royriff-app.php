@@ -321,7 +321,7 @@ add_action('send_headers', function () {
         . "img-src 'self' data: blob: https: http:; "
         . "media-src 'self' https:; "
         . "connect-src 'self' https://api.royriff.com.ar https://royriff.com.ar https://*.mercadopago.com https://*.mercadolibre.com https://www.google-analytics.com https://www.facebook.com; "
-        . "frame-src 'self' https://www.google.com https://*.mercadopago.com https://*.mercadolibre.com; "
+        . "frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com https://*.mercadopago.com https://*.mercadolibre.com https://www.youtube.com https://www.youtube-nocookie.com; "
         . "frame-ancestors 'self'; "
         . "form-action 'self' https://*.mercadopago.com https://*.mercadolibre.com; "
         . "base-uri 'self'; "
