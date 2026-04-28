@@ -311,9 +311,24 @@ add_action('send_headers', function () {
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=()');
+    // CSP defensivo — permite recursos del propio dominio + Google Fonts + WhatsApp + Mercado Pago + Meta Pixel.
+    // Mantenemos 'unsafe-inline' y 'unsafe-eval' para no romper el bundle React + plugins WP.
+    $csp = "default-src 'self'; "
+        . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.mercadopago.com https://*.mercadolibre.com; "
+        . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        . "font-src 'self' data: https://fonts.gstatic.com; "
+        . "img-src 'self' data: blob: https: http:; "
+        . "media-src 'self' https:; "
+        . "connect-src 'self' https://api.royriff.com.ar https://royriff.com.ar https://*.mercadopago.com https://*.mercadolibre.com https://www.google-analytics.com https://www.facebook.com; "
+        . "frame-src 'self' https://www.google.com https://*.mercadopago.com https://*.mercadolibre.com; "
+        . "frame-ancestors 'self'; "
+        . "form-action 'self' https://*.mercadopago.com https://*.mercadolibre.com; "
+        . "base-uri 'self'; "
+        . "upgrade-insecure-requests;";
+    header('Content-Security-Policy: ' . $csp);
     if (is_ssl()) {
-        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        header('Strict-Transport-Security: max-age=63072000; includeSubDomains; preload');
     }
 });
 

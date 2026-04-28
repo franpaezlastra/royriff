@@ -49,7 +49,7 @@ const HeroSection = () => {
               variant="primary"
               className="text-base md:text-lg px-8 md:px-12 py-3 md:py-4 uppercase font-bold"
             >
-              Haz clic aquí
+              Comparar LOLA vs XXXX
             </Button>
           </motion.div>
         </motion.div>

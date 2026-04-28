@@ -84,6 +84,38 @@ const Galeria = () => {
         </div>
       </section>
 
+      {/* INTRO COPY — contexto editorial + SEO */}
+      <section className="bg-primary-beige py-12 md:py-16">
+        <div className="container-custom max-w-3xl">
+          <div className="space-y-5 font-neue text-neutral-darkGreen text-base md:text-lg leading-relaxed">
+            <p>
+              Esta es la galería visual de <strong>Roy Riff</strong>: una colección
+              curada de fotos y videos de las bicis eléctricas <strong>LOLA</strong> y{' '}
+              <strong>XXXX Expedition</strong>, los clientes que ya andan con su
+              Roy Riff por las calles de Argentina, los eventos de la marca y el
+              detrás de escena del local en Yerba Buena, Tucumán.
+            </p>
+            <p>
+              Documentamos la marca porque creemos que las bicis no son solo
+              especificaciones: son parte de cómo la gente se mueve, se cruza con
+              vecinos, llega al trabajo o sale de paseo el domingo. Cada foto es
+              una pieza real — no stock, no escenarios armados. Las personas que
+              ves en la galería son clientes reales, el equipo de Roy Riff y
+              amigos que pasaron por el local en Yerba Buena.
+            </p>
+            <p>
+              Usá los filtros de abajo para navegar por <strong>Productos</strong>{' '}
+              (LOLA y XXXX en distintos colores y ángulos),{' '}
+              <strong>Vida Roy Riff</strong> (producciones de marca y comunidad),{' '}
+              <strong>Clientes</strong> (las 6 personas que confiaron primero en
+              nosotros) y <strong>Eventos</strong> (la inauguración del showroom
+              y otras movidas). Click en cualquier foto la abre en pantalla
+              completa para que la veas en detalle.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FILTROS */}
       <GalleryFilters active={activeCategory} onChange={setActiveCategory} />
 
