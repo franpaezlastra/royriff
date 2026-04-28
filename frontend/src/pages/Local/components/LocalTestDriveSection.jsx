@@ -36,18 +36,18 @@ const BENEFITS = [
 
 const LocalTestDriveSection = () => {
   const whatsappTestDrive = `${CONTACT_INFO.whatsappLink}?text=${encodeURIComponent(
-    'Hola! Quiero agendar un test drive en el local de Yerba Buena. ¿Qué día y hora tienen disponible?'
+    'Hola! Quiero agendar un test ride en el local de Yerba Buena. ¿Qué día y hora tienen disponible?'
   )}`;
 
   return (
     <section
-      id="test-drive"
-      aria-labelledby="test-drive-heading"
+      id="test-ride"
+      aria-labelledby="test-ride-heading"
       className="relative bg-primary-beige text-neutral-black py-20 md:py-28 overflow-hidden scroll-mt-20"
     >
       <div className="relative container-custom">
         <SectionTitle
-          title="Cómo funciona el test drive"
+          title="Cómo funciona el test ride"
           subtitle="Sin compromiso, con turno, en 4 pasos simples."
         />
 

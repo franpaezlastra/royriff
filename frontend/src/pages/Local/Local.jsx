@@ -20,7 +20,7 @@ const Local = () => {
     if (meta) {
       meta.setAttribute(
         'content',
-        'Visitá nuestro local en Yerba Buena, Tucumán. Probá la LOLA y la XXXX sin compromiso. Equipo propio, service in-house y parking. Coordinamos test drive por WhatsApp.'
+        'Visitá nuestro local en Yerba Buena, Tucumán. Probá la LOLA y la XXXX sin compromiso. Equipo propio, service in-house y parking. Coordinamos test ride por WhatsApp.'
       );
     }
   }, []);
@@ -51,7 +51,7 @@ const Local = () => {
               to="/test-ride-tucuman"
               className="inline-flex items-center justify-center gap-2 bg-primary-orange hover:bg-[#E03D0B] text-white font-bold uppercase tracking-wide text-sm py-3.5 px-7 rounded-full transition-colors"
             >
-              Agendar test drive
+              Agendar test ride
             </Link>
             <a
               href={whatsappFinal}

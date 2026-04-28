@@ -4,11 +4,11 @@ import SectionTitle from '../../../components/common/SectionTitle';
 const FAQ_ITEMS = [
   {
     q: '¿Necesito turno para visitar el local?',
-    a: 'No. Podés pasar cuando quieras durante los horarios. Solo pedimos turno previo si querés hacer un test drive, para tener la bici lista y con batería full cuando llegues.',
+    a: 'No. Podés pasar cuando quieras durante los horarios. Solo pedimos turno previo si querés hacer un test ride, para tener la bici lista y con batería full cuando llegues.',
   },
   {
-    q: '¿Puedo hacer el test drive sin compromiso de compra?',
-    a: 'Claro. El test drive existe justamente para que te saques todas las dudas antes de decidir. Coordinás por WhatsApp, venís y probás la bici en la calle con el equipo.',
+    q: '¿Puedo hacer el test ride sin compromiso de compra?',
+    a: 'Claro. El test ride existe justamente para que te saques todas las dudas antes de decidir. Coordinás por WhatsApp, venís y probás la bici en la calle con el equipo.',
   },
   {
     q: '¿Qué medios de pago aceptan en el local?',

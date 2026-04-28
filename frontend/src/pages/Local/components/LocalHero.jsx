@@ -7,7 +7,7 @@ import heroBg from '../../../assets/local/hero.webp';
 
 const scrollToTestDrive = (e) => {
   e.preventDefault();
-  const target = document.getElementById('test-drive');
+  const target = document.getElementById('test-ride');
   if (target) {
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -15,7 +15,7 @@ const scrollToTestDrive = (e) => {
 
 const LocalHero = () => {
   const whatsappUrl = `${CONTACT_INFO.whatsappLink}?text=${encodeURIComponent(
-    'Hola! Quiero coordinar un test drive en el local de Yerba Buena.'
+    'Hola! Quiero coordinar un test ride en el local de Yerba Buena.'
   )}`;
 
   return (
@@ -44,7 +44,7 @@ const LocalHero = () => {
           </h1>
 
           <h2 className="font-barlow font-black text-3xl md:text-5xl lg:text-6xl !text-white mb-8 leading-tight uppercase">
-            Test drive en Yerba Buena, Tucumán
+            Test ride en Yerba Buena, Tucumán
           </h2>
 
           <p className="font-neue !text-white text-lg md:text-xl mb-12 font-normal">
@@ -58,7 +58,7 @@ const LocalHero = () => {
             className="flex flex-col items-center gap-3"
           >
             <Button
-              href="#test-drive"
+              href="#test-ride"
               onClick={scrollToTestDrive}
               variant="primary"
               className="text-base md:text-lg px-8 md:px-12 py-3 md:py-4 uppercase font-bold"

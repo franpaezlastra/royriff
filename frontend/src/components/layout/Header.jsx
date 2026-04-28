@@ -62,7 +62,7 @@ const Header = () => {
               to="/test-ride-tucuman"
               className="text-neutral-black hover:text-primary-orange transition-smooth text-sm font-barlow font-bold"
             >
-              Test drive
+              Test ride
             </Link>
             <Link
               to="/local"
@@ -132,7 +132,7 @@ const Header = () => {
               className="text-neutral-black hover:text-primary-orange transition-smooth font-barlow font-bold py-2"
               onClick={closeMenu}
             >
-              Test drive
+              Test ride
             </Link>
             <Link
               to="/local"
