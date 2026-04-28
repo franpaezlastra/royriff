@@ -239,6 +239,7 @@ function royriff_app_get_breadcrumb_schema($path) {
         'bicicletas-electricas' => 'Bicicletas Eléctricas',
         'lola-cruiser' => 'LOLA Cruiser',
         'xxxx-expedition' => 'XXXX Expedition',
+        'elegir' => 'Comprar',
         'comparacion-ebike-royriff' => 'Comparador',
         'test-ride-tucuman' => 'Test Ride Tucumán',
         'local' => 'Local',

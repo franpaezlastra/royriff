@@ -8,7 +8,7 @@ import { addToCart } from '../../store/slices/cartSlice';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import toast from 'react-hot-toast';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiTruck, FiTool, FiShield, FiMapPin } from 'react-icons/fi';
 
 const MIN_QTY = 1;
 const MAX_QTY = 10;
@@ -90,7 +90,14 @@ const ProductElegir = () => {
     const displayName = getDisplayName(product);
     const variationByColor = product.variationByColor || {};
     const currentVariation = selectedColor ? variationByColor[selectedColor.name] : null;
-    const price = currentVariation?.price || product.price || selectedProduct.price || 0;
+    // Forzar precio efectivo (source of truth: productData.pricing.efectivo)
+    // Si WC admin tiene un precio distinto, este override garantiza coherencia con el resto del sitio.
+    const price =
+      product.pricing?.efectivo ||
+      currentVariation?.price ||
+      product.price ||
+      selectedProduct.price ||
+      0;
     const mainImage =
       currentVariation?.image?.src ||
       (product.imagesByColor?.[selectedColor?.name]?.[0]?.src) ||
@@ -190,26 +197,34 @@ const ProductElegir = () => {
               Elegí color y cantidad para agregar al carrito.
             </p>
 
-            {/* Precio de la variación seleccionada */}
-            <div className="mb-8">
-              {currentVariation ? (
+            {/* Precio — efectivo prominente + 6 cuotas + legal */}
+            <div className="mb-8 bg-[#FCF8F5] border border-neutral-gray/20 rounded-xl p-5">
+              {product.pricing ? (
                 <>
-                  <p className="font-barlow font-black text-3xl text-neutral-black">
-                    {formatPrice(currentVariation.price || 0)}
+                  <p className="font-barlow font-black text-3xl md:text-4xl text-primary-orange leading-none">
+                    {formatPrice(product.pricing.efectivo)}
                   </p>
-                  {currentVariation.regularPrice > (currentVariation.price || 0) && (
-                    <p className="text-neutral-darkGreen font-neue text-sm line-through mt-0.5">
-                      {formatPrice(currentVariation.regularPrice)}
+                  <p className="font-neue text-sm text-neutral-darkGreen mt-1.5">
+                    en efectivo o transferencia bancaria
+                  </p>
+                  <div className="border-t border-neutral-gray/25 mt-4 pt-4">
+                    <p className="font-neue text-base text-neutral-black">
+                      o <strong className="font-bold">6 cuotas fijas de {formatPrice(product.pricing.cuota6)}</strong>
                     </p>
-                  )}
+                    {product.pricing.ahorro && (
+                      <p className="font-neue text-xs text-primary-orange font-bold mt-1">
+                        Ahorrás {formatPrice(product.pricing.ahorro)} pagando en efectivo
+                      </p>
+                    )}
+                    <p className="font-neue text-xs text-neutral-darkGreen/80 mt-2 leading-snug">
+                      Más planes 3, 9 o 12 cuotas vía Mercado Pago. CFT aplicable según medio de pago.
+                    </p>
+                  </div>
                 </>
               ) : (
                 <p className="font-barlow font-black text-3xl text-neutral-black">
-                  {formatPrice(product.price || 0)}
+                  {formatPrice(currentVariation?.price || product.price || 0)}
                 </p>
-              )}
-              {product.hero?.financing?.cuotas && (
-                <p className="text-neutral-darkGreen font-neue text-sm mt-1">{product.hero.financing.cuotas}</p>
               )}
             </div>
 
@@ -282,6 +297,57 @@ const ProductElegir = () => {
             >
               Consultar por WhatsApp
             </a>
+
+            {/* Cards informativas — envío, armado, garantía, retiro */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-white border border-neutral-gray/25 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FiTruck className="w-5 h-5 text-primary-orange" aria-hidden />
+                  <p className="font-barlow font-black text-sm text-neutral-black uppercase tracking-tight">
+                    Envío gratis
+                  </p>
+                </div>
+                <p className="font-neue text-xs text-neutral-darkGreen leading-relaxed">
+                  A todo el país. 3-6 días hábiles por paquetería nacional.
+                </p>
+              </div>
+
+              <div className="bg-white border border-neutral-gray/25 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FiTool className="w-5 h-5 text-primary-orange" aria-hidden />
+                  <p className="font-barlow font-black text-sm text-neutral-black uppercase tracking-tight">
+                    Cómo te llega
+                  </p>
+                </div>
+                <p className="font-neue text-xs text-neutral-darkGreen leading-relaxed">
+                  Pre-ensamblada al 85-90%. Manual y videos de armado online. Recomendamos ajuste final por bicicletero.
+                </p>
+              </div>
+
+              <div className="bg-white border border-neutral-gray/25 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FiShield className="w-5 h-5 text-primary-orange" aria-hidden />
+                  <p className="font-barlow font-black text-sm text-neutral-black uppercase tracking-tight">
+                    Garantía
+                  </p>
+                </div>
+                <p className="font-neue text-xs text-neutral-darkGreen leading-relaxed">
+                  2 años cuadro. 1 año electrónica (motor, batería, controlador). Service propio en Yerba Buena.
+                </p>
+              </div>
+
+              <div className="bg-white border border-neutral-gray/25 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FiMapPin className="w-5 h-5 text-primary-orange" aria-hidden />
+                  <p className="font-barlow font-black text-sm text-neutral-black uppercase tracking-tight">
+                    Retiro alternativo
+                  </p>
+                </div>
+                <p className="font-neue text-xs text-neutral-darkGreen leading-relaxed">
+                  Si vivís en BsAs o Tucumán, coordinás retiro en Palermo o Yerba Buena por WhatsApp.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

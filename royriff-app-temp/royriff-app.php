@@ -57,9 +57,17 @@ function royriff_app_get_route_metadata() {
             'title' => 'Roy Riff LOLA | E-Bike Urbana 500W con frenos hidráulicos',
             'description' => 'LOLA, bicicleta eléctrica urbana de Roy Riff. Motor 500W, batería 48V 10.4Ah extraíble, autonomía 40-65km, frenos hidráulicos. 100% legal sin patente.',
         ),
+        'bicicletas-electricas/lola-cruiser/elegir' => array(
+            'title' => 'Comprar LOLA Cruiser | $2.000.000 efectivo · Envío gratis | Roy Riff',
+            'description' => 'Elegí color y cantidad de tu LOLA Cruiser. Pagás $2.000.000 en efectivo o 6 cuotas fijas de $402.000. Envío gratis a todo el país. Garantía 2 años cuadro.',
+        ),
         'bicicletas-electricas/xxxx-expedition' => array(
             'title' => 'Roy Riff XXXX Expedition | Fat Tire 500W con 90km autonomía',
             'description' => 'XXXX Expedition, bici eléctrica fat tire de Roy Riff. 90km autonomía, batería 48V 20Ah, doble suspensión. 100% legal sin patente. Para quien va más lejos.',
+        ),
+        'bicicletas-electricas/xxxx-expedition/elegir' => array(
+            'title' => 'Comprar XXXX Expedition | $2.700.000 efectivo · Envío gratis | Roy Riff',
+            'description' => 'Elegí color y cantidad de tu XXXX Expedition. Pagás $2.700.000 en efectivo o 6 cuotas fijas de $536.167. Envío gratis a todo el país. Garantía 2 años cuadro.',
         ),
         'bicicletas-electricas/comparacion-ebike-royriff' => array(
             'title' => 'LOLA vs XXXX | Compará las e-bikes de Roy Riff',
