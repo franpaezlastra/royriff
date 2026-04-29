@@ -14,8 +14,7 @@ import {
   clearDeliveryContext,
   isStoreLocalPickup,
 } from '../../utils/checkoutStorage';
-import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION } from '../../utils/localPickupOption';
-import { isCarrierBranchPickup } from '../../utils/shippingClassify';
+import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION, CABA_PICKUP_OPTION } from '../../utils/localPickupOption';
 import Button from '../common/Button';
 
 const CartDrawer = ({ isOpen, onClose }) => {
@@ -34,6 +33,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const handleSelectPickup = () => {
     setSelectedShipping(LOCAL_PICKUP_OPTION);
+    setDeliveryMode(false);
+  };
+  const handleSelectCabaPickup = () => {
+    setSelectedShipping(CABA_PICKUP_OPTION);
     setDeliveryMode(false);
   };
   const handleSelectDelivery = () => {
@@ -61,6 +64,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
   const hasSelectedShipping = !!selectedShipping;
   const isLocalPickupSelected =
     hasSelectedShipping && selectedShipping?.id?.toString().startsWith('local_pickup');
+  const isCabaPickupSelected =
+    hasSelectedShipping && selectedShipping?.id?.toString().startsWith('caba_pickup');
   const isDeliverySelected = deliveryMode;
 
   const remoteShippingHeadline = () => 'Envío a domicilio';
@@ -240,7 +245,39 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   </span>
                 </button>
 
-                {/* Opción 2: Envío a domicilio — gratis a todo el país, sin calculador */}
+                {/* Opción 2: Retiro en depósito CABA — gratis, coordinás por WhatsApp */}
+                <button
+                  type="button"
+                  onClick={handleSelectCabaPickup}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
+                    isCabaPickupSelected
+                      ? 'border-primary-orange bg-primary-orange/5'
+                      : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      isCabaPickupSelected
+                        ? 'border-primary-orange bg-primary-orange'
+                        : 'border-neutral-gray/40'
+                    }`}
+                  >
+                    {isCabaPickupSelected && (
+                      <FiCheck className="w-3 h-3 text-white" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-barlow font-bold text-sm">Retiro en depósito CABA</p>
+                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue">
+                      Buenos Aires · L–V 9 a 16 hs · Coordinás por WhatsApp
+                    </p>
+                  </div>
+                  <span className="text-xs font-barlow font-bold text-green-600 whitespace-nowrap">
+                    GRATIS
+                  </span>
+                </button>
+
+                {/* Opción 3: Envío a domicilio — gratis a todo el país, sin calculador */}
                 <button
                   type="button"
                   onClick={handleSelectDelivery}
@@ -316,8 +353,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   {selectedShipping
                     ? isStoreLocalPickup(selectedShipping)
                       ? 'Retiro en Yerba Buena · Completarás los datos de contacto ✓'
-                      : isCarrierBranchPickup(selectedShipping)
-                        ? 'Retiro en sucursal del correo · Completarás datos en entrega ✓'
+                      : isCabaPickupSelected
+                        ? 'Retiro en CABA · Completarás los datos de contacto ✓'
                         : 'Envío a domicilio · Completarás la dirección en entrega ✓'
                     : 'Completarás los datos de entrega en el siguiente paso'}
                 </p>

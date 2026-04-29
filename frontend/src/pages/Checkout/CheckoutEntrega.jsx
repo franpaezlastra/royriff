@@ -12,7 +12,7 @@ import {
   loadDeliveryContext,
   isStoreLocalPickup,
 } from '../../utils/checkoutStorage';
-import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION } from '../../utils/localPickupOption';
+import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION, CABA_PICKUP_OPTION } from '../../utils/localPickupOption';
 import { FiCheck, FiShoppingCart, FiTruck, FiHome } from 'react-icons/fi';
 
 // ── Stepper exportado ─────────────────────────────────────────────────────────
@@ -191,12 +191,22 @@ const CheckoutEntrega = () => {
     return () => window.removeEventListener('royriff:checkout-shipping-saved', applyFromStorage);
   }, [location.key]);
 
-  // Modo entrega: retiro en el local Roy Riff vs envío gratis a domicilio.
-  const isPickup = isStoreLocalPickup(selectedShipping);
-  const isLocalPickupSelected = isPickup;
+  // Modo entrega: 3 opciones — retiro Yerba Buena, retiro CABA, envío gratis a domicilio.
+  const isLocalPickupSelected = isStoreLocalPickup(selectedShipping);
+  const isCabaPickupSelected = selectedShipping?.id?.toString().startsWith('caba_pickup');
+  // "isPickup" cualquier retiro (Yerba Buena o CABA) — sin dirección de entrega.
+  const isPickup = isLocalPickupSelected || isCabaPickupSelected;
 
   const handleSelectPickup = () => {
     setSelectedShipping(LOCAL_PICKUP_OPTION);
+    setErrors((p) => {
+      const n = { ...p };
+      delete n.address_1; delete n.address_number; delete n.city; delete n.postcode;
+      return n;
+    });
+  };
+  const handleSelectCabaPickup = () => {
+    setSelectedShipping(CABA_PICKUP_OPTION);
     setErrors((p) => {
       const n = { ...p };
       delete n.address_1; delete n.address_number; delete n.city; delete n.postcode;
@@ -242,10 +252,18 @@ const CheckoutEntrega = () => {
     e.preventDefault();
     if (!validate()) return;
     // Para retiro: WooCommerce necesita address_1 y city no vacíos.
-    // Usamos la dirección del local como datos de facturación.
-    const STORE_ADDRESS = 'Aconquija 1163';
-    const STORE_CITY = 'Yerba Buena';
-    const STORE_POSTCODE = '4107';
+    // Usamos la dirección del punto de retiro como datos de facturación.
+    const PICKUP_DEFAULTS = isCabaPickupSelected
+      ? {
+          address: 'Retiro en depósito CABA — coordinar por WhatsApp',
+          city: 'Ciudad Autónoma de Buenos Aires',
+          postcode: '1000',
+        }
+      : {
+          address: 'Aconquija 1163',
+          city: 'Yerba Buena',
+          postcode: '4107',
+        };
 
     saveCheckoutBilling({
       billing_first_name: form.first_name,
@@ -254,13 +272,13 @@ const CheckoutEntrega = () => {
       billing_phone: form.phone,
       billing_dni: form.dni,
       billing_address_1: isPickup
-        ? STORE_ADDRESS
+        ? PICKUP_DEFAULTS.address
         : `${form.address_1} ${form.address_number}`.trim(),
       billing_address_number: isPickup ? '' : form.address_number,
       billing_address_2: isPickup ? '' : form.address_2 || '',
       billing_address_neighborhood: isPickup ? '' : form.address_neighborhood || '',
-      billing_city: isPickup ? STORE_CITY : form.city,
-      billing_postcode: isPickup ? STORE_POSTCODE : postcode,
+      billing_city: isPickup ? PICKUP_DEFAULTS.city : form.city,
+      billing_postcode: isPickup ? PICKUP_DEFAULTS.postcode : postcode,
       billing_state: '',
       billing_country: 'AR',
       billing_is_pickup: isPickup,
@@ -316,10 +334,18 @@ const CheckoutEntrega = () => {
               />
 
               <DeliveryToggleRow
+                icon={FiHome}
+                title="Retiro en depósito CABA"
+                subtitle="Buenos Aires · L–V 9 a 16 hs · Coordinás por WhatsApp"
+                selected={isCabaPickupSelected}
+                onSelect={handleSelectCabaPickup}
+              />
+
+              <DeliveryToggleRow
                 icon={FiTruck}
                 title="Envío a domicilio"
                 subtitle="Envío gratis a todo el país · 3–6 días hábiles"
-                selected={!isLocalPickupSelected}
+                selected={!isPickup}
                 onSelect={handleSelectDelivery}
               />
             </div>
@@ -333,7 +359,9 @@ const CheckoutEntrega = () => {
                       Datos de contacto
                     </h2>
                     <p className="text-[11px] text-neutral-darkGreen/50 font-neue -mt-2">
-                      Para avisarte cuando tu pedido esté listo para retirar en Yerba Buena.
+                      {isCabaPickupSelected
+                        ? 'Para coordinar por WhatsApp el retiro en nuestro depósito de CABA.'
+                        : 'Para avisarte cuando tu pedido esté listo para retirar en Yerba Buena.'}
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <Field

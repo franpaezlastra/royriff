@@ -15,3 +15,12 @@ export const FREE_SHIPPING_OPTION = {
   cost: 0,
   _isStatic: true,
 };
+
+/** Retiro en depósitos de CABA (Buenos Aires) — sin cargo, coordinás por WhatsApp. */
+export const CABA_PICKUP_OPTION = {
+  id: 'caba_pickup',
+  method_id: 'caba_pickup',
+  title: 'Retiro en depósito CABA',
+  cost: 0,
+  _isStatic: true,
+};
