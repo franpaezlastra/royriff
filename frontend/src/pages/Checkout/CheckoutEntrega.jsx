@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCartItems } from '../../store/slices/cartSlice';
 import { formatPrice, getProductMainImage } from '../../utils/constants';
-import { calculateShipping } from '../../services/woocommerceService';
 import {
   saveCheckoutShipping,
   saveCheckoutBilling,
@@ -12,18 +11,9 @@ import {
   saveDeliveryContext,
   loadDeliveryContext,
   isStoreLocalPickup,
-  filterDuplicateStoreRates,
 } from '../../utils/checkoutStorage';
-import {
-  isDoorDeliveryOption,
-  isCarrierBranchPickup,
-} from '../../utils/shippingClassify';
-import { LOCAL_PICKUP_OPTION } from '../../utils/localPickupOption';
-import BranchSucursalInfo from '../../components/shipping/BranchSucursalInfo';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { FiMapPin, FiCheck, FiRefreshCw, FiShoppingCart } from 'react-icons/fi';
-const ANDREANI_LOGO_URL =
-  'https://api.royriff.com.ar/wp-content/uploads/2026/04/correo_andreani_-removebg-preview-e1776259635246.webp';
+import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION } from '../../utils/localPickupOption';
+import { FiCheck, FiShoppingCart, FiTruck, FiHome } from 'react-icons/fi';
 
 // ── Stepper exportado ─────────────────────────────────────────────────────────
 export const CheckoutStepper = ({ currentStep }) => (
@@ -107,74 +97,51 @@ const Field = ({
   </div>
 );
 
-// ── Fila opción de envío ──────────────────────────────────────────────────────
-const ShippingRow = ({ opt, selected, onSelect, isDeliveryGroup = false }) => {
-  const rawTitle = opt?.title || 'Envío';
-  const displayTitle =
-    isDeliveryGroup && /est[aá]ndar/i.test(rawTitle)
-      ? `${rawTitle} (envío a domicilio)`
-      : rawTitle;
-  const isAndreani = /andreani/i.test(rawTitle);
-  return (
+// ── Fila opción de entrega (toggle Retiro / Envío) ───────────────────────────
+const DeliveryToggleRow = ({ icon: Icon, title, subtitle, selected, onSelect }) => (
   <label
-    className={`flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
+    onClick={onSelect}
+    className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
       selected
         ? 'border-neutral-black bg-neutral-black/[0.03] shadow-sm'
         : 'border-neutral-gray/25 bg-white hover:border-neutral-gray/50'
     }`}
   >
     <div
-      className={`mt-0.5 w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center ${
+      className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
         selected ? 'border-neutral-black bg-neutral-black' : 'border-neutral-gray/40'
       }`}
     >
       {selected && <FiCheck className="w-2.5 h-2.5 text-white" />}
     </div>
-    <input type="radio" className="sr-only" checked={selected} readOnly onClick={() => onSelect(opt)} />
+    {Icon && <Icon className="w-4 h-4 text-neutral-darkGreen/70 flex-shrink-0" aria-hidden />}
     <div className="flex-1 min-w-0">
-      {isAndreani && (
-        <img
-          src={ANDREANI_LOGO_URL}
-          alt="Andreani"
-          className="h-4 w-auto mb-1 object-contain"
-          loading="lazy"
-        />
-      )}
-      <p className="font-barlow font-bold text-sm text-neutral-black leading-snug">{displayTitle}</p>
-      {opt.estimated_delivery && (
-        <p className="text-[11px] text-neutral-gray/55 font-neue mt-0.5">{opt.estimated_delivery}</p>
+      <p className="font-barlow font-bold text-sm text-neutral-black leading-snug">{title}</p>
+      {subtitle && (
+        <p className="text-[11px] text-neutral-gray/60 font-neue mt-0.5">{subtitle}</p>
       )}
     </div>
-    <span
-      className={`font-barlow font-bold text-sm whitespace-nowrap ml-2 ${
-        Number(opt.cost) > 0 ? 'text-neutral-black' : 'text-green-600'
-      }`}
-    >
-      {Number(opt.cost) > 0 ? formatPrice(opt.cost) : 'Gratis'}
+    <span className="font-barlow font-bold text-sm whitespace-nowrap ml-2 text-green-600">
+      Gratis
     </span>
   </label>
-  );
-};
+);
 
-/** Lee billing + envío + CP guardados (carrito / drawer / paso anterior). */
+/** Lee billing + envío guardados (carrito / drawer / paso anterior). */
 function readEntregaBootstrap() {
   const prev = loadCheckoutBilling() || {};
   const prevShipping = loadCheckoutShipping();
   const deliveryCtx = loadDeliveryContext();
   const storePickup = isStoreLocalPickup(prevShipping);
   const initialPc = String(prev.billing_postcode || deliveryCtx.postcode || '').replace(/\D/g, '');
-  const savedCalculatedMethod = prevShipping && !storePickup;
-  const billingHadPc = String(prev.billing_postcode || '').replace(/\D/g, '').length >= 4;
-  const initialPcConfirmed =
-    storePickup ||
-    (savedCalculatedMethod && initialPc.length >= 4) ||
-    (billingHadPc && !storePickup);
+
+  // Si NO viene retiro local del drawer, default = envío gratis a todo el país.
+  const resolvedShipping = storePickup ? prevShipping : (prevShipping || FREE_SHIPPING_OPTION);
 
   return {
     prev,
-    prevShipping,
+    prevShipping: resolvedShipping,
     initialPc,
-    initialPcConfirmed,
   };
 }
 
@@ -193,14 +160,7 @@ const CheckoutEntrega = () => {
   const i0 = initRef.current;
 
   const [postcode, setPostcode] = useState(i0.initialPc);
-  const [postcodeInput, setPostcodeInput] = useState(i0.initialPc);
-  const [pcConfirmed, setPcConfirmed] = useState(i0.initialPcConfirmed);
-
-  const [shippingOptions, setShippingOptions] = useState([]);
-  const [selectedShipping, setSelectedShipping] = useState(i0.prevShipping || null);
-  const [shippingLoading, setShippingLoading] = useState(false);
-  const [shippingCalcError, setShippingCalcError] = useState('');
-  const [shippingCalculated, setShippingCalculated] = useState(!!i0.prevShipping);
+  const [selectedShipping, setSelectedShipping] = useState(i0.prevShipping);
 
   const [form, setForm] = useState({
     first_name: i0.prev.billing_first_name || '',
@@ -224,105 +184,39 @@ const CheckoutEntrega = () => {
     const applyFromStorage = () => {
       const b = readEntregaBootstrap();
       setPostcode(b.initialPc);
-      setPostcodeInput(b.initialPc);
-      setPcConfirmed(b.initialPcConfirmed);
-      setSelectedShipping(b.prevShipping || null);
-      setShippingOptions([]);
-      setShippingCalcError('');
-      setShippingCalculated(!!b.prevShipping);
-      // El auto-calculo inmediato se encarga de recalcular si pcConfirmed es true
-      if (initialCalcDone) initialCalcDone.current = false;
+      setSelectedShipping(b.prevShipping);
     };
     applyFromStorage();
     window.addEventListener('royriff:checkout-shipping-saved', applyFromStorage);
     return () => window.removeEventListener('royriff:checkout-shipping-saved', applyFromStorage);
   }, [location.key]);
 
-  /** Solo retiro en el local Roy Riff — no sucursal Andreani (ahí hace falta dirección del cliente) */
+  // Modo entrega: retiro en el local Roy Riff vs envío gratis a domicilio.
   const isPickup = isStoreLocalPickup(selectedShipping);
-  const isLocalPickupSelected = selectedShipping?.id?.toString().startsWith('local_pickup');
-  const isBranchCarrierPickup =
-    selectedShipping && !isPickup && isCarrierBranchPickup(selectedShipping);
-  const calcRef = useRef(null);
-  const initialCalcDone = useRef(false);
+  const isLocalPickupSelected = isPickup;
 
-  // Firma del carrito para recalcular envío cuando agregan/quitan productos
-  const cartSignature = cartItems
-    .map((i) => `${i.lineKey || i.id}:${i.quantity || 1}`)
-    .join('|');
-
-  // Auto-calcular cuando cambia el CP confirmado.
-  // Primer cálculo (viene del drawer): inmediato (0ms).
-  // Siguientes (usuario cambia CP): debounce 400ms.
-  useEffect(() => {
-    if (pcConfirmed && postcode.length >= 4 && !isPickup) {
-      const delay = initialCalcDone.current ? 400 : 0;
-      clearTimeout(calcRef.current);
-      calcRef.current = setTimeout(() => {
-        initialCalcDone.current = true;
-        doCalcShipping(postcode);
-      }, delay);
-    }
-    return () => clearTimeout(calcRef.current);
-  }, [postcode, pcConfirmed, cartSignature, isPickup]);
-
-  const doCalcShipping = async (pc) => {
-    setShippingLoading(true);
-    setShippingCalcError('');
-    try {
-      const result = await calculateShipping({ postcode: pc, line_items: cartItems });
-      const opts = filterDuplicateStoreRates(result.options || []);
-      setShippingOptions(opts);
-      setShippingCalculated(true);
-      if (opts.length > 0) {
-        setSelectedShipping((prev) => {
-          const match = prev && opts.find((o) => o.id === prev.id);
-          return match || opts[0];
-        });
-      } else {
-        setSelectedShipping(null);
-        setShippingCalcError(
-          'No hay opciones de envío disponibles para ese código postal. Contactanos para coordinar.'
-        );
-      }
-    } catch {
-      setShippingCalculated(true);
-      setShippingCalcError(
-        'No se pudo calcular el envío. Podés igualmente ingresar tus datos y elegir el método más abajo, o intentar nuevamente.'
-      );
-    } finally {
-      setShippingLoading(false);
-    }
+  const handleSelectPickup = () => {
+    setSelectedShipping(LOCAL_PICKUP_OPTION);
+    setErrors((p) => {
+      const n = { ...p };
+      delete n.address_1; delete n.address_number; delete n.city; delete n.postcode;
+      return n;
+    });
   };
-
-  const handleConfirmPostcode = () => {
-    const pc = postcodeInput.replace(/\D/g, '');
-    if (pc.length < 4) {
-      setErrors((p) => ({ ...p, postcode: 'Ingresá al menos 4 dígitos' }));
-      return;
-    }
-    setErrors((p) => { const n = { ...p }; delete n.postcode; return n; });
-    setPostcode(pc);
-    setPcConfirmed(true);
-    setShippingCalculated(false);
-    setShippingOptions([]);
-    setSelectedShipping(null);
-    setShippingCalcError('');
-  };
-
-  const handleChangePostcode = () => {
-    setPcConfirmed(false);
-    setShippingCalculated(false);
-    setShippingOptions([]);
-    setSelectedShipping(null);
-    setShippingCalcError('');
-    setPostcodeInput(postcode);
+  const handleSelectDelivery = () => {
+    setSelectedShipping(FREE_SHIPPING_OPTION);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
     if (errors[name]) setErrors((p) => { const n = { ...p }; delete n[name]; return n; });
+  };
+
+  const handlePostcodeChange = (e) => {
+    const pc = e.target.value.replace(/\D/g, '').slice(0, 8);
+    setPostcode(pc);
+    if (errors.postcode) setErrors((p) => { const n = { ...p }; delete n.postcode; return n; });
   };
 
   const validate = () => {
@@ -333,11 +227,8 @@ const CheckoutEntrega = () => {
     if (!form.last_name.trim()) e.last_name = 'Requerido';
     if (!form.phone.trim()) e.phone = 'Requerido';
 
-    if (isBranchCarrierPickup) {
-      if (!postcode || postcode.length < 4) e.postcode = 'Ingresá tu código postal para calcular el envío';
-      if (!form.dni.trim()) e.dni = 'Andreani requiere DNI/CUIT para entregar en sucursal';
-    } else if (!isPickup) {
-      if (!postcode || postcode.length < 4) e.postcode = 'Ingresá tu código postal para calcular el envío';
+    if (!isPickup) {
+      if (!postcode || postcode.length < 4) e.postcode = 'Ingresá tu código postal';
       if (!form.city.trim()) e.city = 'Requerido';
       if (!form.address_1.trim()) e.address_1 = 'Requerido';
       if (!form.address_number.trim()) e.address_number = 'Requerido';
@@ -364,31 +255,23 @@ const CheckoutEntrega = () => {
       billing_dni: form.dni,
       billing_address_1: isPickup
         ? STORE_ADDRESS
-        : isBranchCarrierPickup
-          ? `Retiro en sucursal — CP ${postcode}`
-          : `${form.address_1} ${form.address_number}`.trim(),
-      billing_address_number: isPickup || isBranchCarrierPickup ? '' : form.address_number,
-      billing_address_2: isPickup || isBranchCarrierPickup ? '' : form.address_2 || '',
-      billing_address_neighborhood: isPickup || isBranchCarrierPickup ? '' : form.address_neighborhood || '',
-      billing_city: isPickup
-        ? STORE_CITY
-        : isBranchCarrierPickup
-          ? `CP ${postcode}`
-          : form.city,
+        : `${form.address_1} ${form.address_number}`.trim(),
+      billing_address_number: isPickup ? '' : form.address_number,
+      billing_address_2: isPickup ? '' : form.address_2 || '',
+      billing_address_neighborhood: isPickup ? '' : form.address_neighborhood || '',
+      billing_city: isPickup ? STORE_CITY : form.city,
       billing_postcode: isPickup ? STORE_POSTCODE : postcode,
       billing_state: '',
       billing_country: 'AR',
       billing_is_pickup: isPickup,
     });
-    saveCheckoutShipping(selectedShipping);
+    saveCheckoutShipping(selectedShipping || FREE_SHIPPING_OPTION);
     if (!isPickup && postcode.replace(/\D/g, '').length >= 4) {
       saveDeliveryContext({ postcode: postcode.replace(/\D/g, '') });
     }
     navigate('/checkout/pago');
   };
 
-  const deliveryOpts = shippingOptions.filter(isDoorDeliveryOption);
-  const pickupOpts = shippingOptions.filter(isCarrierBranchPickup);
   const subtotal = cartItems.reduce((t, i) => t + i.price * i.quantity, 0);
   const shippingCost = Number(selectedShipping?.cost || 0);
 
@@ -420,168 +303,25 @@ const CheckoutEntrega = () => {
               />
             </div>
 
-            {/* Entrega */}
-            <div className="bg-white rounded-xl border border-neutral-gray/15 shadow-sm p-5 md:p-6 space-y-4">
+            {/* Entrega — toggle Retiro local / Envío gratis (sin calculador) */}
+            <div className="bg-white rounded-xl border border-neutral-gray/15 shadow-sm p-5 md:p-6 space-y-3">
               <h2 className="font-barlow font-bold text-sm text-neutral-darkGreen">Entrega</h2>
 
-              {/* ── Retiro en el local (siempre visible) ────────────── */}
-              <div className="space-y-2">
-                <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                  Retirar por
-                </p>
-                <ShippingRow
-                  opt={LOCAL_PICKUP_OPTION}
-                  selected={isLocalPickupSelected}
-                  onSelect={(opt) => {
-                    setSelectedShipping(opt);
-                    setShippingCalcError('');
-                    setErrors((p) => {
-                      const n = { ...p };
-                      delete n.address_1; delete n.address_number; delete n.city; delete n.postcode;
-                      return n;
-                    });
-                  }}
-                />
-              </div>
+              <DeliveryToggleRow
+                icon={FiHome}
+                title="Retiro en el local"
+                subtitle="Yerba Buena, Tucumán · L–V 9–13 y 17–21 · Sáb 9–13"
+                selected={isLocalPickupSelected}
+                onSelect={handleSelectPickup}
+              />
 
-              {/* ── Separador ────────────────────────────────────────── */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-neutral-gray/15" />
-                <span className="text-[11px] text-neutral-gray/40 font-neue uppercase tracking-wider">
-                  o calculá el envío
-                </span>
-                <div className="flex-1 h-px bg-neutral-gray/15" />
-              </div>
-
-              {/* ── Envío calculado por CP ── */}
-              <div className="space-y-3">
-                <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                  Envío a domicilio o sucursal del correo
-                </p>
-
-                {isPickup && !shippingOptions.length && !pcConfirmed && (
-                  <p className="text-xs text-neutral-darkGreen/70 font-neue leading-relaxed bg-neutral-gray/5 rounded-lg px-3 py-2.5">
-                    Tenés seleccionado retiro en el local. Si preferís envío, ingresá tu CP acá abajo.
-                  </p>
-                )}
-
-                {!pcConfirmed ? (
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <div
-                        className={`rr-postcode-field flex min-h-[44px] flex-1 items-center gap-2.5 rounded-lg border bg-white px-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] transition-all focus-within:ring-1 focus-within:ring-primary-orange/25 ${
-                          errors.postcode
-                            ? 'border-red-400 bg-red-50/40 focus-within:border-red-400'
-                            : 'border-neutral-gray/35 focus-within:border-primary-orange'
-                        }`}
-                      >
-                        <FiMapPin className="shrink-0 w-4 h-4 text-neutral-gray/50 pointer-events-none" aria-hidden />
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="postal-code"
-                          value={postcodeInput}
-                          onChange={(e) =>
-                            setPostcodeInput(e.target.value.replace(/\D/g, '').slice(0, 8))
-                          }
-                          onKeyDown={(e) =>
-                            e.key === 'Enter' && (e.preventDefault(), handleConfirmPostcode())
-                          }
-                          placeholder="Ej: 4107"
-                          className="rr-postcode-input min-h-0 min-w-0 flex-1 border-0 bg-transparent py-2.5 font-neue text-sm leading-normal tracking-normal text-neutral-black placeholder:text-neutral-gray/50 focus:outline-none focus:ring-0"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleConfirmPostcode}
-                        disabled={postcodeInput.length < 4}
-                        className="px-4 py-3 bg-neutral-black text-white text-sm font-barlow font-bold rounded-lg hover:bg-neutral-black/80 transition-colors disabled:opacity-40 whitespace-nowrap"
-                      >
-                        Calcular
-                      </button>
-                    </div>
-                    {errors.postcode && (
-                      <p className="text-red-500 text-[11px] font-neue">{errors.postcode}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between bg-neutral-gray/5 rounded-lg px-4 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <FiMapPin className="w-3.5 h-3.5 text-neutral-gray/50" />
-                      <span className="font-neue text-sm text-neutral-darkGreen">
-                        CP <span className="font-barlow font-bold text-neutral-black">{postcode}</span>
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleChangePostcode}
-                      className="text-xs text-primary-orange font-neue hover:underline"
-                    >
-                      Cambiar
-                    </button>
-                  </div>
-                )}
-
-                {shippingLoading && (
-                  <div className="flex items-center gap-2 text-sm text-neutral-darkGreen/60 font-neue py-1">
-                    <LoadingSpinner size="sm" /> Calculando…
-                  </div>
-                )}
-
-                {!shippingLoading && shippingCalcError && pcConfirmed && (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2.5 font-neue">
-                      {shippingCalcError}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => doCalcShipping(postcode)}
-                      className="flex items-center gap-1.5 text-xs text-primary-orange font-neue hover:underline"
-                    >
-                      <FiRefreshCw className="w-3 h-3" /> Reintentar
-                    </button>
-                  </div>
-                )}
-
-                {!shippingLoading && shippingOptions.length > 0 && (
-                  <div className="space-y-4">
-                    {deliveryOpts.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                          Envío a domicilio
-                        </p>
-                        {deliveryOpts.map((opt) => (
-                          <ShippingRow
-                            key={opt.id}
-                            opt={opt}
-                            isDeliveryGroup
-                            selected={!isPickup && selectedShipping?.id === opt.id}
-                            onSelect={setSelectedShipping}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    {pickupOpts.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-[11px] font-semibold text-neutral-darkGreen/50 uppercase tracking-wider font-neue">
-                          Retiro en sucursal del transporte
-                        </p>
-                        <p className="text-[10px] text-neutral-darkGreen/45 font-neue leading-snug">
-                          No es el local de Yerba Buena: es una sucursal del correo (ej. Andreani).
-                        </p>
-                        {pickupOpts.map((opt) => (
-                          <ShippingRow
-                            key={opt.id}
-                            opt={opt}
-                            selected={!isPickup && selectedShipping?.id === opt.id}
-                            onSelect={setSelectedShipping}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <DeliveryToggleRow
+                icon={FiTruck}
+                title="Envío a domicilio"
+                subtitle="Envío gratis a todo el país · 3–6 días hábiles"
+                selected={!isLocalPickupSelected}
+                onSelect={handleSelectDelivery}
+              />
             </div>
 
             {/* Formulario de datos — aparece si hay selección, o si hay error de CP para no bloquear */}
@@ -628,54 +368,6 @@ const CheckoutEntrega = () => {
                         value={form.dni}
                         onChange={handleChange}
                         optional
-                        placeholder="Tu DNI o CUIT"
-                        className="col-span-2"
-                      />
-                    </div>
-                  </>
-                ) : isBranchCarrierPickup ? (
-                  <>
-                    <BranchSucursalInfo title={selectedShipping?.title} className="mb-1" />
-                    <h2 className="font-barlow font-bold text-sm text-neutral-darkGreen">
-                      Persona que retira en sucursal
-                    </h2>
-                    <p className="text-[11px] text-neutral-darkGreen/60 font-neue -mt-2 leading-relaxed">
-                      El paquete se envía a la sucursal de Andreani más cercana a tu CP.
-                      Solo necesitamos tus datos para que puedas retirarlo con DNI.
-                    </p>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field
-                        label="Nombre"
-                        name="first_name"
-                        value={form.first_name}
-                        onChange={handleChange}
-                        error={errors.first_name}
-                        placeholder="Tu nombre"
-                      />
-                      <Field
-                        label="Apellido"
-                        name="last_name"
-                        value={form.last_name}
-                        onChange={handleChange}
-                        error={errors.last_name}
-                        placeholder="Tu apellido"
-                      />
-                      <Field
-                        label="Teléfono"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        error={errors.phone}
-                        type="tel"
-                        placeholder="+54 381 000-0000"
-                        className="col-span-2"
-                      />
-                      <Field
-                        label="DNI o CUIT"
-                        name="dni"
-                        value={form.dni}
-                        onChange={handleChange}
-                        error={errors.dni}
                         placeholder="Tu DNI o CUIT"
                         className="col-span-2"
                       />
@@ -759,12 +451,22 @@ const CheckoutEntrega = () => {
                         className="col-span-2 md:col-span-1"
                       />
                       <Field
+                        label="Código postal"
+                        name="postcode"
+                        value={postcode}
+                        onChange={handlePostcodeChange}
+                        error={errors.postcode}
+                        type="text"
+                        placeholder="Ej: 4107"
+                      />
+                      <Field
                         label="DNI o CUIT"
                         name="dni"
                         value={form.dni}
                         onChange={handleChange}
                         optional
                         placeholder="Tu DNI o CUIT"
+                        className="col-span-2"
                       />
                     </div>
                   </>
