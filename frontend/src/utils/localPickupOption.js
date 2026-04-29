@@ -6,3 +6,12 @@ export const LOCAL_PICKUP_OPTION = {
   cost: 0,
   _isStatic: true,
 };
+
+/** Envío gratis a todo el país — opción estática que no requiere calcular por CP. */
+export const FREE_SHIPPING_OPTION = {
+  id: 'free_shipping',
+  method_id: 'free_shipping',
+  title: 'Envío gratis a todo el país',
+  cost: 0,
+  _isStatic: true,
+};
