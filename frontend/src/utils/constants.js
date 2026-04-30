@@ -42,13 +42,13 @@ export const PRODUCTS = {
     // Usar siempre el slug real de WooCommerce
     slug: 'lola-cruiser',
     tagline: 'La cruiser para moverte por la ciudad sin transpirar',
-    price: 2000000,
+    price: 2412000,
     installments: 6,
     installmentPrice: 402000,
     discount: {
-      method: 'Efectivo o transferencia bancaria',
-      percentage: 20,
-      description: 'Ahorrás 20% pagando en efectivo',
+      method: 'Transferencia bancaria',
+      percentage: 17,
+      description: 'Ahorrás 17% pagando con transferencia bancaria',
     },
     specs: {
       motor: '500W Cubo Trasero (Modelo 110SZ) - Torque 65 N.m',
@@ -91,14 +91,14 @@ export const PRODUCTS = {
     // Slug real de WooCommerce para XXXX
     slug: 'xxxx-expedition',
     tagline: 'Tu compañera de aventuras todoterreno',
-    price: 2700000,
+    price: 3217000,
     installments: 6,
     installmentPrice: 536167,
     discount: {
-      method: 'Efectivo o transferencia bancaria',
+      method: 'Transferencia bancaria',
       amount: 2700000,
-      percentage: 20,
-      description: 'Ahorrás 20% pagando en efectivo',
+      percentage: 16,
+      description: 'Ahorrás 16% pagando con transferencia bancaria',
     },
     specs: {
       motor: '500W Cubo Trasero - Torque 65 N.m',

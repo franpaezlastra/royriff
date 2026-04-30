@@ -90,10 +90,9 @@ const ProductElegir = () => {
     const displayName = getDisplayName(product);
     const variationByColor = product.variationByColor || {};
     const currentVariation = selectedColor ? variationByColor[selectedColor.name] : null;
-    // Forzar precio efectivo (source of truth: productData.pricing.efectivo)
-    // Si WC admin tiene un precio distinto, este override garantiza coherencia con el resto del sitio.
+    // Precio de lista: viene de WC (variation o producto). El descuento por transferencia
+    // bancaria lo aplica el plugin PHP en el checkout (bacs-discount.php), no acá.
     const price =
-      product.pricing?.efectivo ||
       currentVariation?.price ||
       product.price ||
       selectedProduct.price ||
@@ -197,29 +196,31 @@ const ProductElegir = () => {
               Elegí color y cantidad para agregar al carrito.
             </p>
 
-            {/* Precio — efectivo prominente + 6 cuotas + legal */}
+            {/* Precio — lista prominente (MP) + ahorro por transferencia */}
             <div className="mb-8 bg-[#FCF8F5] border border-neutral-gray/20 rounded-xl p-5">
               {product.pricing ? (
                 <>
                   <p className="font-barlow font-black text-3xl md:text-4xl text-primary-orange leading-none">
-                    {formatPrice(product.pricing.efectivo)}
+                    {formatPrice(currentVariation?.price || product.price)}
                   </p>
                   <p className="font-neue text-sm text-neutral-darkGreen mt-1.5">
-                    en efectivo o transferencia bancaria
+                    en <strong className="font-bold">6 cuotas sin interés</strong> de {formatPrice(product.pricing.cuota6)} con tarjeta de crédito (Mercado Pago)
                   </p>
-                  <div className="border-t border-neutral-gray/25 mt-4 pt-4">
-                    <p className="font-neue text-base text-neutral-black">
-                      o <strong className="font-bold">6 cuotas fijas de {formatPrice(product.pricing.cuota6)}</strong>
-                    </p>
-                    {product.pricing.ahorro && (
-                      <p className="font-neue text-xs text-primary-orange font-bold mt-1">
-                        Ahorrás {formatPrice(product.pricing.ahorro)} pagando en efectivo
+                  {product.pricing.ahorro && (
+                    <div className="border-t border-neutral-gray/25 mt-4 pt-4">
+                      <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
+                        <span className="font-barlow font-black text-sm uppercase text-green-800 tracking-wide">
+                          Ahorrás {formatPrice(product.pricing.ahorro)}
+                        </span>
+                      </div>
+                      <p className="font-neue text-sm text-neutral-black mt-2">
+                        pagando con <strong>transferencia bancaria</strong>: {formatPrice(product.pricing.efectivo)}
                       </p>
-                    )}
-                    <p className="font-neue text-xs text-neutral-darkGreen/80 mt-2 leading-snug">
-                      Más planes 3, 9 o 12 cuotas vía Mercado Pago. CFT aplicable según medio de pago.
-                    </p>
-                  </div>
+                      <p className="font-neue text-xs text-neutral-darkGreen/70 mt-1 leading-snug">
+                        El descuento se aplica automáticamente al elegir transferencia en el paso de pago.
+                      </p>
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="font-barlow font-black text-3xl text-neutral-black">

@@ -12,8 +12,8 @@ Nota sobre el modelo XXXX: "XXXX Expedition" es el nombre oficial del modelo fat
 
 ## Productos
 
-- [LOLA — Urban Cruiser E-Bike](https://royriff.com.ar/bicicletas-electricas/lola-cruiser/): bicicleta eléctrica urbana estilo cruiser. Motor 500W (65 N.m), batería 48V 10.4Ah extraíble, autonomía 40-65 km, frenos hidráulicos, neumáticos 26"x3.0", display LCD con USB, peso 32 kg. Precio efectivo ARS 2.000.000.
-- [XXXX Expedition — Fat Tire E-Bike](https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/): bicicleta eléctrica fat-tire de expedición. Motor 500W, batería 48V 20Ah (960Wh), autonomía 70-90 km, doble suspensión, neumáticos 20"x4.0", peso 42 kg. Precio efectivo ARS 2.700.000.
+- [LOLA — Urban Cruiser E-Bike](https://royriff.com.ar/bicicletas-electricas/lola-cruiser/): bicicleta eléctrica urbana estilo cruiser. Motor 500W (65 N.m), batería 48V 10.4Ah extraíble, autonomía 40-65 km, frenos hidráulicos, neumáticos 26"x3.0", display LCD con USB, peso 32 kg. Precio ARS 2.412.000 con Mercado Pago (hasta 6 cuotas sin interés con tarjeta de crédito) o ARS 2.000.000 con descuento por transferencia bancaria.
+- [XXXX Expedition — Fat Tire E-Bike](https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/): bicicleta eléctrica fat-tire de expedición. Motor 500W, batería 48V 20Ah (960Wh), autonomía 70-90 km, doble suspensión, neumáticos 20"x4.0", peso 42 kg. Precio ARS 3.217.000 con Mercado Pago (hasta 6 cuotas sin interés) o ARS 2.700.000 con descuento por transferencia bancaria.
 - [Comparador LOLA vs XXXX](https://royriff.com.ar/bicicletas-electricas/comparacion-ebike-royriff/): tabla comparativa de ambos modelos.
 
 ## Información legal y técnica
@@ -21,7 +21,7 @@ Nota sobre el modelo XXXX: "XXXX Expedition" es el nombre oficial del modelo fat
 - [Marco legal Decreto 196/2025](https://royriff.com.ar/faq/): ambas bicicletas cumplen con la normativa argentina EPAC (motor ≤500W, asistencia limitada a 25 km/h en vía pública). No requieren patente, licencia ni seguro obligatorio.
 - [Garantía y servicio técnico](https://royriff.com.ar/servicio-tecnico-y-garantia/): 2 años en cuadro, 1 año en componentes eléctricos (motor, batería, controller, display).
 - [Envíos a todo el país](https://royriff.com.ar/envios/): paquetería nacional 3-6 días hábiles, bici llega pre-ensamblada al 85-90%.
-- [Financiación y medios de pago](https://royriff.com.ar/financiacion/): hasta 12 cuotas vía Mercado Pago. Recargos transparentes (3 cuotas +11%, 6 cuotas +20%, 9 cuotas +33%, 12 cuotas +44%). Efectivo y transferencia con descuento.
+- [Financiación y medios de pago](https://royriff.com.ar/financiacion/): Mercado Pago con hasta 6 cuotas SIN interés con tarjeta de crédito (Roy Riff absorbe el costo del recargo). Pago con transferencia bancaria recibe descuento fijo: ARS 412.000 LOLA / ARS 517.000 XXXX. El descuento se aplica automáticamente al elegir transferencia en el checkout.
 - [FAQ general](https://royriff.com.ar/faq/): preguntas frecuentes sobre legalidad, autonomía, lluvia, batería, repuestos.
 
 ## Tutoriales

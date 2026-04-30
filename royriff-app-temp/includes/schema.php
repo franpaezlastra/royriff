@@ -133,14 +133,14 @@ function royriff_app_get_product_schema($slug) {
             'name' => 'LOLA Urban Cruiser E-Bike',
             'sku' => 'RR-LOLA-001',
             'description' => 'Bicicleta eléctrica urbana estilo cruiser. Motor 500W (65 N.m), batería 48V 10.4Ah extraíble, autonomía 40-65 km, frenos hidráulicos, neumáticos 26"x3.0", display LCD con USB. Cumple Decreto 196/2025 (EPAC). Peso 32 kg.',
-            'price' => '2000000',
+            'price' => '2412000',
             'url' => 'https://royriff.com.ar/bicicletas-electricas/lola-cruiser/',
         ),
         'xxxx' => array(
             'name' => 'XXXX Expedition Fat Tire E-Bike',
             'sku' => 'RR-XXXX-001',
             'description' => 'Bicicleta eléctrica fat-tire de expedición. Motor 500W, batería 48V 20Ah (960Wh), autonomía 70-90 km, doble suspensión, neumáticos 20"x4.0", display LCD. Cumple Decreto 196/2025 (EPAC). Peso 42 kg.',
-            'price' => '2700000',
+            'price' => '3217000',
             'url' => 'https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/',
         ),
     );

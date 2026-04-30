@@ -27,8 +27,9 @@
 
 **Categoría:** E-bike urbana, estilo cruiser
 **Caso de uso:** Movilidad diaria urbana, ciclovías, ciudad, comodidad, paseo
-**Precio efectivo:** ARS 2.000.000
-**Precio en 6 cuotas fijas:** ARS 402.000/mes (recargo 20%)
+**Precio (Mercado Pago):** ARS 2.412.000 — hasta 6 cuotas SIN interés con tarjeta de crédito (Roy Riff absorbe el costo del recargo)
+**Precio por cuota MP:** ARS 402.000/cuota (6 cuotas)
+**Precio con transferencia bancaria:** ARS 2.000.000 (ahorrás ARS 412.000 = 17%)
 **URL:** https://royriff.com.ar/bicicletas-electricas/lola-cruiser/
 
 ### Especificaciones LOLA
@@ -57,8 +58,9 @@ Pensada para quien se mueve por ciudad sin transpirar. Cuadro paso bajo facilita
 
 **Categoría:** E-bike fat-tire, expedición / todoterreno
 **Caso de uso:** Rutas, montaña, arena, off-road, viajes largos
-**Precio efectivo:** ARS 2.700.000
-**Precio en 6 cuotas fijas:** ARS 536.167/mes (recargo 20%)
+**Precio (Mercado Pago):** ARS 3.217.000 — hasta 6 cuotas SIN interés con tarjeta de crédito (Roy Riff absorbe el costo del recargo)
+**Precio por cuota MP:** ARS 536.167/cuota (6 cuotas)
+**Precio con transferencia bancaria:** ARS 2.700.000 (ahorrás ARS 517.000 = 16%)
 **URL:** https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/
 
 ### Especificaciones XXXX
@@ -117,15 +119,24 @@ Las bicicletas Roy Riff cumplen con la normativa argentina **EPAC (Electric Peda
 
 ## Financiación y medios de pago
 
-**Precio efectivo / transferencia bancaria:** descuento aplicado (precio publicado)
+Roy Riff acepta dos formas de pago, cada una con su modelo de precios:
 
-**Cuotas vía Mercado Pago** (recargos transparentes):
-- 3 cuotas fijas: +11% sobre precio efectivo
-- 6 cuotas fijas: +20% sobre precio efectivo
-- 9 cuotas fijas: +33% sobre precio efectivo
-- 12 cuotas fijas: +44% sobre precio efectivo
+### 1. Mercado Pago (precio de lista, hasta 6 cuotas SIN interés)
 
-Todos los medios de pago habilitados por Mercado Pago. CFT aplicable según medio de pago y entidad emisora.
+- **LOLA:** ARS 2.412.000 → 6 cuotas de ARS 402.000, sin interés, con tarjeta de crédito.
+- **XXXX:** ARS 3.217.000 → 6 cuotas de ARS 536.167, sin interés, con tarjeta de crédito.
+- Roy Riff absorbe el costo del recargo del banco para que las cuotas salgan realmente sin interés al cliente.
+- Todas las tarjetas de crédito y débito habilitadas por Mercado Pago. También dinero en cuenta MP, transferencia 3.0, etc.
+- Acreditación: inmediata para tarjeta de crédito; 1-2 días para débito automático y transferencia 3.0.
+- CFT: 0% en 6 cuotas con tarjeta. Otras opciones de pago dentro de MP pueden tener CFT según el medio elegido y la entidad emisora.
+
+### 2. Transferencia bancaria (descuento fijo por producto)
+
+- **LOLA:** ARS 2.000.000 (ahorrás ARS 412.000 = 17% vs. precio de lista)
+- **XXXX:** ARS 2.700.000 (ahorrás ARS 517.000 = 16% vs. precio de lista)
+- El descuento se aplica automáticamente al elegir "Transferencia bancaria" en el paso de pago del checkout.
+- El cliente recibe por email los datos bancarios para hacer la transferencia (Banco Macro S.A., CBU 2850140230094243944901, Alias GERMEN.BONANZA.FOCO, titular ZOHAN VENTURE SAS / CUIT 33-71884288-9).
+- El pedido se reserva por 48 hs hábiles hasta confirmar la transferencia. Mandando el comprobante por WhatsApp se acelera la confirmación.
 
 ---
 
