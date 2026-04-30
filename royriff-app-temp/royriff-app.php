@@ -23,6 +23,9 @@ define('ROYRIFF_APP_SLUG', '');
 // Schema.org JSON-LD generators (Organization, LocalBusiness, Product, Breadcrumb, FAQ, WebSite)
 require_once ROYRIFF_APP_PATH . 'includes/schema.php';
 
+// Descuento automático para pago con Transferencia Bancaria (BACS)
+require_once ROYRIFF_APP_PATH . 'includes/bacs-discount.php';
+
 /**
  * Mapa de metadata SEO por ruta SPA.
  * Cada entrada: title (sub-60 chars idealmente) + description (sub-160) + og_image opcional.

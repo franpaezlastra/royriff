@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCartItems } from '../../store/slices/cartSlice';
 import { clearCart } from '../../store/slices/cartSlice';
 import { formatPrice } from '../../utils/constants';
+import { calculateCartBacsDiscount } from '../../utils/bacsDiscount';
 import { createOrder, getPaymentMethods } from '../../services/woocommerceService';
 import DOMPurify from 'dompurify';
 import {
@@ -581,6 +582,7 @@ const CheckoutPago = () => {
                     const logo = getMethodLogo(method);
                     const isMP = isMercadoPagoMethod(method);
                     const isBacs = isBacsMethod(method);
+                    const bacsDiscount = isBacs ? calculateCartBacsDiscount(cartItems) : 0;
 
                     return (
                       <label
@@ -606,6 +608,17 @@ const CheckoutPago = () => {
                             <p className="font-barlow font-bold text-base">
                               {method.title}
                             </p>
+                            {/* Badges prominentes según método */}
+                            {isMP && (
+                              <span className="text-[11px] font-barlow font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-full uppercase tracking-wide">
+                                Hasta 6 cuotas sin interés
+                              </span>
+                            )}
+                            {isBacs && bacsDiscount > 0 && (
+                              <span className="text-[11px] font-barlow font-bold bg-green-100 text-green-800 px-2 py-1 rounded-full uppercase tracking-wide">
+                                Ahorrás {formatPrice(bacsDiscount)}
+                              </span>
+                            )}
                             {selected && (
                               <FiCheck className="w-4 h-4 text-primary-orange ml-auto" />
                             )}
@@ -625,18 +638,25 @@ const CheckoutPago = () => {
                                 </span>
                               </div>
                               <p className="text-[11px] text-neutral-darkGreen/60 font-neue leading-relaxed">
-                                Al finalizar, te redirigimos a Mercado Pago donde elegís tarjeta, cuotas y completás el pago de forma segura.
+                                Pagás en hasta <strong>6 cuotas sin interés</strong> con tarjeta de crédito.
+                                Al finalizar, te redirigimos a Mercado Pago donde elegís tarjeta y completás el pago de forma segura.
                               </p>
                             </div>
                           )}
 
                           {selected && isBacs && (
                             <div className="mt-3 space-y-2">
-                              <div className="flex flex-wrap gap-2">
-                                <span className="text-xs bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-neue">
-                                  Transferencia bancaria
-                                </span>
-                              </div>
+                              {bacsDiscount > 0 && (
+                                <div className="rounded-lg border border-green-300 bg-green-50 p-3">
+                                  <p className="font-barlow font-black text-green-800 text-sm uppercase tracking-tight">
+                                    Te ahorrás {formatPrice(bacsDiscount)}
+                                  </p>
+                                  <p className="text-[11px] text-green-700 font-neue leading-relaxed mt-1">
+                                    Total a transferir: <strong>{formatPrice(Math.max(0, cartItems.reduce((t, i) => t + i.price * i.quantity, 0) - bacsDiscount))}</strong>{' '}
+                                    en lugar del precio de lista. El descuento se aplica automáticamente al confirmar el pedido.
+                                  </p>
+                                </div>
+                              )}
                               <p className="text-[11px] text-neutral-darkGreen/60 font-neue leading-relaxed">
                                 Tu pedido queda reservado. Te enviamos los datos bancarios por email para que hagas la transferencia.
                                 Una vez que confirmemos el pago, procesamos el envío.

@@ -15,6 +15,7 @@ import {
   isStoreLocalPickup,
 } from '../../utils/checkoutStorage';
 import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION, CABA_PICKUP_OPTION } from '../../utils/localPickupOption';
+import { calculateCartBacsDiscount } from '../../utils/bacsDiscount';
 import Button from '../common/Button';
 
 const CartDrawer = ({ isOpen, onClose }) => {
@@ -338,6 +339,19 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     <span className="text-primary-orange">
                       {formatPrice(cartTotal + shippingCost)}
                     </span>
+                  </div>
+                )}
+
+                {/* Cartel de ahorro por transferencia bancaria */}
+                {calculateCartBacsDiscount(cartItems) > 0 && (
+                  <div className="rounded-lg border border-primary-orange/40 bg-primary-orange/5 px-3 py-2.5">
+                    <p className="font-neue text-xs text-neutral-darkGreen leading-snug">
+                      <span className="font-barlow font-bold uppercase text-primary-orange tracking-wide">
+                        Ahorrá {formatPrice(calculateCartBacsDiscount(cartItems))}
+                      </span>{' '}
+                      pagando con <strong>transferencia bancaria</strong>. Te pasamos los
+                      datos por email después de iniciar la compra.
+                    </p>
                   </div>
                 )}
 
