@@ -369,8 +369,12 @@ const CheckoutPago = () => {
 
   const subtotal = cartItems.reduce((t, i) => t + i.price * i.quantity, 0);
   const shippingCost = shipping?.cost || 0;
-  const total = subtotal + shippingCost;
-  const isPickup = isStoreLocalPickup(shipping);
+  // Si el cliente eligió Transferencia bancaria, descontar el ahorro del total visible.
+  // El plugin PHP aplica el mismo descuento como fee negativo al crear la orden en WC.
+  const selectedMethodObj = paymentMethods.find((m) => m.id === selectedPayment);
+  const isBacsSelected = selectedMethodObj ? isBacsMethod(selectedMethodObj) : false;
+  const bacsDiscount = isBacsSelected ? calculateCartBacsDiscount(cartItems) : 0;
+  const total = Math.max(0, subtotal + shippingCost - bacsDiscount);
 
   return (
     <div className="py-10 md:py-16 min-h-screen bg-primary-beige">
@@ -770,6 +774,14 @@ const CheckoutPago = () => {
                       : 'A calcular'}
                   </span>
                 </div>
+                {bacsDiscount > 0 && (
+                  <div className="flex justify-between font-neue text-green-700">
+                    <span>Descuento por transferencia</span>
+                    <span className="font-barlow font-bold whitespace-nowrap">
+                      − {formatPrice(bacsDiscount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between font-neue border-t pt-2">
                   <span className="font-barlow font-bold text-base">Total</span>
                   <span className="font-barlow font-black text-xl text-primary-orange">

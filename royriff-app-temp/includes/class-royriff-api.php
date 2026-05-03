@@ -550,6 +550,33 @@ class RoyRiff_API {
             return $data;
         }
 
+        // Envío gratis a todo el país — método sintético del frontend Roy Riff.
+        // No requiere consulta a la transportista: cost 0, sin restricción por CP.
+        if ($method_id === 'free_shipping') {
+            $data['shipping_lines'][0]['total'] = '0';
+            if (empty($data['shipping_lines'][0]['method_title'])) {
+                $data['shipping_lines'][0]['method_title'] = 'Envío gratis a todo el país';
+            }
+            return $data;
+        }
+
+        // Retiro en depósito CABA — sintético del frontend. Mapeamos a local_pickup
+        // para que WooCommerce lo acepte como método válido, preservando el título.
+        if ($method_id === 'caba_pickup') {
+            $data['shipping_lines'][0]['total'] = '0';
+            $caba_title = isset($data['shipping_lines'][0]['method_title']) && $data['shipping_lines'][0]['method_title'] !== ''
+                ? (string) $data['shipping_lines'][0]['method_title']
+                : 'Retiro en depósito CABA';
+            $resolved = $this->resolve_wc_local_pickup_instance();
+            if (is_array($resolved) && !empty($resolved['method_id'])) {
+                $data['shipping_lines'][0]['method_id'] = $resolved['method_id'];
+            } else {
+                $data['shipping_lines'][0]['method_id'] = 'local_pickup';
+            }
+            $data['shipping_lines'][0]['method_title'] = $caba_title;
+            return $data;
+        }
+
         $postcode = '';
         if (!empty($data['shipping']['postcode'])) {
             $postcode = preg_replace('/\D+/', '', (string) $data['shipping']['postcode']);
