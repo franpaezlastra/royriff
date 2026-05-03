@@ -54,10 +54,34 @@ function royriff_app_get_bacs_discount_for_product($product_id) {
 }
 
 /**
- * Calcula el descuento BACS total del carrito actual.
- * Suma el descuento de cada item × quantity.
+ * Calcula el descuento BACS total.
+ *
+ * Modo cart (sin parámetro): suma desde WC()->cart. Sirve para el hook
+ * `woocommerce_cart_calculate_fees` durante el checkout NORMAL de WC.
+ *
+ * Modo REST (con line_items): suma desde el payload del create-order. Sirve para
+ * cuando la orden se crea via WC REST API (POST /wc/v3/orders desde el SPA),
+ * donde NO existe WC()->cart porque el contexto es REST, no checkout.
+ *
+ * @param array|null $line_items  Si se pasa, calcula desde este array.
+ *                                Cada item: ['product_id' => int, 'variation_id' => int, 'quantity' => int]
+ * @return int Descuento total en pesos (positivo, listo para usar como fee negativo)
  */
-function royriff_app_calculate_total_bacs_discount() {
+function royriff_app_calculate_total_bacs_discount($line_items = null) {
+    // Modo REST: calcular desde el payload del create-order
+    if ($line_items !== null && is_array($line_items)) {
+        $total = 0;
+        foreach ($line_items as $li) {
+            if (!is_array($li)) continue;
+            $product_id = !empty($li['variation_id']) ? (int) $li['variation_id'] : (int) ($li['product_id'] ?? 0);
+            $quantity = max(1, (int) ($li['quantity'] ?? 1));
+            $discount = royriff_app_get_bacs_discount_for_product($product_id);
+            $total += $discount * $quantity;
+        }
+        return $total;
+    }
+
+    // Modo cart: legacy (hook woocommerce_cart_calculate_fees)
     if (!function_exists('WC') || !WC()->cart) return 0;
 
     $total = 0;

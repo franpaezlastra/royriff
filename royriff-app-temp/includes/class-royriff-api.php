@@ -472,6 +472,28 @@ class RoyRiff_API {
             $data = $trusted;
         }
 
+        // Inyectar descuento BACS como fee negativo cuando el método de pago es transferencia.
+        // El hook woocommerce_cart_calculate_fees no se dispara via REST, así que tenemos que
+        // pre-calcular el descuento y agregarlo al payload directamente.
+        if (
+            isset($data['payment_method'])
+            && (string) $data['payment_method'] === 'bacs'
+            && function_exists('royriff_app_calculate_total_bacs_discount')
+        ) {
+            $line_items = isset($data['line_items']) && is_array($data['line_items']) ? $data['line_items'] : array();
+            $bacs_discount = (int) royriff_app_calculate_total_bacs_discount($line_items);
+            if ($bacs_discount > 0) {
+                if (!isset($data['fee_lines']) || !is_array($data['fee_lines'])) {
+                    $data['fee_lines'] = array();
+                }
+                $data['fee_lines'][] = array(
+                    'name'       => 'Descuento por transferencia bancaria',
+                    'total'      => '-' . $bacs_discount,
+                    'tax_status' => 'none',
+                );
+            }
+        }
+
         return wp_json_encode($data);
     }
 

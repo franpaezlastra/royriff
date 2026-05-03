@@ -339,11 +339,15 @@ const CheckoutPago = () => {
         }, 4000);
         return;
       } else if (isTransferencia) {
+        // Bloquear el guard del useEffect que detecta cartItems vacío y manda a /carrito.
+        // Sin este flag, el clearCart() de abajo dispara el guard antes que navigate() complete.
+        setIsRedirectingToPayment(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada. Revisá tu email para los datos de transferencia.');
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       } else {
+        setIsRedirectingToPayment(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada exitosamente');
