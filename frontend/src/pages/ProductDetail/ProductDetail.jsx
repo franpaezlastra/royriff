@@ -21,8 +21,6 @@ import {
   FiArrowUp,
   FiCheck,
 } from 'react-icons/fi';
-import { FaWhatsapp } from 'react-icons/fa';
-
 const BENEFIT_ICONS = [FiZap, FiCpu, FiSun, FiBattery];
 
 const ProductDetail = () => {
@@ -62,11 +60,6 @@ const ProductDetail = () => {
     const first = selectedProduct?.colors?.[0]?.name;
     setPickedColor(first ?? null);
   }, [selectedProduct?.slug, selectedProduct?.colors]);
-
-  const whatsappMessage = selectedProduct
-    ? `Hola, quiero consultar sobre la bici ${getDisplayName(selectedProduct)}`
-    : 'Hola, quiero consultar sobre sus bicicletas eléctricas';
-  const whatsappUrl = `https://wa.me/5493812006514?text=${encodeURIComponent(whatsappMessage)}`;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -660,17 +653,8 @@ const ProductDetail = () => {
         </section>
       )}
 
-      {/* CTA inferior fijo */}
-      <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-2 items-end" aria-label="Acciones rápidas">
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors"
-          aria-label="WhatsApp"
-        >
-          <FaWhatsapp className="w-6 h-6" />
-        </a>
+      {/* Botón "volver arriba" — el WhatsApp flotante (naranja Roy Riff) lo inyecta el plugin globalmente */}
+      <div className="fixed bottom-6 left-5 z-50" aria-label="Acciones rápidas">
         <button
           type="button"
           onClick={scrollToTop}
