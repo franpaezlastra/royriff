@@ -63,10 +63,19 @@ const CheckoutPago = () => {
   const savedBilling = loadCheckoutBilling();
   const shipping = loadCheckoutShipping();
   const [isRedirectingToPayment, setIsRedirectingToPayment] = useState(false);
+  // Ref síncrono usado por el guard del useEffect para evitar race condition con
+  // Redux: dispatch(clearCart()) ejecuta antes que React aplique setIsRedirectingToPayment,
+  // entonces el guard ve cartItems=[] e isRedirectingToPayment=false y manda a /carrito.
+  // El ref se actualiza inmediatamente al llamar markRedirecting() y no depende del render cycle.
+  const isRedirectingRef = useRef(false);
+  const markRedirecting = (value) => {
+    isRedirectingRef.current = value;
+    setIsRedirectingToPayment(value);
+  };
 
   useEffect(() => {
     if (cartItems.length === 0) {
-      if (isRedirectingToPayment) return;
+      if (isRedirectingRef.current) return;
       navigate('/carrito');
       return;
     }
@@ -74,7 +83,7 @@ const CheckoutPago = () => {
     if (!shp) {
       navigate('/checkout', { replace: true });
     }
-  }, [cartItems.length, isRedirectingToPayment, navigate]);
+  }, [cartItems.length, navigate]);
 
   // Formulario de contacto inline (por si llegaron sin pasar por entrega)
   const [contactForm, setContactForm] = useState({
@@ -214,7 +223,7 @@ const CheckoutPago = () => {
     }
     setErrors({});
     setSubmitting(true);
-    setIsRedirectingToPayment(false);
+    markRedirecting(false);
 
     try {
       const bil = getEffectiveBilling();
@@ -324,7 +333,7 @@ const CheckoutPago = () => {
       const isTransferencia = selectedMethodObj ? isBacsMethod(selectedMethodObj) : false;
 
       if (isMercadoPago) {
-        setIsRedirectingToPayment(true);
+        markRedirecting(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         const baseUrl = import.meta.env.VITE_WOOCOMMERCE_URL || 'https://api.royriff.com.ar';
@@ -341,13 +350,13 @@ const CheckoutPago = () => {
       } else if (isTransferencia) {
         // Bloquear el guard del useEffect que detecta cartItems vacío y manda a /carrito.
         // Sin este flag, el clearCart() de abajo dispara el guard antes que navigate() complete.
-        setIsRedirectingToPayment(true);
+        markRedirecting(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada. Revisá tu email para los datos de transferencia.');
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       } else {
-        setIsRedirectingToPayment(true);
+        markRedirecting(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada exitosamente');
@@ -359,11 +368,11 @@ const CheckoutPago = () => {
       if (err.response?.data?.message) msg = err.response.data.message;
       else if (err.message) msg = err.message;
       toast.error(msg);
-      setIsRedirectingToPayment(false);
+      markRedirecting(false);
     } finally {
       if (!skipFinallyRef.current) {
         setSubmitting(false);
-        setIsRedirectingToPayment(false);
+        markRedirecting(false);
       }
       skipFinallyRef.current = false;
     }
