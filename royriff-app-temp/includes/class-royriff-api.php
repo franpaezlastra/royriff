@@ -244,6 +244,19 @@ class RoyRiff_API {
             }
             $this->send_error('Método no permitido.', 405);
             return;
+        } elseif ($path === 'meta-capi' && $method === 'POST') {
+            // Endpoint para reenviar eventos del frontend a Meta Conversions API.
+            // No requiere nonce (es fire-and-forget desde el browser).
+            // No falla nunca: si CAPI no está configurado, devuelve { ok: true, skipped: ... }
+            if (!function_exists('royriff_capi_handle_event_request')) {
+                $this->send_json(array('ok' => true, 'skipped' => 'capi_module_not_loaded'));
+                return;
+            }
+            $raw_body = file_get_contents('php://input');
+            $decoded = json_decode($raw_body, true);
+            $response = royriff_capi_handle_event_request($decoded);
+            $this->send_json($response);
+            return;
         } else {
             $this->send_error('Ruta no encontrada: ' . $path, 404);
             return;

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { store } from './store/store';
 import AppRouter from './router/AppRouter';
 import { fetchProducts } from './store/slices/productsSlice';
+import { initWhatsAppTracking } from './utils/tracking';
 import './index.css';
 
 // Componente interno que carga productos al inicio
@@ -14,6 +15,8 @@ function AppContent() {
   // Cargar productos al inicio de la aplicación (una sola vez)
   useEffect(() => {
     dispatch(fetchProducts());
+    // Meta Pixel: listener global para clicks en links de WhatsApp → trackea Lead
+    initWhatsAppTracking();
   }, [dispatch]);
 
   return (

@@ -5,6 +5,7 @@ import { selectCartItems } from '../../store/slices/cartSlice';
 import { clearCart } from '../../store/slices/cartSlice';
 import { formatPrice } from '../../utils/constants';
 import { calculateCartBacsDiscount } from '../../utils/bacsDiscount';
+import { trackPurchase } from '../../utils/tracking';
 import { createOrder, getPaymentMethods } from '../../services/woocommerceService';
 import DOMPurify from 'dompurify';
 import {
@@ -62,15 +63,13 @@ const CheckoutPago = () => {
   // Recuperar datos de pasos anteriores
   const savedBilling = loadCheckoutBilling();
   const shipping = loadCheckoutShipping();
-  const [isRedirectingToPayment, setIsRedirectingToPayment] = useState(false);
   // Ref síncrono usado por el guard del useEffect para evitar race condition con
-  // Redux: dispatch(clearCart()) ejecuta antes que React aplique setIsRedirectingToPayment,
-  // entonces el guard ve cartItems=[] e isRedirectingToPayment=false y manda a /carrito.
+  // Redux: dispatch(clearCart()) ejecuta antes que React procese cualquier setState,
+  // entonces el guard veía cartItems=[] e isRedirectingToPayment=false y mandaba a /carrito.
   // El ref se actualiza inmediatamente al llamar markRedirecting() y no depende del render cycle.
   const isRedirectingRef = useRef(false);
   const markRedirecting = (value) => {
     isRedirectingRef.current = value;
-    setIsRedirectingToPayment(value);
   };
 
   useEffect(() => {
@@ -324,6 +323,11 @@ const CheckoutPago = () => {
         toast.error('La orden se creó pero no obtuvimos los datos para redirigirte. Revisá tu email.');
         return;
       }
+
+      // Meta Pixel: Purchase (dispara para los 3 casos: MP, BACS, otros).
+      // Hacemos esto antes de los branches porque el branch MP hace window.location.replace
+      // y queremos que fbq tenga tiempo de fire antes que el browser desmonte la página.
+      try { trackPurchase(order, cartItems); } catch (e) { /* silent */ }
 
       const orderId = order.id || order.number;
       const orderKey = order.order_key || '';

@@ -5,6 +5,7 @@ import { formatPrice, getProductMainImage } from '../../utils/constants';
 import { getDisplayName } from '../../utils/productData';
 import { fetchProductBySlug } from '../../store/slices/productsSlice';
 import { addToCart } from '../../store/slices/cartSlice';
+import { trackAddToCart } from '../../utils/tracking';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import toast from 'react-hot-toast';
@@ -115,6 +116,8 @@ const ProductElegir = () => {
       },
       quantity,
     }));
+    // Meta Pixel: AddToCart
+    trackAddToCart({ slug: selectedProduct.slug, displayName, price }, quantity);
     toast.success(quantity > 1 ? `${quantity} × ${displayName} agregadas al carrito` : `${displayName} agregada al carrito`, { duration: 2000 });
   };
 

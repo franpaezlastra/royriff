@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { getProductMainImage, getProductMainImagePreferring } from '../../utils/constants';
 import { getDisplayName, getProductDetailImageOverride } from '../../utils/productData';
 import { fetchProductBySlug } from '../../store/slices/productsSlice';
+import { trackViewContent } from '../../utils/tracking';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ProductPriceBlock from '../../components/product/ProductPriceBlock';
@@ -52,6 +53,8 @@ const ProductDetail = () => {
         }
         metaDesc.content = desc;
       }
+      // Meta Pixel: ViewContent
+      trackViewContent(selectedProduct);
     }
   }, [selectedProduct]);
 

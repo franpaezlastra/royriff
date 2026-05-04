@@ -16,6 +16,7 @@ import {
 } from '../../utils/checkoutStorage';
 import { LOCAL_PICKUP_OPTION, FREE_SHIPPING_OPTION, CABA_PICKUP_OPTION } from '../../utils/localPickupOption';
 import { calculateCartBacsDiscount } from '../../utils/bacsDiscount';
+import { trackInitiateCheckout } from '../../utils/tracking';
 import Button from '../common/Button';
 
 const CartDrawer = ({ isOpen, onClose }) => {
@@ -49,6 +50,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) return;
+    // Meta Pixel: InitiateCheckout (antes de navigate, así fbq tiene tiempo de fire)
+    trackInitiateCheckout(cartItems);
     onClose?.();
     if (selectedShipping) {
       saveCheckoutShipping(selectedShipping);

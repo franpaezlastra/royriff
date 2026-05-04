@@ -29,6 +29,9 @@ require_once ROYRIFF_APP_PATH . 'includes/bacs-discount.php';
 // Personalización de emails post-pedido (BACS, footer Roy Riff)
 require_once ROYRIFF_APP_PATH . 'includes/email-customizations.php';
 
+// Meta Conversions API (CAPI) — tracking server-side de eventos del funnel
+require_once ROYRIFF_APP_PATH . 'includes/meta-capi.php';
+
 /**
  * Mapa de metadata SEO por ruta SPA.
  * Cada entrada: title (sub-60 chars idealmente) + description (sub-160) + og_image opcional.
