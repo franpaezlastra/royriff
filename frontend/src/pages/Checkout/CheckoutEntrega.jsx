@@ -260,7 +260,7 @@ const CheckoutEntrega = () => {
           postcode: '1000',
         }
       : {
-          address: 'Aconquija 1163',
+          address: 'Avenida Aconquija 1727 — Local Roy Riff',
           city: 'Yerba Buena',
           postcode: '4107',
         };

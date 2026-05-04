@@ -3,7 +3,7 @@ export const CONTACT_INFO = {
   whatsapp: '+54 381 200-6514',
   whatsappLink: 'https://wa.me/5493812006514',
   email: 'postventa@royriff.com.ar',
-  address: 'Avenida Aconquija 1727, Yerba Buena, Tucumán',
+  address: 'Avenida Aconquija 1727, Local Roy Riff, Yerba Buena, Tucumán',
   /** Enlace corto oficial al pin en Google Maps */
   googleMapsLink: 'https://maps.app.goo.gl/1q2wnfTUhPMEUvzPA',
   /** iframe embed (misma ubicación que la dirección) */

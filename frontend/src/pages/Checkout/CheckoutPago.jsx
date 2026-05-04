@@ -121,7 +121,7 @@ const CheckoutPago = () => {
   };
 
   // Dirección del local (fallback para pedidos de retiro)
-  const STORE_ADDRESS = 'Aconquija 1163';
+  const STORE_ADDRESS = 'Avenida Aconquija 1727 — Local Roy Riff';
   const STORE_CITY = 'Yerba Buena';
   const STORE_POSTCODE = '4107';
 
@@ -354,16 +354,20 @@ const CheckoutPago = () => {
       } else if (isTransferencia) {
         // Bloquear el guard del useEffect que detecta cartItems vacío y manda a /carrito.
         // Sin este flag, el clearCart() de abajo dispara el guard antes que navigate() complete.
+        // skipFinallyRef evita que el finally resetee markRedirecting(false) antes que el
+        // componente desmonte tras navigate().
         markRedirecting(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada. Revisá tu email para los datos de transferencia.');
+        skipFinallyRef.current = true;
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       } else {
         markRedirecting(true);
         dispatch(clearCart());
         clearCheckoutStorage();
         toast.success('Orden creada exitosamente');
+        skipFinallyRef.current = true;
         navigate(`/compra-confirmada?order_id=${orderId}&order_key=${orderKey}`);
       }
     } catch (err) {
@@ -424,7 +428,7 @@ const CheckoutPago = () => {
                 {shippingIsPickup && (
                   <p className="text-[11px] text-neutral-darkGreen/50 font-neue -mt-2 flex items-center gap-1.5">
                     <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
-                    Retiro en el local · Aconquija 1163, Yerba Buena
+                    Retiro en el local · Av. Aconquija 1727, Yerba Buena
                   </p>
                 )}
                 {shipping && shippingIsBranchCarrier && (
