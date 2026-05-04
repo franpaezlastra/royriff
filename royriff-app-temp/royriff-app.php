@@ -47,6 +47,8 @@ function royriff_app_get_route_metadata() {
     $path = trim($path, '/');
 
     $home_og_image = 'https://royriff.com.ar/og-image.webp';
+    $lola_og_image = 'https://royriff.com.ar/og-lola.webp';
+    $xxxx_og_image = 'https://royriff.com.ar/og-xxxx.webp';
 
     $routes = array(
         '' => array(
@@ -65,18 +67,22 @@ function royriff_app_get_route_metadata() {
         'bicicletas-electricas/lola-cruiser' => array(
             'title' => 'Roy Riff LOLA | E-Bike Urbana 500W con frenos hidráulicos',
             'description' => 'LOLA, bicicleta eléctrica urbana de Roy Riff. Motor 500W, batería 48V 10.4Ah extraíble, autonomía 40-65km, frenos hidráulicos. 100% legal sin patente.',
+            'og_image' => $lola_og_image,
         ),
         'bicicletas-electricas/lola-cruiser/elegir' => array(
             'title' => 'Comprar LOLA Cruiser | $2.000.000 efectivo · Envío gratis | Roy Riff',
             'description' => 'Elegí color y cantidad de tu LOLA Cruiser. Pagás $2.000.000 en efectivo o 6 cuotas fijas de $402.000. Envío gratis a todo el país. Garantía 2 años cuadro.',
+            'og_image' => $lola_og_image,
         ),
         'bicicletas-electricas/xxxx-expedition' => array(
             'title' => 'Roy Riff XXXX Expedition | Fat Tire 500W con 90km autonomía',
             'description' => 'XXXX Expedition, bici eléctrica fat tire de Roy Riff. 90km autonomía, batería 48V 20Ah, doble suspensión. 100% legal sin patente. Para quien va más lejos.',
+            'og_image' => $xxxx_og_image,
         ),
         'bicicletas-electricas/xxxx-expedition/elegir' => array(
             'title' => 'Comprar XXXX Expedition | $2.700.000 efectivo · Envío gratis | Roy Riff',
             'description' => 'Elegí color y cantidad de tu XXXX Expedition. Pagás $2.700.000 en efectivo o 6 cuotas fijas de $536.167. Envío gratis a todo el país. Garantía 2 años cuadro.',
+            'og_image' => $xxxx_og_image,
         ),
         'bicicletas-electricas/comparacion-ebike-royriff' => array(
             'title' => 'LOLA vs XXXX | Compará las e-bikes de Roy Riff',
@@ -457,6 +463,28 @@ function royriff_app_rewrite_rules() {
     }
 }
 add_action('init', 'royriff_app_rewrite_rules');
+
+/**
+ * Redirects 301 de URLs legacy a sus versiones canónicas.
+ * Sin esto, links viejos compartidos en redes/ads aterrizan en la home (404 enmascarado).
+ */
+function royriff_app_legacy_redirects() {
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    $parsed = parse_url($request_uri);
+    $path = isset($parsed['path']) ? trim($parsed['path'], '/') : '';
+    $query = isset($parsed['query']) ? '?' . $parsed['query'] : '';
+
+    $legacy_map = array(
+        'politica-privacidad'      => '/politica-de-privacidad/',
+        'comparacion-ebike-royriff' => '/bicicletas-electricas/comparacion-ebike-royriff/',
+    );
+
+    if (isset($legacy_map[$path])) {
+        wp_redirect(home_url($legacy_map[$path] . $query), 301);
+        exit;
+    }
+}
+add_action('template_redirect', 'royriff_app_legacy_redirects', 1);
 
 /**
  * Interceptar rutas SPA antes de que WordPress/WooCommerce las manejen.
