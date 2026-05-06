@@ -8,6 +8,7 @@ import { trackViewContent } from '../../utils/tracking';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ProductPriceBlock from '../../components/product/ProductPriceBlock';
+import ProductGallery from '../../components/product/ProductGallery';
 import {
   FiChevronDown,
   FiChevronUp,
@@ -207,6 +208,19 @@ const ProductDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════
+          GALERÍA — Mirala de cerca
+          ═══════════════════════════════════════════ */}
+      {product.gallery?.images?.length > 0 && (
+        <ProductGallery
+          eyebrow={product.gallery.eyebrow}
+          title={product.gallery.title}
+          subtitle={product.gallery.subtitle}
+          images={product.gallery.images}
+          productName={displayName}
+        />
+      )}
 
       {/* ═══════════════════════════════════════════
           HISTORIA — Fondo blanco, storytelling

@@ -4,6 +4,19 @@
  * Las rutas en WordPress pueden ser: slug "lola-cruiser" y "xxxx-expedition".
  */
 
+// Galería del producto en el PDP (sección "Conocé la LOLA / XXXX — Mirala de cerca")
+// La primera imagen es la destacada (col-span 2 / row-span 2 en el grid masonry).
+import lolaGal01 from '../assets/galeria/productos/lola-04.webp';
+import lolaGal02 from '../assets/galeria/productos/lola-01.webp';
+import lolaGal03 from '../assets/galeria/productos/lola-05.webp';
+import lolaGal04 from '../assets/galeria/productos/lola-02.webp';
+import lolaGal05 from '../assets/galeria/productos/lola-03.webp';
+import xxxxGal01 from '../assets/galeria/productos/xxxx-02.webp';
+import xxxxGal02 from '../assets/galeria/productos/xxxx-01.webp';
+import xxxxGal03 from '../assets/galeria/productos/xxxx-05.webp';
+import xxxxGal04 from '../assets/galeria/productos/xxxx-03.webp';
+import xxxxGal05 from '../assets/galeria/productos/xxxx-04.webp';
+
 // Slugs que usamos para matchear (WooCommerce puede devolver lola-cruiser, lola, etc.)
 const LOLA_SLUGS = ['lola-cruiser', 'lola'];
 const XXXX_SLUGS = ['xxxx-expedition', 'xxxx'];
@@ -66,6 +79,14 @@ export const PRODUCT_DATA = {
       { name: 'Champagne Metallic', value: '#C9B896' },
       { name: 'Graphite Pearl', value: '#4A4A4A' },
     ],
+    /** Galería del PDP — sección "Conocé la LOLA · Mirala de cerca". */
+    gallery: {
+      eyebrow: 'CONOCÉ LA LOLA',
+      title: 'Mirala de cerca',
+      subtitle:
+        'Cada detalle pensado para que andes con confianza. Geometría urbana, motor 500W y acabados premium.',
+      images: [lolaGal01, lolaGal02, lolaGal03, lolaGal04, lolaGal05],
+    },
     /**
      * Posición de anclaje de la imagen por color (object-position).
      * Cada foto tiene la bici en distinto lugar dentro del archivo; con esto alineamos todas en el mismo sitio.
@@ -201,6 +222,14 @@ export const PRODUCT_DATA = {
       { name: 'Graphite Pearl', value: '#4A4A4A' },
       { name: 'Matte Olive Gold', value: '#8B7355' },
     ],
+    /** Galería del PDP — sección "Conocé la XXXX · Mirala de cerca". */
+    gallery: {
+      eyebrow: 'CONOCÉ LA XXXX',
+      title: 'Mirala de cerca',
+      subtitle:
+        'Cada detalle pensado para llevarte más lejos. Fat tire, batería 48V 20Ah y 90 km de autonomía real.',
+      images: [xxxxGal01, xxxxGal02, xxxxGal03, xxxxGal04, xxxxGal05],
+    },
     /** Posición de la imagen por color (mismo criterio que LOLA). Ajustar % si las fotos quedan desalineadas. */
     imageObjectPositionByColor: {
       'Graphite Pearl': 'center 58%',
@@ -349,6 +378,7 @@ export const enrichProductData = (wcProduct) => {
     faq: hardcoded.faq,
     links: hardcoded.links,
     pricing: hardcoded.pricing,
+    gallery: hardcoded.gallery,
     tagline: hardcoded.hero?.productTitle || hardcoded.hero?.h2,
   };
 };
