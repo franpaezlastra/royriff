@@ -79,13 +79,20 @@ export const PRODUCT_DATA = {
       { name: 'Champagne Metallic', value: '#C9B896' },
       { name: 'Graphite Pearl', value: '#4A4A4A' },
     ],
-    /** Galería del PDP — sección "Conocé la LOLA · Mirala de cerca". */
+    /**
+     * Sección audiovisual del PDP.
+     * video: { src, poster, durationSec, credits: { location, period, filmmaker } }.
+     *   Si video.src es null, no se renderiza el bloque de video.
+     * gallery: { eyebrow, title, subtitle, images, photographer }
+     */
+    video: null, // TODO: completar cuando lleguen los archivos del fotoshoot Cafayate Abril 2026
     gallery: {
       eyebrow: 'CONOCÉ LA LOLA',
       title: 'Mirala de cerca',
       subtitle:
         'Cada detalle pensado para que andes con confianza. Geometría urbana, motor 500W y acabados premium.',
       images: [lolaGal01, lolaGal02, lolaGal03, lolaGal04, lolaGal05],
+      photographer: 'Sebastian Alcover',
     },
     /**
      * Posición de anclaje de la imagen por color (object-position).
@@ -222,13 +229,15 @@ export const PRODUCT_DATA = {
       { name: 'Graphite Pearl', value: '#4A4A4A' },
       { name: 'Matte Olive Gold', value: '#8B7355' },
     ],
-    /** Galería del PDP — sección "Conocé la XXXX · Mirala de cerca". */
+    /** Sección audiovisual del PDP. Misma estructura que LOLA. */
+    video: null, // TODO: completar cuando lleguen los archivos del fotoshoot Cafayate Abril 2026
     gallery: {
       eyebrow: 'CONOCÉ LA XXXX',
       title: 'Mirala de cerca',
       subtitle:
         'Cada detalle pensado para llevarte más lejos. Fat tire, batería 48V 20Ah y 90 km de autonomía real.',
       images: [xxxxGal01, xxxxGal02, xxxxGal03, xxxxGal04, xxxxGal05],
+      photographer: 'Sebastian Alcover',
     },
     /** Posición de la imagen por color (mismo criterio que LOLA). Ajustar % si las fotos quedan desalineadas. */
     imageObjectPositionByColor: {
@@ -378,6 +387,7 @@ export const enrichProductData = (wcProduct) => {
     faq: hardcoded.faq,
     links: hardcoded.links,
     pricing: hardcoded.pricing,
+    video: hardcoded.video,
     gallery: hardcoded.gallery,
     tagline: hardcoded.hero?.productTitle || hardcoded.hero?.h2,
   };

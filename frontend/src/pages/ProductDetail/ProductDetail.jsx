@@ -210,14 +210,12 @@ const ProductDetail = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          GALERÍA — Mirala de cerca
+          AUDIOVISUAL — Video destacado + galería "Mirala de cerca"
           ═══════════════════════════════════════════ */}
-      {product.gallery?.images?.length > 0 && (
+      {(product.video?.src || product.gallery?.images?.length > 0) && (
         <ProductGallery
-          eyebrow={product.gallery.eyebrow}
-          title={product.gallery.title}
-          subtitle={product.gallery.subtitle}
-          images={product.gallery.images}
+          video={product.video}
+          gallery={product.gallery}
           productName={displayName}
         />
       )}
