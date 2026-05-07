@@ -50,6 +50,46 @@ const CompraConfirmada = () => {
     order.payment_method.includes('offline')
   );
 
+  // Mensaje WhatsApp pre-armado con los datos del pedido (varía según medio de pago).
+  const buildWhatsAppLink = () => {
+    const number = order?.number || orderId || 'sin número';
+    const fullName = [
+      order?.billing?.first_name,
+      order?.billing?.last_name,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .trim() || 'cliente';
+    const email = order?.billing?.email || '';
+    const phone = order?.billing?.phone || '';
+    const totalRaw = order?.total ? `$${parseFloat(order.total).toLocaleString('es-AR')}` : '';
+    const itemsLine =
+      Array.isArray(order?.line_items) && order.line_items.length > 0
+        ? order.line_items
+            .map((li) => `${li.name}${li.quantity > 1 ? ` x${li.quantity}` : ''}`)
+            .join(', ')
+        : '';
+
+    const lines = [
+      `¡Hola Roy Riff! Acabo de hacer mi pedido.`,
+      ``,
+      `Pedido: #${number}`,
+      `Nombre: ${fullName}`,
+    ];
+    if (email) lines.push(`Email: ${email}`);
+    if (phone) lines.push(`Teléfono: ${phone}`);
+    if (itemsLine) lines.push(`Producto: ${itemsLine}`);
+    if (totalRaw) lines.push(`Total: ${totalRaw}`);
+    lines.push('');
+    lines.push(
+      isTransferencia
+        ? 'En breve les paso el comprobante de la transferencia. ¡Gracias!'
+        : 'Quería confirmar el pedido. ¡Gracias!'
+    );
+    const text = lines.join('\n');
+    return `https://wa.me/5493812006514?text=${encodeURIComponent(text)}`;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-20 bg-primary-beige">
       <div className="text-center max-w-2xl mx-auto px-4">
@@ -104,14 +144,11 @@ const CompraConfirmada = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button to="/">Volver al inicio</Button>
-          {orderId && (
-            <Button 
-              to={`/seguimiento?order_id=${orderId}&order_key=${orderKey || ''}`}
-              variant="secondary"
-            >
-              Ver seguimiento
-            </Button>
-          )}
+          <Button href={buildWhatsAppLink()} variant="secondary">
+            {isTransferencia
+              ? 'Enviar comprobante por WhatsApp'
+              : 'Escribinos por WhatsApp'}
+          </Button>
         </div>
       </div>
     </div>
