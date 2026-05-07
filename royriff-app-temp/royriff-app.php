@@ -46,9 +46,13 @@ function royriff_app_get_route_metadata() {
     $path = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
     $path = trim($path, '/');
 
-    $home_og_image = 'https://royriff.com.ar/og-image.webp';
-    $lola_og_image = 'https://royriff.com.ar/og-lola.webp';
-    $xxxx_og_image = 'https://royriff.com.ar/og-xxxx.webp';
+    // OG images servidas desde el plugin (path con 200 OK garantizado).
+    // Antes apuntaban al root del dominio (`/og-*.webp`) que solo funcionaba para `og-image.webp`
+    // (subida manual a public_html); las de productos redirigían 301 al home y rompían el preview en redes.
+    $plugin_dist_url = plugins_url('dist', __FILE__);
+    $home_og_image = $plugin_dist_url . '/og-image.webp';
+    $lola_og_image = $plugin_dist_url . '/og-lola.webp';
+    $xxxx_og_image = $plugin_dist_url . '/og-xxxx.webp';
 
     $routes = array(
         '' => array(
