@@ -5,17 +5,33 @@
  */
 
 // Galería del producto en el PDP (sección "Conocé la LOLA / XXXX — Mirala de cerca")
-// La primera imagen es la destacada (col-span 2 / row-span 2 en el grid masonry).
-import lolaGal01 from '../assets/galeria/productos/lola-04.webp';
-import lolaGal02 from '../assets/galeria/productos/lola-01.webp';
-import lolaGal03 from '../assets/galeria/productos/lola-05.webp';
-import lolaGal04 from '../assets/galeria/productos/lola-02.webp';
-import lolaGal05 from '../assets/galeria/productos/lola-03.webp';
-import xxxxGal01 from '../assets/galeria/productos/xxxx-02.webp';
-import xxxxGal02 from '../assets/galeria/productos/xxxx-01.webp';
-import xxxxGal03 from '../assets/galeria/productos/xxxx-05.webp';
-import xxxxGal04 from '../assets/galeria/productos/xxxx-03.webp';
-import xxxxGal05 from '../assets/galeria/productos/xxxx-04.webp';
+// Fotoshoot Cafayate Abril 2026 — Filmmaker: Nicolás Perondi · Fotógrafo: Sebastian Alcover
+// Hay 23 fotos LOLA y 29 fotos XXXX disponibles en assets/products/{lola,xxxx}/.
+// El grid del PDP muestra solo las primeras 10 — para cambiar la selección, reordenar el array images[] abajo.
+import lolaVideo from '../assets/products/lola/video.mp4';
+import lolaVideoPoster from '../assets/products/lola/video-poster.webp';
+import lola01 from '../assets/products/lola/01.webp';
+import lola02 from '../assets/products/lola/02.webp';
+import lola03 from '../assets/products/lola/03.webp';
+import lola04 from '../assets/products/lola/04.webp';
+import lola05 from '../assets/products/lola/05.webp';
+import lola06 from '../assets/products/lola/06.webp';
+import lola07 from '../assets/products/lola/07.webp';
+import lola08 from '../assets/products/lola/08.webp';
+import lola09 from '../assets/products/lola/09.webp';
+import lola10 from '../assets/products/lola/10.webp';
+import xxxxVideo from '../assets/products/xxxx/video.mp4';
+import xxxxVideoPoster from '../assets/products/xxxx/video-poster.webp';
+import xxxx01 from '../assets/products/xxxx/01.webp';
+import xxxx02 from '../assets/products/xxxx/02.webp';
+import xxxx03 from '../assets/products/xxxx/03.webp';
+import xxxx04 from '../assets/products/xxxx/04.webp';
+import xxxx05 from '../assets/products/xxxx/05.webp';
+import xxxx06 from '../assets/products/xxxx/06.webp';
+import xxxx07 from '../assets/products/xxxx/07.webp';
+import xxxx08 from '../assets/products/xxxx/08.webp';
+import xxxx09 from '../assets/products/xxxx/09.webp';
+import xxxx10 from '../assets/products/xxxx/10.webp';
 
 // Slugs que usamos para matchear (WooCommerce puede devolver lola-cruiser, lola, etc.)
 const LOLA_SLUGS = ['lola-cruiser', 'lola'];
@@ -85,13 +101,22 @@ export const PRODUCT_DATA = {
      *   Si video.src es null, no se renderiza el bloque de video.
      * gallery: { eyebrow, title, subtitle, images, photographer }
      */
-    video: null, // TODO: completar cuando lleguen los archivos del fotoshoot Cafayate Abril 2026
+    video: {
+      src: lolaVideo,
+      poster: lolaVideoPoster,
+      durationSec: 45,
+      credits: {
+        location: 'Cafayate',
+        period: 'Abril 2026',
+        filmmaker: 'Nicolás Perondi',
+      },
+    },
     gallery: {
       eyebrow: 'CONOCÉ LA LOLA',
       title: 'Mirala de cerca',
       subtitle:
         'Cada detalle pensado para que andes con confianza. Geometría urbana, motor 500W y acabados premium.',
-      images: [lolaGal01, lolaGal02, lolaGal03, lolaGal04, lolaGal05],
+      images: [lola01, lola02, lola03, lola04, lola05, lola06, lola07, lola08, lola09, lola10],
       photographer: 'Sebastian Alcover',
     },
     /**
@@ -230,13 +255,22 @@ export const PRODUCT_DATA = {
       { name: 'Matte Olive Gold', value: '#8B7355' },
     ],
     /** Sección audiovisual del PDP. Misma estructura que LOLA. */
-    video: null, // TODO: completar cuando lleguen los archivos del fotoshoot Cafayate Abril 2026
+    video: {
+      src: xxxxVideo,
+      poster: xxxxVideoPoster,
+      durationSec: 45,
+      credits: {
+        location: 'Cafayate',
+        period: 'Abril 2026',
+        filmmaker: 'Nicolás Perondi',
+      },
+    },
     gallery: {
       eyebrow: 'CONOCÉ LA XXXX',
       title: 'Mirala de cerca',
       subtitle:
         'Cada detalle pensado para llevarte más lejos. Fat tire, batería 48V 20Ah y 90 km de autonomía real.',
-      images: [xxxxGal01, xxxxGal02, xxxxGal03, xxxxGal04, xxxxGal05],
+      images: [xxxx01, xxxx02, xxxx03, xxxx04, xxxx05, xxxx06, xxxx07, xxxx08, xxxx09, xxxx10],
       photographer: 'Sebastian Alcover',
     },
     /** Posición de la imagen por color (mismo criterio que LOLA). Ajustar % si las fotos quedan desalineadas. */
