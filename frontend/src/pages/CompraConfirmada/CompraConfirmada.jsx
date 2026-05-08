@@ -11,11 +11,17 @@ const CompraConfirmada = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  const orderId = searchParams.get('order_id');
-  const orderKey = searchParams.get('order_key');
+  // BACS: ?order_id=X&order_key=Y · MP: ?status=approved&external_reference=X&payment_id=Y
+  const orderId = searchParams.get('order_id') || searchParams.get('external_reference');
+  const orderKey = searchParams.get('order_key'); // null en redirects de MP
+  const mpStatus = searchParams.get('status'); // 'approved' | 'pending' | 'in_process' | etc.
+  const mpPaymentId = searchParams.get('payment_id');
+  const isMpPending = mpStatus === 'pending' || mpStatus === 'in_process';
 
   useEffect(() => {
-    // Obtener información de la orden si tenemos order_id
+    // Solo podemos pedir el detalle al backend si tenemos ambos: orderId + orderKey.
+    // Los redirects de MP traen external_reference (orderId) pero no order_key por seguridad WC,
+    // entonces salteamos el fetch — la página igual muestra confirmación + WhatsApp pre-armado.
     if (orderId && orderKey) {
       loadOrder();
     } else {
@@ -80,12 +86,13 @@ const CompraConfirmada = () => {
     if (phone) lines.push(`Teléfono: ${phone}`);
     if (itemsLine) lines.push(`Producto: ${itemsLine}`);
     if (totalRaw) lines.push(`Total: ${totalRaw}`);
+    if (mpPaymentId) lines.push(`ID de pago MP: ${mpPaymentId}`);
     lines.push('');
-    lines.push(
-      isTransferencia
-        ? 'En breve les paso el comprobante de la transferencia. ¡Gracias!'
-        : 'Quería confirmar el pedido. ¡Gracias!'
-    );
+    let closing;
+    if (isMpPending) closing = 'Quería confirmar el estado de mi pago. ¡Gracias!';
+    else if (isTransferencia) closing = 'En breve les paso el comprobante de la transferencia. ¡Gracias!';
+    else closing = 'Quería confirmar el pedido. ¡Gracias!';
+    lines.push(closing);
     const text = lines.join('\n');
     return `https://wa.me/5493812006514?text=${encodeURIComponent(text)}`;
   };
@@ -109,7 +116,29 @@ const CompraConfirmada = () => {
           </div>
         )}
 
-        {isTransferencia ? (
+        {isMpPending ? (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <div className="flex items-start gap-3">
+              <FiAlertCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div className="text-left">
+                <h3 className="font-barlow font-bold text-lg mb-2 text-blue-900">
+                  Pago en proceso
+                </h3>
+                <p className="text-blue-800 mb-2">
+                  Tu pago está siendo procesado por Mercado Pago. Te avisaremos por email apenas se confirme.
+                </p>
+                <p className="text-sm text-blue-700">
+                  Si pagaste con efectivo (Rapipago / Pago Fácil), revisá tu casilla — ahí está el cupón con el monto y vencimiento.
+                </p>
+                {mpPaymentId && (
+                  <p className="text-sm text-blue-700 mt-2">
+                    <strong>ID de pago:</strong> {mpPaymentId}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : isTransferencia ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
             <div className="flex items-start gap-3">
               <FiAlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
@@ -147,7 +176,9 @@ const CompraConfirmada = () => {
           <Button href={buildWhatsAppLink()} variant="secondary">
             {isTransferencia
               ? 'Enviar comprobante por WhatsApp'
-              : 'Escribinos por WhatsApp'}
+              : isMpPending
+                ? 'Consultar estado por WhatsApp'
+                : 'Escribinos por WhatsApp'}
           </Button>
         </div>
       </div>
