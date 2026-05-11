@@ -9,23 +9,41 @@ import {
   FiMail 
 } from 'react-icons/fi';
 import SectionTitle from '../../../components/common/SectionTitle';
+import { isHotSaleActive } from '../../../utils/promoConfig';
+
+const HOT_SALE_PRICING_CARD = {
+  icon: FiCreditCard,
+  badge: '🔥 Hot Sale · 3 días',
+  title: 'Cuotas y medios de pago',
+  description: 'Hot Sale: bajamos todos los precios. Solo hasta el miércoles 13/05.',
+  bullets: [
+    { label: '6 cuotas SIN interés', text: '$385.000 LOLA · $534.667 XXXX (Mercado Pago, tarjeta de crédito)' },
+    { label: 'Transferencia / efectivo', text: '$1.800.000 LOLA · $2.500.000 XXXX — ahorrás $200.000 en cualquier caso' },
+    { label: '3 cuotas', text: '$722.667 LOLA · $1.003.333 XXXX — CFT aplicable' },
+  ],
+  link: '/financiacion',
+  cta: 'Ver financiación',
+  level: 'A',
+};
+
+const NORMAL_PRICING_CARD = {
+  icon: FiCreditCard,
+  badge: 'Transparencia total',
+  title: 'Cuotas y medios de pago',
+  description: '6 cuotas sin interés con tarjeta · O ahorrá pagando con transferencia.',
+  bullets: [
+    { label: '6 cuotas SIN interés', text: '$402.000 LOLA · $536.167 XXXX (Mercado Pago, tarjeta de crédito)' },
+    { label: 'Transferencia bancaria', text: '$2.000.000 LOLA · $2.700.000 XXXX — ahorrás $412.000 / $517.000' },
+    { text: 'Todos los medios habilitados por Mercado Pago · CFT aplicable según medio elegido' },
+  ],
+  link: '/financiacion',
+  cta: 'Ver financiación',
+  level: 'A',
+};
 
 const trustCards = [
-  // Nivel A - Decisión de compra
-  {
-    icon: FiCreditCard,
-    badge: 'Transparencia total',
-    title: 'Cuotas y medios de pago',
-    description: '6 cuotas sin interés con tarjeta · O ahorrá pagando con transferencia.',
-    bullets: [
-      { label: '6 cuotas SIN interés', text: '$402.000 LOLA · $536.167 XXXX (Mercado Pago, tarjeta de crédito)' },
-      { label: 'Transferencia bancaria', text: '$2.000.000 LOLA · $2.700.000 XXXX — ahorrás $412.000 / $517.000' },
-      { text: 'Todos los medios habilitados por Mercado Pago · CFT aplicable según medio elegido' },
-    ],
-    link: '/financiacion',
-    cta: 'Ver financiación',
-    level: 'A'
-  },
+  // Nivel A - Decisión de compra (cambia durante Hot Sale)
+  isHotSaleActive() ? HOT_SALE_PRICING_CARD : NORMAL_PRICING_CARD,
   {
     icon: FiTruck,
     badge: 'Envío gratis en todo el país',

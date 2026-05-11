@@ -4,27 +4,42 @@ import PRODUCT_DATA from '../../utils/productData';
 import SectionTitle from '../../components/common/SectionTitle';
 import Button from '../../components/common/Button';
 
-const PriceCell = ({ pricing }) => (
-  <div className="flex flex-col gap-1.5 items-center">
-    <p className="font-barlow font-black text-primary-orange text-lg md:text-xl uppercase leading-tight tracking-tight">
-      6 cuotas fijas de {formatPrice(pricing.cuota6)}
-    </p>
-    <p className="font-neue text-sm text-neutral-black">
-      o {formatPrice(pricing.efectivo)} en efectivo
-      {pricing.ahorro ? (
-        <>
-          {' · '}
-          <span className="font-bold text-primary-orange">
-            ahorrás {formatPrice(pricing.ahorro)}
-          </span>
-        </>
+const PriceCell = ({ pricing }) => {
+  const isHotSale = pricing?.isHotSale === true;
+  return (
+    <div className="flex flex-col gap-1.5 items-center">
+      {isHotSale && (
+        <span className="font-barlow font-black text-[10px] tracking-[0.2em] uppercase text-white bg-primary-orange rounded-full px-2.5 py-0.5">
+          🔥 Hot Sale
+        </span>
+      )}
+      <p className="font-barlow font-black text-primary-orange text-lg md:text-xl uppercase leading-tight tracking-tight">
+        6 cuotas SIN interés de {formatPrice(pricing.cuota6)}
+      </p>
+      <p className="font-neue text-sm text-neutral-black">
+        o {formatPrice(pricing.efectivo)} en efectivo
+        {pricing.ahorroEfectivo || pricing.ahorro ? (
+          <>
+            {' · '}
+            <span className="font-bold text-primary-orange">
+              ahorrás {formatPrice(pricing.ahorroEfectivo || pricing.ahorro)}
+            </span>
+          </>
+        ) : null}
+      </p>
+      {isHotSale && pricing.precioRegular ? (
+        <p className="font-neue text-xs text-neutral-gray">
+          antes <span className="line-through">{formatPrice(pricing.precioRegular)}</span>
+        </p>
       ) : null}
-    </p>
-    <p className="font-neue text-[11px] text-neutral-gray leading-snug max-w-[260px]">
-      Más planes en 3, 9 o 12 cuotas. CFT según medio de pago.
-    </p>
-  </div>
-);
+      <p className="font-neue text-[11px] text-neutral-gray leading-snug max-w-[260px]">
+        {isHotSale
+          ? 'Precio Hot Sale hasta el miércoles 13/05. También 3 cuotas con tarjeta · CFT aplicable.'
+          : 'Más planes en 3, 9 o 12 cuotas. CFT según medio de pago.'}
+      </p>
+    </div>
+  );
+};
 
 const Comparador = () => {
   const lolaPricing = PRODUCT_DATA['lola-cruiser'].pricing;

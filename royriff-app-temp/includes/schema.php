@@ -128,19 +128,24 @@ function royriff_app_get_localbusiness_schema() {
  * @param string $slug 'lola' o 'xxxx'
  */
 function royriff_app_get_product_schema($slug) {
+    // Hot Sale flag — espejo del frontend promoConfig.js.
+    // Cuando active=true, schema.org refleja el precio Hot Sale (= 6 cuotas total).
+    $hot_sale_active = true;
+    $hot_sale_end = '2026-05-13T23:59:59-03:00';
+
     $products = array(
         'lola' => array(
             'name' => 'LOLA Urban Cruiser E-Bike',
             'sku' => 'RR-LOLA-001',
             'description' => 'Bicicleta eléctrica urbana estilo cruiser. Motor 500W (65 N.m), batería 48V 10.4Ah extraíble, autonomía 40-65 km, frenos hidráulicos, neumáticos 26"x3.0", display LCD con USB. Cumple Decreto 196/2025 (EPAC). Peso 32 kg.',
-            'price' => '2412000',
+            'price' => $hot_sale_active ? '2310000' : '2412000',
             'url' => 'https://royriff.com.ar/bicicletas-electricas/lola-cruiser/',
         ),
         'xxxx' => array(
             'name' => 'XXXX Expedition Fat Tire E-Bike',
             'sku' => 'RR-XXXX-001',
             'description' => 'Bicicleta eléctrica fat-tire de expedición. Motor 500W, batería 48V 20Ah (960Wh), autonomía 70-90 km, doble suspensión, neumáticos 20"x4.0", display LCD. Cumple Decreto 196/2025 (EPAC). Peso 42 kg.',
-            'price' => '3217000',
+            'price' => $hot_sale_active ? '3208000' : '3217000',
             'url' => 'https://royriff.com.ar/bicicletas-electricas/xxxx-expedition/',
         ),
     );
@@ -169,7 +174,7 @@ function royriff_app_get_product_schema($slug) {
             'url' => $p['url'],
             'priceCurrency' => 'ARS',
             'price' => $p['price'],
-            'priceValidUntil' => '2026-12-31',
+            'priceValidUntil' => $hot_sale_active ? $hot_sale_end : '2026-12-31',
             'availability' => 'https://schema.org/InStock',
             'itemCondition' => 'https://schema.org/NewCondition',
             'seller' => array('@id' => 'https://royriff.com.ar/#organization'),

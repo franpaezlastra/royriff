@@ -3,6 +3,7 @@
  * Se combinan con los datos de WooCommerce (precio, stock, imágenes, slug real).
  * Las rutas en WordPress pueden ser: slug "lola-cruiser" y "xxxx-expedition".
  */
+import { getHotSalePricing } from './promoConfig';
 
 // Galería del producto en el PDP (sección "Conocé la LOLA / XXXX — Mirala de cerca")
 // Fotoshoot Cafayate Abril 2026 — Filmmaker: Nicolás Perondi · Fotógrafo: Sebastian Alcover
@@ -420,10 +421,32 @@ export const enrichProductData = (wcProduct) => {
     trustBlock: hardcoded.trustBlock,
     faq: hardcoded.faq,
     links: hardcoded.links,
-    pricing: hardcoded.pricing,
+    pricing: mergeHotSalePricing(hardcoded.slug || wcProduct.slug, hardcoded.pricing),
     video: hardcoded.video,
     gallery: hardcoded.gallery,
     tagline: hardcoded.hero?.productTitle || hardcoded.hero?.h2,
+  };
+};
+
+/**
+ * Si la Hot Sale está activa, devuelve el pricing override para ese producto.
+ * Mantiene la shape del pricing normal + agrega flags isHotSale, precioRegular y ahorroEfectivo.
+ * Sólo expone 3 y 6 cuotas durante Hot Sale (9, 12 quedan ocultas en la UI).
+ */
+const mergeHotSalePricing = (slug, normalPricing) => {
+  const hs = getHotSalePricing(slug);
+  if (!hs || !normalPricing) return normalPricing;
+  return {
+    ...normalPricing,
+    efectivo: hs.efectivo,
+    cuota6: hs.cuota6,
+    ahorro: hs.cuota6Total - hs.efectivo,
+    cuotas: { 3: hs.cuota3, 6: hs.cuota6 },
+    cuota6Total: hs.cuota6Total,
+    cuota3Total: hs.cuota3Total,
+    precioRegular: hs.precioRegular,
+    ahorroEfectivo: hs.ahorroEfectivo,
+    isHotSale: true,
   };
 };
 
