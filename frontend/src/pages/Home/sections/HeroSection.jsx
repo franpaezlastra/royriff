@@ -58,82 +58,85 @@ const NormalHero = () => (
 );
 
 const HotSaleHero = () => (
-  <section className="relative min-h-[80vh] md:min-h-[90vh] overflow-hidden bg-neutral-black">
-    {/* Background banner: mobile vertical, desktop horizontal */}
-    <picture>
-      <source media="(min-width: 768px)" srcSet={hotSaleDesktop} />
-      <img
-        src={hotSaleMobile}
-        alt="Roy Riff Hot Sale"
-        className="absolute inset-0 w-full h-full object-cover"
-        loading="eager"
-        fetchpriority="high"
-      />
-    </picture>
+  <>
+    {/* ════════ SECCIÓN 1: BANNER LIMPIO (sin texto overlay) ════════ */}
+    <section className="bg-neutral-black w-full overflow-hidden">
+      <picture>
+        <source media="(min-width: 768px)" srcSet={hotSaleDesktop} />
+        <img
+          src={hotSaleMobile}
+          alt="Roy Riff Hot Sale · 11 al 13 de mayo · hasta 6 cuotas sin interés y $200.000 off"
+          className="w-full h-auto object-cover max-h-[80vh] mx-auto block"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </picture>
+    </section>
 
-    {/* Overlay sutil: deja respirar el banner arriba, oscurece abajo para que el copy se lea */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/30 to-black/70" />
-
-    {/* Contenido */}
-    <div className="container-custom relative z-10 min-h-[80vh] md:min-h-[90vh] flex items-end md:items-center pb-12 md:pb-0 pt-24">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="max-w-3xl text-left"
-      >
-        {/* Badge Hot Sale */}
-        <div className="inline-flex items-center gap-2 bg-primary-orange text-white px-4 py-2 rounded-full mb-5 shadow-lg">
-          <span className="font-barlow font-black text-sm tracking-[0.2em] uppercase">
-            🔥 {HOT_SALE.label} · {HOT_SALE.badge}
-          </span>
-        </div>
-
-        {/* H1 */}
-        <h1 className="font-barlow font-black !text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] uppercase mb-4 tracking-tight">
-          Hasta <span className="text-primary-orange">6 cuotas sin interés</span>
-          <br className="hidden md:block" /> y $200.000 off
-        </h1>
-
-        {/* Subtítulo */}
-        <p className="font-neue !text-white/90 text-base md:text-xl mb-6 leading-relaxed max-w-2xl">
-          LOLA desde <strong>$1.800.000</strong> · XXXX desde <strong>$2.500.000</strong>.
-          Envío gratis a todo el país. Sólo por la web hasta el miércoles.
-        </p>
-
-        {/* Countdown */}
-        <div className="mb-7">
-          <p className="font-barlow font-bold text-xs tracking-[0.25em] text-white/70 mb-2 uppercase">
-            {HOT_SALE.countdownLabel}
-          </p>
-          <Countdown endDate={HOT_SALE.endDate} variant="blocks" theme="dark" />
-        </div>
-
-        {/* CTAs */}
+    {/* ════════ SECCIÓN 2: COPY + COUNTDOWN + CTAs sobre fondo blanco ════════ */}
+    <section className="bg-white py-12 md:py-16 border-b border-neutral-gray/15">
+      <div className="container-custom">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          className="grid md:grid-cols-2 gap-10 md:gap-16 items-center"
         >
-          <Button
-            to="/bicicletas-electricas/lola-cruiser"
-            variant="primary"
-            className="text-base px-7 py-3.5 uppercase font-bold rounded-full"
-          >
-            Quiero la LOLA
-          </Button>
-          <Button
-            to="/bicicletas-electricas/xxxx-expedition"
-            variant="secondary"
-            className="text-base px-7 py-3.5 uppercase font-bold rounded-full !border-white !text-white hover:!bg-white hover:!text-neutral-black"
-          >
-            Quiero la XXXX
-          </Button>
+          {/* Columna 1: Copy */}
+          <div>
+            <div className="inline-flex items-center gap-2 bg-primary-orange text-white px-3 py-1.5 rounded-full mb-4 shadow-sm">
+              <span className="font-barlow font-black text-xs tracking-[0.2em] uppercase">
+                🔥 {HOT_SALE.label} · {HOT_SALE.badge}
+              </span>
+            </div>
+            <h1 className="font-barlow font-black text-neutral-black text-3xl sm:text-4xl md:text-[2.75rem] leading-[1.05] uppercase mb-4 tracking-tight">
+              Hasta <span className="text-primary-orange">6 cuotas sin interés</span> y $200.000 off
+            </h1>
+            <p className="font-neue text-neutral-darkGreen text-base md:text-lg leading-relaxed mb-6 max-w-xl">
+              LOLA desde <strong className="text-neutral-black">$1.800.000</strong> · XXXX desde{' '}
+              <strong className="text-neutral-black">$2.500.000</strong>. Envío gratis a todo el país.
+              Sólo por la web hasta el miércoles 13/05.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                to="/bicicletas-electricas/lola-cruiser"
+                variant="primary"
+                className="text-base px-7 py-3.5 uppercase font-bold rounded-full"
+              >
+                Quiero la LOLA
+              </Button>
+              <Button
+                to="/bicicletas-electricas/xxxx-expedition"
+                variant="secondary"
+                className="text-base px-7 py-3.5 uppercase font-bold rounded-full"
+              >
+                Quiero la XXXX
+              </Button>
+            </div>
+          </div>
+
+          {/* Columna 2: Countdown */}
+          <div className="md:justify-self-end w-full md:w-auto">
+            <div className="bg-primary-beige border border-primary-orange/25 rounded-2xl p-6 md:p-7 shadow-sm">
+              <p className="font-barlow font-bold text-[11px] tracking-[0.25em] text-primary-orange mb-3 uppercase text-center md:text-left">
+                {HOT_SALE.countdownLabel} · 11 al 13 de mayo
+              </p>
+              <Countdown
+                endDate={HOT_SALE.endDate}
+                variant="blocks"
+                theme="light"
+                className="justify-center md:justify-start"
+              />
+              <p className="font-neue text-xs text-neutral-darkGreen/70 mt-3 text-center md:text-left">
+                Envío gratis a todo el país · Promo solo por la web
+              </p>
+            </div>
+          </div>
         </motion.div>
-      </motion.div>
-    </div>
-  </section>
+      </div>
+    </section>
+  </>
 );
 
 export default HeroSection;
