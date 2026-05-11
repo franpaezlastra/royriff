@@ -46,6 +46,10 @@ function royriff_app_get_route_metadata() {
     $path = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
     $path = trim($path, '/');
 
+    // Hot Sale flag — mirror del frontend promoConfig.js + schema.php.
+    // Cuando active=true, los meta tags Open Graph y SEO mencionan la promoción.
+    $hot_sale_active = true;
+
     // OG images servidas desde el plugin (path con 200 OK garantizado).
     // Antes apuntaban al root del dominio (`/og-*.webp`) que solo funcionaba para `og-image.webp`
     // (subida manual a public_html); las de productos redirigían 301 al home y rompían el preview en redes.
@@ -56,8 +60,12 @@ function royriff_app_get_route_metadata() {
 
     $routes = array(
         '' => array(
-            'title' => 'Roy Riff | Bicicletas Eléctricas Premium en Argentina',
-            'description' => 'Bicicletas eléctricas LOLA y XXXX en Argentina. Envío gratis a todo el país, financiación en cuotas y test ride en nuestro local de Yerba Buena, Tucumán.',
+            'title' => $hot_sale_active
+                ? '🔥 HOT SALE 3 días | Roy Riff Bicicletas Eléctricas'
+                : 'Roy Riff | Bicicletas Eléctricas Premium en Argentina',
+            'description' => $hot_sale_active
+                ? '🔥 HOT SALE web hasta el miércoles: LOLA $1.800.000 · XXXX $2.500.000. Envío gratis, 6 cuotas sin interés y ahorro de $200.000.'
+                : 'Bicicletas eléctricas LOLA y XXXX en Argentina. Envío gratis a todo el país, financiación en cuotas y test ride en nuestro local de Yerba Buena, Tucumán.',
             'og_image' => $home_og_image,
         ),
         'local' => array(
@@ -69,23 +77,39 @@ function royriff_app_get_route_metadata() {
             'description' => 'Galería de fotos de Roy Riff: clientes con sus bicis eléctricas, productos LOLA y XXXX, vida de marca y eventos en Tucumán.',
         ),
         'bicicletas-electricas/lola-cruiser' => array(
-            'title' => 'Roy Riff LOLA | E-Bike Urbana 500W con frenos hidráulicos',
-            'description' => 'LOLA, bicicleta eléctrica urbana de Roy Riff. Motor 500W, batería 48V 10.4Ah extraíble, autonomía 40-65km, frenos hidráulicos. 100% legal sin patente.',
+            'title' => $hot_sale_active
+                ? '🔥 LOLA Cruiser $1.800.000 HOT SALE | Roy Riff'
+                : 'Roy Riff LOLA | E-Bike Urbana 500W con frenos hidráulicos',
+            'description' => $hot_sale_active
+                ? 'HOT SALE LOLA: $1.800.000 efectivo (antes $2.000.000) o 6 cuotas SIN interés de $385.000. Solo hasta el miércoles. Envío gratis a todo el país.'
+                : 'LOLA, bicicleta eléctrica urbana de Roy Riff. Motor 500W, batería 48V 10.4Ah extraíble, autonomía 40-65km, frenos hidráulicos. 100% legal sin patente.',
             'og_image' => $lola_og_image,
         ),
         'bicicletas-electricas/lola-cruiser/elegir' => array(
-            'title' => 'Comprar LOLA Cruiser | $2.000.000 efectivo · Envío gratis | Roy Riff',
-            'description' => 'Elegí color y cantidad de tu LOLA Cruiser. Pagás $2.000.000 en efectivo o 6 cuotas fijas de $402.000. Envío gratis a todo el país. Garantía 2 años cuadro.',
+            'title' => $hot_sale_active
+                ? '🔥 Comprar LOLA $1.800.000 HOT SALE | Roy Riff'
+                : 'Comprar LOLA Cruiser | $2.000.000 efectivo · Envío gratis | Roy Riff',
+            'description' => $hot_sale_active
+                ? 'HOT SALE: elegí color y llevate la LOLA por $1.800.000 efectivo o 6 cuotas SIN interés de $385.000. Envío gratis. Solo por la web hasta el miércoles.'
+                : 'Elegí color y cantidad de tu LOLA Cruiser. Pagás $2.000.000 en efectivo o 6 cuotas fijas de $402.000. Envío gratis a todo el país. Garantía 2 años cuadro.',
             'og_image' => $lola_og_image,
         ),
         'bicicletas-electricas/xxxx-expedition' => array(
-            'title' => 'Roy Riff XXXX Expedition | Fat Tire 500W con 90km autonomía',
-            'description' => 'XXXX Expedition, bici eléctrica fat tire de Roy Riff. 90km autonomía, batería 48V 20Ah, doble suspensión. 100% legal sin patente. Para quien va más lejos.',
+            'title' => $hot_sale_active
+                ? '🔥 XXXX Expedition $2.500.000 HOT SALE | Roy Riff'
+                : 'Roy Riff XXXX Expedition | Fat Tire 500W con 90km autonomía',
+            'description' => $hot_sale_active
+                ? 'HOT SALE XXXX: $2.500.000 efectivo (antes $2.700.000) o 6 cuotas SIN interés de $534.667. Solo hasta el miércoles. Envío gratis a todo el país.'
+                : 'XXXX Expedition, bici eléctrica fat tire de Roy Riff. 90km autonomía, batería 48V 20Ah, doble suspensión. 100% legal sin patente. Para quien va más lejos.',
             'og_image' => $xxxx_og_image,
         ),
         'bicicletas-electricas/xxxx-expedition/elegir' => array(
-            'title' => 'Comprar XXXX Expedition | $2.700.000 efectivo · Envío gratis | Roy Riff',
-            'description' => 'Elegí color y cantidad de tu XXXX Expedition. Pagás $2.700.000 en efectivo o 6 cuotas fijas de $536.167. Envío gratis a todo el país. Garantía 2 años cuadro.',
+            'title' => $hot_sale_active
+                ? '🔥 Comprar XXXX $2.500.000 HOT SALE | Roy Riff'
+                : 'Comprar XXXX Expedition | $2.700.000 efectivo · Envío gratis | Roy Riff',
+            'description' => $hot_sale_active
+                ? 'HOT SALE: elegí color y llevate la XXXX por $2.500.000 efectivo o 6 cuotas SIN interés de $534.667. Envío gratis. Solo por la web hasta el miércoles.'
+                : 'Elegí color y cantidad de tu XXXX Expedition. Pagás $2.700.000 en efectivo o 6 cuotas fijas de $536.167. Envío gratis a todo el país. Garantía 2 años cuadro.',
             'og_image' => $xxxx_og_image,
         ),
         'bicicletas-electricas/comparacion-ebike-royriff' => array(
@@ -97,8 +121,12 @@ function royriff_app_get_route_metadata() {
             'description' => 'Reservá un test ride gratis en Yerba Buena, Tucumán. Probá la LOLA o la XXXX en la calle, sin compromiso. Coordinamos por WhatsApp en 1 minuto.',
         ),
         'financiacion' => array(
-            'title' => 'Financiación Roy Riff | Cuotas Bicicletas Eléctricas',
-            'description' => 'Hasta 12 cuotas con Mercado Pago. Recargo transparente: 3 cuotas +11%, 6 cuotas +20%, 9 cuotas +33%, 12 cuotas +44%. Efectivo y transferencia con descuento.',
+            'title' => $hot_sale_active
+                ? '🔥 Financiación Hot Sale | 6 cuotas SIN interés | Roy Riff'
+                : 'Financiación Roy Riff | Cuotas Bicicletas Eléctricas',
+            'description' => $hot_sale_active
+                ? 'HOT SALE: 6 cuotas SIN interés con tarjeta o ahorrá $200.000 en efectivo. LOLA $1.800.000 · XXXX $2.500.000. Vigente hasta el miércoles 13/05.'
+                : 'Hasta 12 cuotas con Mercado Pago. Recargo transparente: 3 cuotas +11%, 6 cuotas +20%, 9 cuotas +33%, 12 cuotas +44%. Efectivo y transferencia con descuento.',
         ),
         'envios' => array(
             'title' => 'Envíos Roy Riff | Gratis a todo Argentina o retiro Palermo',

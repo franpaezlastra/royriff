@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import SectionTitle from '../../components/common/SectionTitle';
 import Button from '../../components/common/Button';
 import Countdown from '../../components/common/Countdown';
-import PRODUCT_DATA from '../../utils/productData';
+import { getEffectiveProduct } from '../../utils/productData';
 import { formatPrice } from '../../utils/constants';
 import { HOT_SALE, isHotSaleActive } from '../../utils/promoConfig';
 
@@ -14,8 +14,8 @@ const NORMAL_INSTALLMENTS = [
 ];
 
 const Financiacion = () => {
-  const lola = PRODUCT_DATA['lola-cruiser'];
-  const xxxx = PRODUCT_DATA['xxxx-expedition'];
+  const lola = getEffectiveProduct('lola-cruiser');
+  const xxxx = getEffectiveProduct('xxxx-expedition');
   const isHotSale = isHotSaleActive();
 
   return (

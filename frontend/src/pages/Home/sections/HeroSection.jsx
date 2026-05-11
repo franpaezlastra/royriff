@@ -71,8 +71,8 @@ const HotSaleHero = () => (
       />
     </picture>
 
-    {/* Overlay para que la copy resalte */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/75" />
+    {/* Overlay sutil: deja respirar el banner arriba, oscurece abajo para que el copy se lea */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/30 to-black/70" />
 
     {/* Contenido */}
     <div className="container-custom relative z-10 min-h-[80vh] md:min-h-[90vh] flex items-end md:items-center pb-12 md:pb-0 pt-24">

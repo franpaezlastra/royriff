@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PRODUCTS, formatPrice } from '../../utils/constants';
-import PRODUCT_DATA from '../../utils/productData';
+import { getEffectiveProduct } from '../../utils/productData';
 import SectionTitle from '../../components/common/SectionTitle';
 import Button from '../../components/common/Button';
 
@@ -42,8 +42,8 @@ const PriceCell = ({ pricing }) => {
 };
 
 const Comparador = () => {
-  const lolaPricing = PRODUCT_DATA['lola-cruiser'].pricing;
-  const xxxxPricing = PRODUCT_DATA['xxxx-expedition'].pricing;
+  const lolaPricing = getEffectiveProduct('lola-cruiser').pricing;
+  const xxxxPricing = getEffectiveProduct('xxxx-expedition').pricing;
 
   return (
     <div className="py-12 md:py-20">

@@ -42,9 +42,9 @@ export const PRODUCTS = {
     // Usar siempre el slug real de WooCommerce
     slug: 'lola-cruiser',
     tagline: 'La cruiser para moverte por la ciudad sin transpirar',
-    price: 2412000,
+    price: 2310000, // Hot Sale price (anterior 2412000)
     installments: 6,
-    installmentPrice: 402000,
+    installmentPrice: 385000, // Hot Sale cuota (anterior 402000)
     discount: {
       method: 'Transferencia bancaria',
       percentage: 17,
@@ -91,9 +91,9 @@ export const PRODUCTS = {
     // Slug real de WooCommerce para XXXX
     slug: 'xxxx-expedition',
     tagline: 'Tu compañera de aventuras todoterreno',
-    price: 3217000,
+    price: 3208000, // Hot Sale price (anterior 3217000)
     installments: 6,
-    installmentPrice: 536167,
+    installmentPrice: 534667, // Hot Sale cuota (anterior 536167)
     discount: {
       method: 'Transferencia bancaria',
       amount: 2700000,

@@ -43,18 +43,20 @@ export const HOT_SALE = {
 };
 
 /**
- * Determina si la Hot Sale está activa AHORA según fecha actual + flag manual.
- * El flag `active` triunfa sobre las fechas (permite previsualización o extensión rápida).
+ * Determina si la Hot Sale está activa AHORA.
+ *
+ * El flag `active` es la autoridad: si está en `true`, renderiza Hot Sale
+ * (permite preview antes del horario público + activación inmediata).
+ * `endDate` actúa como safety net para auto-desactivar el miércoles 23:59
+ * sin requerir push/deploy manual si te olvidás de flipear el flag.
  */
 export const isHotSaleActive = () => {
   if (!HOT_SALE.active) return false;
   try {
-    const now = Date.now();
-    const start = new Date(HOT_SALE.startDate).getTime();
     const end = new Date(HOT_SALE.endDate).getTime();
-    return now >= start && now <= end;
+    return isNaN(end) ? true : Date.now() <= end;
   } catch {
-    return HOT_SALE.active;
+    return true;
   }
 };
 

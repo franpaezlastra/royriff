@@ -429,11 +429,24 @@ export const enrichProductData = (wcProduct) => {
 };
 
 /**
+ * Devuelve el producto hardcodeado con el pricing mergeado con Hot Sale (si aplica).
+ * Útil para páginas que NO pasan por enrichProductData (Financiacion, Comparador).
+ */
+export const getEffectiveProduct = (slug) => {
+  const base = PRODUCT_DATA[slug];
+  if (!base) return null;
+  return {
+    ...base,
+    pricing: mergeHotSalePricing(slug, base.pricing),
+  };
+};
+
+/**
  * Si la Hot Sale está activa, devuelve el pricing override para ese producto.
  * Mantiene la shape del pricing normal + agrega flags isHotSale, precioRegular y ahorroEfectivo.
  * Sólo expone 3 y 6 cuotas durante Hot Sale (9, 12 quedan ocultas en la UI).
  */
-const mergeHotSalePricing = (slug, normalPricing) => {
+export const mergeHotSalePricing = (slug, normalPricing) => {
   const hs = getHotSalePricing(slug);
   if (!hs || !normalPricing) return normalPricing;
   return {
