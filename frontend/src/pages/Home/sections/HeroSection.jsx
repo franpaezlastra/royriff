@@ -66,7 +66,7 @@ const HotSaleHero = () => (
         <img
           src={hotSaleMobile}
           alt="Roy Riff Hot Sale · 11 al 13 de mayo · hasta 6 cuotas sin interés y $200.000 off"
-          className="w-full h-auto object-cover max-h-[80vh] mx-auto block"
+          className="w-full h-auto block"
           loading="eager"
           fetchpriority="high"
         />

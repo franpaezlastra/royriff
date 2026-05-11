@@ -453,6 +453,7 @@ export const mergeHotSalePricing = (slug, normalPricing) => {
     ...normalPricing,
     efectivo: hs.efectivo,
     cuota6: hs.cuota6,
+    cuota3: hs.cuota3,
     ahorro: hs.cuota6Total - hs.efectivo,
     cuotas: { 3: hs.cuota3, 6: hs.cuota6 },
     cuota6Total: hs.cuota6Total,
