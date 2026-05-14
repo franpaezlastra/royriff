@@ -130,7 +130,7 @@ function royriff_app_get_localbusiness_schema() {
 function royriff_app_get_product_schema($slug) {
     // Hot Sale flag — espejo del frontend promoConfig.js.
     // Cuando active=true, schema.org refleja el precio Hot Sale (= 6 cuotas total).
-    $hot_sale_active = true;
+    $hot_sale_active = false;
     $hot_sale_end = '2026-05-13T23:59:59-03:00';
 
     $products = array(

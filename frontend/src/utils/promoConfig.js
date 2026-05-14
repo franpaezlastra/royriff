@@ -14,7 +14,7 @@
  */
 
 export const HOT_SALE = {
-  active: true,
+  active: false,
   startDate: '2026-05-11T08:00:00-03:00', // Lunes 11 May 08:00 ART
   endDate:   '2026-05-13T23:59:59-03:00', // Miércoles 13 May 23:59 ART
   label: 'HOT SALE',

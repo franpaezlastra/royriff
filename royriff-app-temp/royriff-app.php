@@ -48,7 +48,7 @@ function royriff_app_get_route_metadata() {
 
     // Hot Sale flag — mirror del frontend promoConfig.js + schema.php.
     // Cuando active=true, los meta tags Open Graph y SEO mencionan la promoción.
-    $hot_sale_active = true;
+    $hot_sale_active = false;
 
     // OG images servidas desde el plugin (path con 200 OK garantizado).
     // Antes apuntaban al root del dominio (`/og-*.webp`) que solo funcionaba para `og-image.webp`
