@@ -88,10 +88,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
         isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}
     >
-      {/* Overlay */}
+      {/* Overlay — bloquea el hover blanco que algunos browsers (Safari/macOS, themes) aplican
+          a <button> por default. Mantenemos semántica accesible con aria-label. */}
       <button
         type="button"
-        className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
+        className="absolute inset-0 bg-black/40 hover:bg-black/40 focus:bg-black/40 active:bg-black/40 backdrop-blur-[1px] appearance-none border-0 cursor-pointer"
         onClick={onClose}
         aria-label="Cerrar carrito"
       />
